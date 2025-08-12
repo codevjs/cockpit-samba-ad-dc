@@ -11,14 +11,14 @@ import {
 import { Loading, RenderError } from '../common';
 import { SearchIcon } from '@patternfly/react-icons';
 
-export default function List() {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState();
-    const [alertVisible, setAlertVisible] = useState(false);
-    const [searchValue, setSearchValue] = useState("");
+const List: React.FC = () => {
+    const [users, setUsers] = useState<string[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | undefined>();
+    const [alertVisible, setAlertVisible] = useState<boolean>(false);
+    const [searchValue, setSearchValue] = useState<string>("");
 
-    const onSearchInputChange = (newValue) => {
+    const onSearchInputChange = (newValue: string) => {
         setSearchValue(newValue);
     };
 
@@ -33,14 +33,14 @@ export default function List() {
     useEffect(() => {
         setLoading(true);
         const command = `samba-tool user list`;
-        const script = () => cockpit.script(command, { superuser: true, err: 'message' })
-                .done((data) => {
+        const script = () => (cockpit as any).script(command, { superuser: true, err: 'message' })
+                .done((data: string) => {
                     const splitData = data.split('\n');
                     const sortedData = splitData.sort();
                     setUsers(sortedData);
                     setLoading(false);
                 })
-                .catch((exception) => {
+                .catch((exception: { message: string }) => {
                     setError(exception.message);
                     setLoading(false);
                 });
@@ -67,9 +67,9 @@ export default function List() {
                 <CardBody>
                     <Loading loading={loading} />
                     <RenderError
-                        error={error}
+                        error={error || ""}
                         hideAlert={hideAlert}
-                        isAlertVisible={alertVisible}
+                        alertVisible={alertVisible}
                     />
                     {filteredList}
                 </CardBody>
@@ -77,3 +77,5 @@ export default function List() {
         </>
     );
 }
+
+export default List;

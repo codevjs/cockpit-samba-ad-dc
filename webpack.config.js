@@ -1,10 +1,10 @@
 const path = require("path");
-const copy = require("copy-webpack-plugin");
-const extract = require("mini-css-extract-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const fs = require("fs");
 const webpack = require("webpack");
 const CompressionPlugin = require("compression-webpack-plugin");
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 var externals = {
     cockpit: "cockpit",
@@ -160,9 +160,13 @@ info.files.forEach(function(value) {
 info.files = files;
 
 var plugins = [
-    new copy(info.files),
-    new extract({ filename: "[name].css" }),
-    new MiniCssExtractPlugin()
+    new CopyWebpackPlugin({
+        patterns: info.files
+    }),
+    new MiniCssExtractPlugin({ filename: "[name].css" }),
+    new ESLintPlugin({
+        extensions: ['js', 'jsx', 'ts', 'tsx']
+    })
 ];
 
 /* Only minimize when in production mode */
@@ -171,10 +175,10 @@ if (production) {
     output.filename = "[name].min.js";
 
     plugins.unshift(new CompressionPlugin({
-        asset: "[path].gz[query]",
+        filename: "[path][base].gz",
+        algorithm: "gzip",
         test: /\.(js|html)$/,
-        minRatio: 0.9,
-        deleteOriginalAssets: true
+        minRatio: 0.9
     }));
 }
 
@@ -200,6 +204,7 @@ module.exports = {
     mode: production ? 'production' : 'development',
     resolve: {
         modules: [ nodedir ],
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },
     entry: info.entries,
     externals: externals,
@@ -208,21 +213,20 @@ module.exports = {
     module: {
         rules: [
             {
-                enforce: 'pre',
-                exclude: /node_modules/,
-                loader: 'eslint-loader',
-                test: /\.(js|jsx)$/
-            },
-            {
+                test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
                 use: babel_loader,
-                test: /\.(js|jsx)$/
+            },
+            {
+                test: /\.(ts|tsx)$/,
+                exclude: /node_modules/,
+                use: 'ts-loader',
             },
             /* HACK: remove unwanted fonts from PatternFly's css */
             {
                 test: /patternfly-4-cockpit.scss$/,
                 use: [
-                    extract.loader,
+                    MiniCssExtractPlugin.loader,
                     {
                         loader: 'css-loader',
                         options: {
@@ -252,7 +256,6 @@ module.exports = {
                         loader: 'sass-loader',
                         options: {
                             sourceMap: true,
-                            outputStyle: 'compressed',
                         },
                     },
                 ]
@@ -261,7 +264,7 @@ module.exports = {
                 test: /\.s?css$/,
                 exclude: /patternfly-4-cockpit.scss/,
                 use: [
-                    extract.loader,
+                    MiniCssExtractPlugin.loader,
                     {
                         loader: 'css-loader',
                         options: {
@@ -273,7 +276,6 @@ module.exports = {
                         loader: 'sass-loader',
                         options: {
                             sourceMap: true,
-                            outputStyle: 'compressed',
                         },
                     },
                 ]
