@@ -23,7 +23,7 @@ var production = process.env.NODE_ENV === 'production';
 var info = {
     entries: {
         index: [
-            "./index.js"
+            "./index.tsx"
         ],
 
         "computer/index": [
@@ -91,7 +91,6 @@ var info = {
         ]
     },
     files: [
-        "css",
         "index.html",
         "computer/computer.html",
         "domain/domain.html",
@@ -165,7 +164,8 @@ var plugins = [
     }),
     new MiniCssExtractPlugin({ filename: "[name].css" }),
     new ESLintPlugin({
-        extensions: ['js', 'jsx', 'ts', 'tsx']
+        extensions: ['js', 'jsx', 'ts', 'tsx'],
+        exclude: 'node_modules'
     })
 ];
 
@@ -195,7 +195,8 @@ var babel_loader = {
                     opera: "44"
                 }
             }],
-            "@babel/preset-react"
+            "@babel/preset-react",
+            "@babel/preset-typescript"
         ]
     }
 };
@@ -205,6 +206,11 @@ module.exports = {
     resolve: {
         modules: [ nodedir ],
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        alias: {
+            '@': path.resolve(__dirname, 'src'),
+            '@/components': path.resolve(__dirname, 'src/components'),
+            '@/lib': path.resolve(__dirname, 'src/lib'),
+        },
     },
     entry: info.entries,
     externals: externals,
@@ -220,49 +226,19 @@ module.exports = {
             {
                 test: /\.(ts|tsx)$/,
                 exclude: /node_modules/,
-                use: 'ts-loader',
-            },
-            /* HACK: remove unwanted fonts from PatternFly's css */
-            {
-                test: /patternfly-4-cockpit.scss$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    babel_loader,
                     {
-                        loader: 'css-loader',
+                        loader: 'ts-loader',
                         options: {
-                            sourceMap: true,
-                            url: false
-                        }
-                    },
-                    {
-                        loader: 'string-replace-loader',
-                        options: {
-                            multiple: [
-                                {
-                                    search: /src:url\("patternfly-icons-fake-path\/pficon[^}]*/g,
-                                    replace: "src:url('fonts/patternfly.woff')format('woff');",
-                                },
-                                {
-                                    search: /@font-face[^}]*patternfly-fonts-fake-path[^}]*}/g,
-                                    replace: '',
-                                },
-                            ]
+                            configFile: path.resolve(__dirname, 'tsconfig.json'),
+                            transpileOnly: false,
                         },
                     },
-                    {
-                        loader: 'resolve-url-loader'
-                    },
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            sourceMap: true,
-                        },
-                    },
-                ]
+                ],
             },
             {
                 test: /\.s?css$/,
-                exclude: /patternfly-4-cockpit.scss/,
                 use: [
                     MiniCssExtractPlugin.loader,
                     {
@@ -271,6 +247,17 @@ module.exports = {
                             sourceMap: true,
                             url: false
                         }
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            postcssOptions: {
+                                plugins: [
+                                    require('tailwindcss'),
+                                    require('autoprefixer'),
+                                ],
+                            },
+                        },
                     },
                     {
                         loader: 'sass-loader',
@@ -282,5 +269,13 @@ module.exports = {
             },
         ]
     },
-    plugins: plugins
+    plugins: plugins,
+    devServer: {
+        static: {
+            directory: path.join(__dirname, 'dist'),
+        },
+        compress: true,
+        port: 9000,
+        hot: true,
+    },
 };
