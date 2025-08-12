@@ -23,7 +23,6 @@
     "plugins": ["react", "react-hooks", "@typescript-eslint"],
     "rules": {
         "indent": "off",
-        "@typescript-eslint/indent": ["error", 4],
         "newline-per-chained-call": ["error", { "ignoreChainWithDepth": 2 }],
         "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
         "prefer-promise-reject-errors": ["error", { "allowEmptyReject": true }],
@@ -43,6 +42,8 @@
         "react/jsx-curly-spacing": "off",
         "react/jsx-indent-props": "off",
         "react/prop-types": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "off",
         "space-before-function-paren": "off",
         "standard/no-callback-literal": "off",
 

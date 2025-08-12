@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import ShowRoles from './show';
 import Seize from './seize';
 import Transfer from './transfer';
@@ -30,5 +30,7 @@ export default function FsmoManagement() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<FsmoManagement />, document.getElementById("fsmo"));
+    const container = document.getElementById("fsmo");
+    const root = createRoot(container);
+    root.render(<FsmoManagement />);
 });

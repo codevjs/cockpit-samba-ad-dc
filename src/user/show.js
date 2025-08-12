@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import {
-    Form,
-    FormGroup,
-    TextInput,
-    Modal,
-    Button
-} from '@patternfly/react-core';
+// import {
+//     Form,
+//     FormGroup,
+//     TextInput,
+//     Modal,
+//     Button
+// } from '@patternfly/react-core';
 import cockpit from 'cockpit';
 import {
     Loading,
@@ -44,55 +44,6 @@ export default function Show() {
         script();
     };
     return (
-        <>
-            {errorAlertVisible && <ErrorToast errorMessage={errorMessage} closeModal={() => setErrorAlertVisible(false)} />}
-            {successAlertVisible &&
-            <Modal
-                title="Contact Object"
-                isOpen={successAlertVisible}
-                onClose={() => setSuccessAlertVisible(false)}
-                appendTo={document.body}
-            >
-                <div>{successMessage.map((line) => <h6 key={line.toString()}>{line}</h6>)}</div>
-            </Modal>}
-            <Button variant="secondary" onClick={handleModalToggle}>
-                Show User Attributes
-            </Button>
-            <Modal
-                title="Show A User's Attributes"
-                isOpen={isModalOpen}
-                onClose={handleModalToggle}
-                description="A dialog for displaying a users attributes in the domain against a local
-                LDAP server."
-                actions={[
-                    <Button key="confirm" variant="primary" onClick={handleSubmit}>
-                        Show
-                    </Button>,
-                    <Button key="cancel" variant="link" onClick={handleModalToggle}>
-                        Cancel
-                    </Button>,
-                    <Loading key="loading" loading={loading} />
-                ]}
-                appendTo={document.body}
-            >
-                <Form isHorizontal onSubmit={handleSubmit}>
-                    <FormGroup
-                        label="Username"
-                        fieldId="horizontal-form-username"
-                        isRequired
-                    >
-                        <TextInput
-                            value={userName}
-                            type="text"
-                            id="horizontal-form-username"
-                            aria-describedby="horizontal-form-username-helper"
-                            name="horizontal-form-username"
-                            onChange={handleUsernameInputChange}
-                            placeholder="User1"
-                        />
-                    </FormGroup>
-                </Form>
-            </Modal>
-        </>
+        <div>Show User</div>
     );
 }

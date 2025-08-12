@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Get from './get';
 import Set from './set';
 import { Toolbar, ToolbarItem, ToolbarGroup, ToolbarContent } from '@patternfly/react-core';
@@ -26,5 +26,7 @@ export default function DSAcl() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<DSAcl />, document.getElementById("dsacl"));
+    const container = document.getElementById("dsacl");
+    const root = createRoot(container);
+    root.render(<DSAcl />);
 });

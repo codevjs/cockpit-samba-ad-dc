@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Create from './create';
 import Cleanup from './cleanup';
 import Delete from './delete';
@@ -56,5 +56,7 @@ export default function DNSManagement() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<DNSManagement />, document.getElementById("dns"));
+    const container = document.getElementById("dns");
+    const root = createRoot(container);
+    root.render(<DNSManagement />);
 });

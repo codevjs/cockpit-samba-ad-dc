@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import List from './list';
 import Create from './add';
 import Delete from './delete';
@@ -32,5 +32,7 @@ export default function SpnManagement() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<SpnManagement />, document.getElementById("spn"));
+    const container = document.getElementById("spn");
+    const root = createRoot(container);
+    root.render(<SpnManagement />);
 });

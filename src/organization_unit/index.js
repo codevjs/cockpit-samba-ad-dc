@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import List from './list';
 import ListObjects from './listobjects';
 import Create from './create';
@@ -44,5 +44,7 @@ export default function OrgUnit() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<OrgUnit />, document.getElementById("org-unit"));
+    const container = document.getElementById("org-unit");
+    const root = createRoot(container);
+    root.render(<OrgUnit />);
 });

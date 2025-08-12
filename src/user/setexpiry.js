@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import {
-    Form,
-    FormGroup,
-    TextInput,
-    Modal,
-    Button,
-    Switch,
-} from '@patternfly/react-core';
+// import {
+//     Form,
+//     FormGroup,
+//     TextInput,
+//     Modal,
+//     Button,
+//     Switch,
+// } from '@patternfly/react-core';
 import cockpit from 'cockpit';
 import {
     Loading,
@@ -78,68 +78,6 @@ export default function SetExpiry() {
         }
     };
     return (
-        <>
-            {errorAlertVisible && <ErrorToast errorMessage={errorMessage} closeModal={() => setErrorAlertVisible(false)} />}
-            {successAlertVisible && <SuccessToast successMessage={successMessage} closeModal={() => setSuccessAlertVisible(false)} />}
-            <Button variant="secondary" onClick={handleModalToggle}>
-                Set Expiry
-            </Button>
-            <Modal
-                title="Set expiry for a user"
-                isOpen={isModalOpen}
-                onClose={handleModalToggle}
-                description="A dialog for setting expiry for a user "
-                actions={[
-                    <Button key="confirm" variant="primary" onClick={handleSubmit}>
-                        Submit
-                    </Button>,
-                    <Button key="cancel" variant="link" onClick={handleModalToggle}>
-                        Cancel
-                    </Button>,
-                    <Loading key="loading" loading={loading} />
-                ]}
-                appendTo={document.body}
-            >
-                <Form isHorizontal onSubmit={handleSubmit}>
-                    <FormGroup
-                        label="Username"
-                        fieldId="horizontal-form-username"
-                    >
-                        <TextInput
-                            value={userName}
-                            type="text"
-                            id="horizontal-form-username"
-                            aria-describedby="horizontal-form-username-helper"
-                            name="horizontal-form-username"
-                            onChange={handleUsernameInputChange}
-                            placeholder="User1"
-                        />
-                    </FormGroup>
-                    <FormGroup
-                        label="Days"
-                        fieldId="horizontal-form-days"
-                    >
-                        <TextInput
-                            value={days}
-                            type="number"
-                            id="horizontal-form-days"
-                            aria-describedby="horizontal-form-days-helper"
-                            name="horizontal-form-days"
-                            onChange={handleDaysInputChange}
-                            placeholder="10"
-                        />
-                    </FormGroup>
-                    <FormGroup>
-                        <Switch
-                            id="expiry-switch"
-                            label="No Expiry"
-                            labelOff={`User is set to expire in ${days} days`}
-                            isChecked={isChecked}
-                            onChange={handleSwitchChange}
-                        />
-                    </FormGroup>
-                </Form>
-            </Modal>
-        </>
+        <div>Set Expiry</div>
     );
 }

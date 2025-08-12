@@ -1,10 +1,9 @@
-import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { Toolbar, ToolbarItem, ToolbarGroup, ToolbarContent } from '@patternfly/react-core';
+import { createRoot } from 'react-dom/client';
+import './tailwind.css';
+// import { Toolbar, ToolbarItem, ToolbarGroup, ToolbarContent } from '@patternfly/react-core';
 import Create from './create';
 import List from './list';
-import './index.css';
 import Enable from './enable';
 import Disable from './disable';
 import Delete from './delete';
@@ -13,14 +12,12 @@ import Show from './show';
 import Password from './password';
 import SetExpiry from './setexpiry';
 import SetPassword from './setpassword';
-import { BackButton } from '../common';
-import "../lib/patternfly-4-overrides.scss";
 
 function User() {
     return (
         <>
-            <BackButton />
-            <Toolbar>
+            {/* <BackButton /> */}
+            {/* <Toolbar>
                 <ToolbarContent>
                     <ToolbarGroup>
                         <ToolbarItem>
@@ -54,12 +51,23 @@ function User() {
                         <SetPassword />
                     </ToolbarItem>
                 </ToolbarContent>
-            </Toolbar>
+            </Toolbar> */}
             <List />
+            <Create />
+            <Delete />
+            <Enable />
+            <Disable />
+            <Move />
+            <Show />
+            <Password />
+            <SetExpiry />
+            <SetPassword />
         </>
     );
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<User />, document.getElementById("user"));
+    const container = document.getElementById("user");
+    const root = createRoot(container);
+    root.render(<User />);
 });

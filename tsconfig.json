@@ -1,5 +1,10 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/components/*": ["src/components/*"],
+      "@/lib/utils": ["src/lib/utils"]
+    },
     "target": "es6",
     "lib": [
       "dom",
@@ -19,6 +24,7 @@
     "jsx": "react"
   },
   "include": [
-    "src"
+    "src",
+    "test"
   ]
 }

@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Backup from './backup';
 import Create from './create';
 import Delete from './delete';
@@ -82,5 +82,7 @@ export default function GPOManagement() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<GPOManagement />, document.getElementById("gpo"));
+    const container = document.getElementById("gpo");
+    const root = createRoot(container);
+    root.render(<GPOManagement />);
 });
