@@ -12,7 +12,13 @@ jest.mock('cockpit', () => ({
 
 describe('List component', () => {
     it('should render without crashing', () => {
-        render(<List />);
-        expect(screen.getByLabelText('search users')).toBeInTheDocument();
+        const mockProps = {
+            users: [],
+            loading: false,
+            error: null,
+            onRefresh: jest.fn(),
+        };
+        render(<List {...mockProps} />);
+        expect(screen.getByText('No users found')).toBeInTheDocument();
     });
 });

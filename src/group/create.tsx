@@ -1,225 +1,261 @@
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, Plus, Users } from 'lucide-react';
+import { z } from 'zod';
+
+import { Button } from "@/components/ui/button";
 import {
-  Modal,
-  ModalVariant,
-  Button,
-  Form,
-  FormGroup,
-  TextInput,
-  TextArea,
-  FormSelect,
-  FormSelectOption,
-  Alert,
-  Spinner
-} from '@patternfly/react-core';
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+
 import { useGroupMutations } from './hooks/useGroupMutations';
-import { CreateGroupInput } from '../types/samba';
-import { SuccessToast, ErrorToast } from '../common';
+import type { CreateGroupInput } from '@/types/samba';
+
+const createGroupSchema = z.object({
+    name: z.string()
+        .min(1, 'Group name is required')
+        .regex(/^[a-zA-Z0-9_-]+$/, 'Group name can only contain letters, numbers, underscores, and hyphens'),
+    displayName: z.string().optional(),
+    description: z.string().optional(),
+    groupType: z.enum(['Security', 'Distribution']),
+    groupScope: z.enum(['DomainLocal', 'Global', 'Universal']).optional(),
+    organizationalUnit: z.string().optional(),
+});
+
+type CreateGroupFormData = z.infer<typeof createGroupSchema>;
 
 interface CreateGroupDialogProps {
-  isOpen?: boolean;
-  onClose?: () => void;
-  onGroupCreated?: () => void;
+    onGroupCreated?: (group: any) => void;
+    trigger?: React.ReactNode;
 }
 
-export const CreateGroupDialog: React.FC<CreateGroupDialogProps> = ({
-  isOpen: externalIsOpen,
-  onClose: externalOnClose,
-  onGroupCreated
-}) => {
-  const [internalIsOpen, setInternalIsOpen] = useState(false);
-  const [formData, setFormData] = useState<CreateGroupInput>({
-    name: '',
-    description: '',
-    groupType: 'Security'
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+export default function CreateGroupDialog({ onGroupCreated, trigger }: CreateGroupDialogProps) {
+    const [isOpen, setIsOpen] = useState(false);
 
-  // Use external state if provided, otherwise use internal state
-  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const onClose = externalOnClose || (() => setInternalIsOpen(false));
+    const form = useForm<CreateGroupFormData>({
+        resolver: zodResolver(createGroupSchema),
+        defaultValues: {
+            name: '',
+            displayName: '',
+            description: '',
+            groupType: 'Security',
+            groupScope: 'Global',
+            organizationalUnit: '',
+        },
+    });
 
-  const { createGroup } = useGroupMutations(
-    () => {
-      // Success callback
-      setSuccessMessage(`Group "${formData.name}" created successfully`);
-      setFormData({ name: '', description: '', groupType: 'Security' });
-      setError(null);
-      onGroupCreated?.();
-      onClose();
-    },
-    (errorMessage: string) => {
-      // Error callback
-      setError(errorMessage);
-    }
-  );
+    const { createGroup, isLoading, error } = useGroupMutations(
+        () => {
+            // Success callback
+            setIsOpen(false);
+            form.reset();
+            onGroupCreated?.({});
+        },
+        (errorMessage: string) => {
+            // Error callback is already handled by the hook
+            console.error('Create group error:', errorMessage);
+        }
+    );
 
-  const handleSubmit = async () => {
-    if (!formData.name.trim()) {
-      setError('Group name is required');
-      return;
-    }
+    const onSubmit = async (data: CreateGroupFormData) => {
+        await createGroup(data);
+    };
 
-    if (!/^[a-zA-Z0-9_-]+$/.test(formData.name)) {
-      setError('Group name can only contain letters, numbers, underscores, and hyphens');
-      return;
-    }
+    const handleOpenChange = (open: boolean) => {
+        setIsOpen(open);
+        if (!open) {
+            form.reset();
+        }
+    };
 
-    try {
-      setLoading(true);
-      setError(null);
-      await createGroup(formData);
-    } catch (err) {
-      // Error is already handled by the mutation hook
-    } finally {
-      setLoading(false);
-    }
-  };
+    return (
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+            <DialogTrigger asChild>
+                {trigger || (
+                    <Button>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create Group
+                    </Button>
+                )}
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>Create Group</DialogTitle>
+                    <DialogDescription>
+                        Create a new Active Directory group. Fill in the required information below.
+                    </DialogDescription>
+                </DialogHeader>
 
-  const handleModalToggle = () => {
-    if (externalIsOpen === undefined) {
-      setInternalIsOpen(!internalIsOpen);
-    } else {
-      onClose();
-    }
-  };
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Group Name *</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Enter group name" {...field} />
+                                        </FormControl>
+                                        <FormDescription>
+                                            Unique name for the group (letters, numbers, underscore, hyphen only)
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-  const handleInputChange = (field: keyof CreateGroupInput) => (
-    value: string,
-    event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    // Clear error when user starts typing
-    if (error) {
-      setError(null);
-    }
-  };
+                            <FormField
+                                control={form.control}
+                                name="displayName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Display Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Enter display name" {...field} />
+                                        </FormControl>
+                                        <FormDescription>
+                                            Friendly name for the group
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
-  const resetForm = () => {
-    setFormData({ name: '', description: '', groupType: 'Security' });
-    setError(null);
-  };
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Description</FormLabel>
+                                    <FormControl>
+                                        <Textarea 
+                                            placeholder="Enter group description" 
+                                            className="resize-none" 
+                                            {...field} 
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        Optional description of the group's purpose
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-  const handleClose = () => {
-    resetForm();
-    onClose();
-  };
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="groupType"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Group Type *</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select group type" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="Security">Security Group</SelectItem>
+                                                <SelectItem value="Distribution">Distribution Group</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormDescription>
+                                            Security groups can be used for permissions
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-  const groupTypeOptions = [
-    { value: 'Security', label: 'Security Group', disabled: false },
-    { value: 'Distribution', label: 'Distribution Group', disabled: false }
-  ];
+                            <FormField
+                                control={form.control}
+                                name="groupScope"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Group Scope</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select group scope" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="DomainLocal">Domain Local</SelectItem>
+                                                <SelectItem value="Global">Global</SelectItem>
+                                                <SelectItem value="Universal">Universal</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormDescription>
+                                            Scope determines where the group can be used
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
-  return (
-    <>
-      {successMessage && (
-        <SuccessToast 
-          successMessage={successMessage} 
-          closeModal={() => setSuccessMessage(null)} 
-        />
-      )}
-      
-      {/* Trigger button when using internal state */}
-      {externalIsOpen === undefined && (
-        <Button variant="primary" onClick={handleModalToggle}>
-          Create Group
-        </Button>
-      )}
+                        <FormField
+                            control={form.control}
+                            name="organizationalUnit"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Organizational Unit</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Enter OU (e.g., ou=Groups,dc=example,dc=com)" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                        Leave empty to use the default Groups container
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-      <Modal
-        variant={ModalVariant.medium}
-        title="Create New Group"
-        isOpen={isOpen}
-        onClose={handleClose}
-        actions={[
-          <Button
-            key="create"
-            variant="primary"
-            onClick={handleSubmit}
-            isDisabled={loading || !formData.name.trim()}
-            isLoading={loading}
-            spinner={<Spinner size="sm" />}
-          >
-            {loading ? 'Creating...' : 'Create Group'}
-          </Button>,
-          <Button key="cancel" variant="link" onClick={handleClose}>
-            Cancel
-          </Button>
-        ]}
-        appendTo={document.body}
-      >
-        {error && (
-          <Alert variant="danger" title="Error" isInline style={{ marginBottom: '1rem' }}>
-            {error}
-          </Alert>
-        )}
-
-        <Form>
-          <FormGroup
-            label="Group Name"
-            isRequired
-            fieldId="group-name"
-            helperText="Group name can only contain letters, numbers, underscores, and hyphens"
-          >
-            <TextInput
-              isRequired
-              type="text"
-              id="group-name"
-              name="group-name"
-              value={formData.name}
-              onChange={handleInputChange('name')}
-              placeholder="e.g., developers, administrators"
-              validated={error && !formData.name.trim() ? 'error' : 'default'}
-            />
-          </FormGroup>
-
-          <FormGroup
-            label="Description"
-            fieldId="group-description"
-            helperText="Optional description for the group"
-          >
-            <TextArea
-              type="text"
-              id="group-description"
-              name="group-description"
-              value={formData.description}
-              onChange={handleInputChange('description')}
-              placeholder="Describe the purpose of this group"
-              rows={3}
-            />
-          </FormGroup>
-
-          <FormGroup
-            label="Group Type"
-            fieldId="group-type"
-            helperText="Security groups can be used for permissions, distribution groups for email"
-          >
-            <FormSelect
-              value={formData.groupType}
-              onChange={handleInputChange('groupType')}
-              id="group-type"
-              name="group-type"
-            >
-              {groupTypeOptions.map((option, index) => (
-                <FormSelectOption
-                  key={index}
-                  value={option.value}
-                  label={option.label}
-                  isDisabled={option.disabled}
-                />
-              ))}
-            </FormSelect>
-          </FormGroup>
-        </Form>
-      </Modal>
-    </>
-  );
-};
-
-export default CreateGroupDialog;
+                        <DialogFooter>
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => handleOpenChange(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={isLoading}>
+                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Create Group
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+}

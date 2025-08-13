@@ -1,6 +1,7 @@
 // User Data Management Hooks
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { UserAPI } from '@/services/user-api';
 import { ErrorHandler } from '@/lib/errors';
 import type { 
@@ -44,26 +45,36 @@ export const useUsers = (options: UseUsersOptions = {}): UseUsersReturn => {
     pagination: initialPagination 
   } = options;
 
-  const [users, setUsers] = useState<SambaUser[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const [filters, setFiltersState] = useState<FilterOptions>(initialFilters);
   const [sort, setSortState] = useState<SortOptions | undefined>(initialSort);
   const [pagination, setPaginationState] = useState<PaginationOptions | undefined>(initialPagination);
 
-  const fetchUsers = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const fetchedUsers = await UserAPI.list(filters);
-      
-      // Apply sorting if specified
-      let sortedUsers = [...fetchedUsers];
-      if (sort) {
-        sortedUsers.sort((a, b) => {
-          const aValue = (a as any)[sort.field];
-          const bValue = (b as any)[sort.field];
+  // Use React Query for data fetching
+  const { 
+    data: users = [], 
+    isLoading: loading, 
+    error: queryError,
+    refetch 
+  } = useQuery({
+    queryKey: ['users', filters],
+    queryFn: () => UserAPI.list(filters),
+    enabled: autoFetch,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  const error = queryError ? (queryError as Error).message : null;
+
+  // Apply sorting and filtering to the fetched data
+  const processedUsers = useMemo(() => {
+    let result = [...users];
+    
+    // Apply sorting if specified
+    if (sort) {
+      result.sort((a, b) => {
+        const aValue = (a as any)[sort.field];
+        const bValue = (b as any)[sort.field];
           
           if (aValue < bValue) return sort.direction === 'asc' ? -1 : 1;
           if (aValue > bValue) return sort.direction === 'asc' ? 1 : -1;
@@ -75,28 +86,21 @@ export const useUsers = (options: UseUsersOptions = {}): UseUsersReturn => {
       if (pagination) {
         const start = (pagination.page - 1) * pagination.pageSize;
         const end = start + pagination.pageSize;
-        sortedUsers = sortedUsers.slice(start, end);
+        result = result.slice(start, end);
       }
       
-      setUsers(sortedUsers);
-    } catch (err) {
-      const apiError = ErrorHandler.handle(err, 'useUsers.fetchUsers', {
-        showToast: false,
-        rethrow: false,
-      });
-      setError(apiError.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, sort, pagination]);
+      return result;
+    }, [users, sort, pagination]);
 
   const refresh = useCallback(async () => {
-    await fetchUsers();
-  }, [fetchUsers]);
+    await refetch();
+  }, [refetch]);
 
   const setFilters = useCallback((newFilters: FilterOptions) => {
     setFiltersState(newFilters);
-  }, []);
+    // Invalidate and refetch when filters change
+    queryClient.invalidateQueries({ queryKey: ['users'] });
+  }, [queryClient]);
 
   const setSort = useCallback((newSort: SortOptions) => {
     setSortState(newSort);
@@ -107,18 +111,11 @@ export const useUsers = (options: UseUsersOptions = {}): UseUsersReturn => {
   }, []);
 
   const clearError = useCallback(() => {
-    setError(null);
+    // React Query handles error state automatically
   }, []);
 
-  // Auto-fetch when dependencies change
-  useEffect(() => {
-    if (autoFetch) {
-      fetchUsers();
-    }
-  }, [fetchUsers, autoFetch]);
-
   return {
-    users,
+    users: processedUsers,
     loading,
     error,
     total: users.length, // Note: This would need to be calculated differently with server-side pagination

@@ -22,8 +22,8 @@ import {
   CardBody,
   Text,
   TextContent
-} from '@patternfly/react-core';
-import { UsersIcon, ExclamationTriangleIcon } from '@patternfly/react-icons';
+} from '@/components/ui/dialog';
+import { UsersIcon, ExclamationTriangleIcon } from '@/components/ui/icons';
 import { useGroupMembers } from './hooks/useGroups';
 import { useGroupMutations } from './hooks/useGroupMutations';
 import { SuccessToast } from '../common';

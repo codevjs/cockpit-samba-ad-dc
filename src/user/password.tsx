@@ -72,7 +72,7 @@ export default function ChangePasswordDialog({
         confirm: false
     });
     const [showToasts, setShowToasts] = useState({ success: false, error: false });
-    const [passwordStrength, setPasswordStrength] = useState({ score: 0, feedback: [], isStrong: false });
+    const [passwordStrength, setPasswordStrength] = useState<{ score: number; feedback: string[]; isStrong: boolean }>({ score: 0, feedback: [], isStrong: false });
 
     const username = user?.username || propUsername || '';
     const displayName = user?.displayName || user?.username || username;

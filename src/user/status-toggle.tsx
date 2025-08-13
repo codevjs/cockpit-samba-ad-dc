@@ -26,7 +26,7 @@ interface UserStatusToggleProps {
     onStatusChanged?: (username: string, newStatus: boolean) => void;
     trigger?: React.ReactNode;
     variant?: 'button' | 'badge' | 'icon';
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'default' | 'sm' | 'lg' | 'icon';
 }
 
 export default function UserStatusToggle({ 

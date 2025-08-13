@@ -75,8 +75,12 @@ export interface CreateGroupInput {
   displayName?: string;
   description?: string;
   groupType: 'Security' | 'Distribution';
-  groupScope: 'DomainLocal' | 'Global' | 'Universal';
+  groupScope?: 'DomainLocal' | 'Global' | 'Universal';
   organizationalUnit?: string;
+}
+
+export interface UpdateGroupInput extends Partial<Omit<CreateGroupInput, 'name'>> {
+  name: string;
 }
 
 export interface SambaOrganizationalUnit {
@@ -155,6 +159,75 @@ export interface CreateGPOInput {
   description?: string;
 }
 
+// Domain Management Types
+export interface DomainInfo {
+  name: string;
+  realm: string;
+  domainSid: string;
+  forestFunctionLevel: string;
+  domainFunctionLevel: string;
+  schemaVersion: string;
+  netbiosName: string;
+  dnsRoot: string;
+  domainControllers: string[];
+  fsmoRoles: FSMORoles;
+}
+
+export interface DomainJoinInput {
+  domain: string;
+  username: string;
+  password: string;
+  organizationalUnit?: string;
+  computerName?: string;
+}
+
+export interface TrustRelationship {
+  name: string;
+  type: 'External' | 'Forest' | 'Realm';
+  direction: 'Incoming' | 'Outgoing' | 'Bidirectional';
+  status: 'Active' | 'Inactive' | 'Broken';
+  createdAt: Date;
+}
+
+export interface CreateTrustInput {
+  trustDomain: string;
+  trustPassword: string;
+  trustType: 'External' | 'Forest' | 'Realm';
+  trustDirection: 'Incoming' | 'Outgoing' | 'Bidirectional';
+}
+
+// Backup Types
+export interface BackupInfo {
+  id: string;
+  type: 'Online' | 'Offline';
+  path: string;
+  timestamp: Date;
+  size: number;
+  status: 'Success' | 'Failed' | 'InProgress';
+}
+
+export interface BackupOfflineInput {
+  targetdir: string;
+  server?: string;
+  realm?: string;
+}
+
+export interface BackupOnlineInput {
+  targetdir: string;
+  server?: string;
+}
+
+export interface BackupRenameInput {
+  oldname: string;
+  newname: string;
+}
+
+export interface BackupRestoreInput {
+  backup: string;
+  targetdir: string;
+  newbasedn?: string;
+}
+
 // API Response Types
 export interface ApiResponse<T> {
   success: boolean;
@@ -201,4 +274,294 @@ export interface ValidationError {
   field: string;
   message: string;
   code: string;
+}
+
+// Contact Management Types
+export interface SambaContact {
+  name: string;
+  givenName?: string;
+  initials?: string;
+  surname?: string;
+  displayName?: string;
+  distinguishedName: string;
+  description?: string;
+  mail?: string;
+  telephoneNumber?: string;
+  createdAt: Date;
+  organizationalUnit?: string;
+}
+
+export interface CreateContactInput {
+  givenName: string;
+  initials?: string;
+  surname: string;
+  displayName?: string;
+  description?: string;
+  mail?: string;
+  telephoneNumber?: string;
+  organizationalUnit?: string;
+}
+
+export interface UpdateContactInput extends Partial<Omit<CreateContactInput, 'givenName' | 'surname'>> {
+  name: string;
+  givenName?: string;
+  surname?: string;
+}
+
+// SPN Management Types
+export interface SambaSPN {
+  name: string;
+  user: string;
+  serviceName: string;
+  hostName?: string;
+  port?: number;
+  createdAt: Date;
+}
+
+export interface CreateSPNInput {
+  name: string;
+  user: string;
+}
+
+export interface DeleteSPNInput {
+  name: string;
+  user: string;
+}
+
+// FSMO (Flexible Single Master Operations) Types
+export interface FSMORole {
+  role: 'SchemaMaster' | 'DomainNamingMaster' | 'PDCEmulator' | 'RIDMaster' | 'InfrastructureMaster';
+  holder: string;
+  description: string;
+}
+
+export interface FSMORoles {
+  schemaMaster: string;
+  domainNamingMaster: string;
+  ridMaster: string;
+  pdcEmulator: string;
+  infrastructureMaster: string;
+}
+
+export interface TransferFSMORoleInput {
+  role: 'SchemaMaster' | 'DomainNamingMaster' | 'PDCEmulator' | 'RIDMaster' | 'InfrastructureMaster';
+  targetServer: string;
+}
+
+export interface SeizeFSMORoleInput {
+  role: 'SchemaMaster' | 'DomainNamingMaster' | 'PDCEmulator' | 'RIDMaster' | 'InfrastructureMaster';
+}
+
+// Sites and Subnets Management Types
+export interface SambaSite {
+  name: string;
+  description?: string;
+  subnets: string[];
+  servers: string[];
+  createdAt: Date;
+}
+
+export interface SambaSubnet {
+  name: string;
+  site: string;
+  description?: string;
+  createdAt: Date;
+}
+
+export interface CreateSiteInput {
+  name: string;
+  description?: string;
+}
+
+export interface CreateSubnetInput {
+  subnet: string;
+  site: string;
+  description?: string;
+}
+
+export interface SetSiteInput {
+  server: string;
+  site: string;
+}
+
+// Forest Management Types
+export interface SambaForest {
+  name: string;
+  domainName: string;
+  forestFunctionLevel: string;
+  domainFunctionLevel: string;
+  schemaVersion: string;
+  directoryServiceSettings: string[];
+  dsheuristics?: string;
+  createdAt: Date;
+}
+
+export interface ForestDirectoryServiceInfo {
+  name: string;
+  value: string;
+  description?: string;
+}
+
+export interface SetDSHeuristicsInput {
+  value: string;
+}
+
+// Organization Unit Management Types  
+export interface SambaOU {
+  name: string;
+  distinguishedName: string;
+  description?: string;
+  parentOU?: string;
+  children: SambaOUChild[];
+  objects: SambaOUObject[];
+  createdAt: Date;
+}
+
+export interface SambaOUChild {
+  name: string;
+  distinguishedName: string;
+  type: 'OU';
+}
+
+export interface SambaOUObject {
+  name: string;
+  distinguishedName: string;
+  type: 'User' | 'Computer' | 'Group' | 'Contact';
+  enabled?: boolean;
+}
+
+export interface CreateOUInput {
+  name: string;
+  description?: string;
+  parentOU?: string;
+}
+
+export interface UpdateOUInput {
+  distinguishedName: string;
+  description?: string;
+}
+
+export interface MoveOUInput {
+  ouDN: string;
+  targetParentDN: string;
+}
+
+export interface RenameOUInput {
+  ouDN: string;
+  newName: string;
+}
+
+// Directory Service ACL Management Types
+export interface DSACLEntry {
+  id: string;
+  objectDN: string;
+  trusteeDN: string;
+  permissions: string[];
+  accessType: 'Allow' | 'Deny';
+  inheritanceFlags: string[];
+  sddl: string;
+}
+
+export interface DSACLInfo {
+  objectDN: string;
+  entries: DSACLEntry[];
+  rawOutput: string[];
+}
+
+export interface SetDSACLInput {
+  url?: string;
+  car?: string;
+  action?: string;
+  objectDN?: string;
+  trusteeDN?: string;
+  sddl?: string;
+}
+
+// NT ACL Management Types
+export interface NTACLInfo {
+  filePath: string;
+  acl: string;
+  permissions: NTACLPermission[];
+  rawOutput: string[];
+}
+
+export interface NTACLPermission {
+  trustee: string;
+  permissions: string[];
+  accessType: 'Allow' | 'Deny';
+  inheritance: string[];
+}
+
+export interface GetNTACLInput {
+  file: string;
+  xattrBackend?: string;
+  eadbFile?: string;
+  useNtvfs?: string;
+  useS3fs?: string;
+  service?: string;
+}
+
+export interface SetNTACLInput {
+  acl: string;
+  file: string;
+  xattrBackend?: string;
+  eadbFile?: string;
+  useNtvfs?: string;
+  useS3fs?: string;
+  service?: string;
+}
+
+export interface ChangeDomSIDInput {
+  oldSid: string;
+  newSid: string;
+  xattrBackend?: string;
+  eadbFile?: string;
+  useNtvfs?: string;
+  useS3fs?: string;
+  service?: string;
+}
+
+export interface SysvolOperationInput {
+  xattrBackend?: string;
+  eadbFile?: string;
+  useNtvfs?: string;
+  useS3fs?: string;
+  service?: string;
+}
+
+export interface DOSInfo {
+  filePath: string;
+  attributes: string[];
+  rawOutput: string[];
+}
+
+// Delegation Management Types
+export interface DelegationInfo {
+  accountName: string;
+  delegationType: 'Constrained' | 'Unconstrained' | 'ResourceBased';
+  allowedServices: string[];
+  protocols: string[];
+  anyService: boolean;
+  anyProtocol: boolean;
+  rawOutput: string[];
+}
+
+export interface AddServiceDelegationInput {
+  accountName: string;
+  principal: string;
+}
+
+export interface DeleteServiceDelegationInput {
+  accountName: string;
+  principal: string;
+}
+
+export interface SetAnyServiceInput {
+  accountName: string;
+  enable: boolean;
+}
+
+export interface SetAnyProtocolInput {
+  accountName: string;
+  enable: boolean;
 }

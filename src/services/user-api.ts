@@ -93,7 +93,7 @@ export class UserAPI extends BaseAPI {
    * Create a new user
    */
   static async create(userData: CreateUserInput): Promise<SambaUser> {
-    this.validateRequired(userData, ['username', 'password']);
+    this.validateRequired(userData as unknown as Record<string, unknown>, ['username', 'password']);
     
     try {
       const command = this.buildCreateCommand(userData);
@@ -116,7 +116,7 @@ export class UserAPI extends BaseAPI {
    * Update user information
    */
   static async update(userData: UpdateUserInput): Promise<SambaUser> {
-    this.validateRequired(userData, ['username']);
+    this.validateRequired(userData as unknown as Record<string, unknown>, ['username']);
     
     try {
       // Build update commands

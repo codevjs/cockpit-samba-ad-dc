@@ -34,7 +34,7 @@ import { useUsers } from './hooks/useUsers';
 import type { FilterOptions } from '@/types/samba';
 
 interface UserManagementPageProps {
-    initialView?: 'list' | 'create';
+    initialView?: 'list' | 'management';
 }
 
 function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
@@ -46,10 +46,10 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
         users, 
         loading, 
         error, 
-        refreshUsers 
+        refresh: refreshUsers 
     } = useUsers({
-        initialFilters: filters,
-        autoRefresh: true,
+        filters: filters,
+        autoFetch: true,
     });
 
     const handleSearch = (query: string) => {
@@ -132,7 +132,7 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                 </div>
 
                 {/* Main Content */}
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+                <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'list' | 'management')} className="space-y-4">
                     <div className="flex items-center justify-between">
                         <TabsList>
                             <TabsTrigger value="list">User List</TabsTrigger>
@@ -239,7 +239,6 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                                     />
                                     <UserStatusToggle 
                                         variant="button"
-                                        className="w-full justify-start"
                                     />
                                 </CardContent>
                             </Card>

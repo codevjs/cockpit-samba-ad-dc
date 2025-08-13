@@ -1,24 +1,30 @@
 import React, { useState } from 'react';
 import {
-  Modal,
-  ModalVariant,
-  Button,
-  Form,
-  FormGroup,
-  TextInput,
-  FormSelect,
-  FormSelectOption,
-  Alert,
-  Text,
-  TextContent,
-  Spinner
-} from '@patternfly/react-core';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, Move } from 'lucide-react';
 import { useGroupMutations } from './hooks/useGroupMutations';
-import { SuccessToast } from '../common';
+import { toast } from 'sonner';
 
 interface MoveGroupDialogProps {
-  isOpen?: boolean;
-  onClose?: () => void;
+  isOpen: boolean;
+  onClose: () => void;
   onGroupMoved?: () => void;
   groupName?: string;
 }
@@ -36,32 +42,25 @@ const COMMON_OUS = [
 ];
 
 export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
-  isOpen: externalIsOpen,
-  onClose: externalOnClose,
+  isOpen,
+  onClose,
   onGroupMoved,
   groupName: externalGroupName
 }) => {
-  const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [internalGroupName, setInternalGroupName] = useState('');
   const [selectedOU, setSelectedOU] = useState('CN=Users,DC=domain,DC=local');
   const [customOU, setCustomOU] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Use external state if provided, otherwise use internal state
-  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const onClose = externalOnClose || (() => setInternalIsOpen(false));
   const groupName = externalGroupName || internalGroupName;
 
   const { moveGroup } = useGroupMutations(
     () => {
       // Success callback
       const targetOU = selectedOU === 'OU=Custom' ? customOU : selectedOU;
-      setSuccessMessage(`Group "${groupName}" moved to ${targetOU} successfully`);
-      setSelectedOU('CN=Users,DC=domain,DC=local');
-      setCustomOU('');
-      setError(null);
+      toast.success(`Group "${groupName}" moved to ${targetOU} successfully`);
+      resetForm();
       onGroupMoved?.();
       onClose();
     },
@@ -101,12 +100,11 @@ export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
     }
   };
 
-  const handleModalToggle = () => {
-    if (externalIsOpen === undefined) {
-      setInternalIsOpen(!internalIsOpen);
-    } else {
-      onClose();
-    }
+  const resetForm = () => {
+    setInternalGroupName('');
+    setSelectedOU('CN=Users,DC=domain,DC=local');
+    setCustomOU('');
+    setError(null);
   };
 
   const handleOUChange = (value: string) => {
@@ -130,13 +128,6 @@ export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
     }
   };
 
-  const resetForm = () => {
-    setInternalGroupName('');
-    setSelectedOU('CN=Users,DC=domain,DC=local');
-    setCustomOU('');
-    setError(null);
-  };
-
   const handleClose = () => {
     resetForm();
     onClose();
@@ -152,127 +143,100 @@ export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
   };
 
   return (
-    <>
-      {successMessage && (
-        <SuccessToast 
-          successMessage={successMessage} 
-          closeModal={() => setSuccessMessage(null)} 
-        />
-      )}
-
-      {/* Trigger button when using internal state */}
-      {externalIsOpen === undefined && (
-        <Button variant="secondary" onClick={handleModalToggle}>
-          Move Group
-        </Button>
-      )}
-
-      <Modal
-        variant={ModalVariant.medium}
-        title="Move Group to Different OU"
-        isOpen={isOpen}
-        onClose={handleClose}
-        actions={[
-          <Button
-            key="move"
-            variant="primary"
-            onClick={handleSubmit}
-            isDisabled={loading || !isFormValid()}
-            isLoading={loading}
-            spinner={<Spinner size="sm" />}
-          >
-            {loading ? 'Moving...' : 'Move Group'}
-          </Button>,
-          <Button key="cancel" variant="link" onClick={handleClose}>
-            Cancel
-          </Button>
-        ]}
-        appendTo={document.body}
-      >
-        {error && (
-          <Alert variant="danger" title="Error" isInline style={{ marginBottom: '1rem' }}>
-            {error}
-          </Alert>
-        )}
-
-        <TextContent style={{ marginBottom: '1.5rem' }}>
-          <Text component="p">
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[525px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Move className="h-4 w-4" />
+            Move Group to Different OU
+          </DialogTitle>
+          <DialogDescription>
             Move this group to a different Organizational Unit (OU). This will change the group's 
             location in the Active Directory hierarchy.
-          </Text>
-        </TextContent>
+          </DialogDescription>
+        </DialogHeader>
 
-        <Form>
-          {/* Show group name input only if not provided externally */}
-          {!externalGroupName && (
-            <FormGroup
-              label="Group Name"
-              isRequired
-              fieldId="group-name-input"
-              helperText="Enter the name of the group you want to move"
-            >
-              <TextInput
-                isRequired
-                type="text"
-                id="group-name-input"
-                name="group-name-input"
-                value={internalGroupName}
-                onChange={(_event, value) => handleGroupNameChange(value)}
-                placeholder="Enter group name"
-              />
-            </FormGroup>
+        <div className="space-y-4 py-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
 
-          <FormGroup
-            label="Target Organizational Unit"
-            isRequired
-            fieldId="target-ou"
-            helperText="Select the OU where you want to move this group"
-          >
-            <FormSelect
-              value={selectedOU}
-              onChange={(_event, value) => handleOUChange(value)}
-              id="target-ou"
-              name="target-ou"
-            >
-              {COMMON_OUS.map((option, index) => (
-                <FormSelectOption
-                  key={index}
-                  value={option.value}
-                  label={option.label}
-                />
-              ))}
-            </FormSelect>
-          </FormGroup>
+          {/* Show group name input only if not provided externally */}
+          {!externalGroupName && (
+            <div className="space-y-2">
+              <Label htmlFor="group-name">Group Name *</Label>
+              <Input
+                id="group-name"
+                value={internalGroupName}
+                onChange={(e) => handleGroupNameChange(e.target.value)}
+                placeholder="Enter group name"
+              />
+              <p className="text-sm text-muted-foreground">
+                Enter the name of the group you want to move
+              </p>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="target-ou">Target Organizational Unit *</Label>
+            <Select value={selectedOU} onValueChange={handleOUChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select target OU" />
+              </SelectTrigger>
+              <SelectContent>
+                {COMMON_OUS.map((option, index) => (
+                  <SelectItem key={index} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-muted-foreground">
+              Select the OU where you want to move this group
+            </p>
+          </div>
 
           {selectedOU === 'OU=Custom' && (
-            <FormGroup
-              label="Custom OU Path"
-              isRequired
-              fieldId="custom-ou"
-              helperText="Enter the full Distinguished Name (DN) of the target OU"
-            >
-              <TextInput
-                isRequired
-                type="text"
+            <div className="space-y-2">
+              <Label htmlFor="custom-ou">Custom OU Path *</Label>
+              <Input
                 id="custom-ou"
-                name="custom-ou"
                 value={customOU}
-                onChange={(_event, value) => handleCustomOUChange(value)}
+                onChange={(e) => handleCustomOUChange(e.target.value)}
                 placeholder="OU=YourOU,DC=domain,DC=local"
               />
-            </FormGroup>
+              <p className="text-sm text-muted-foreground">
+                Enter the full Distinguished Name (DN) of the target OU
+              </p>
+            </div>
           )}
 
           {groupName && (
-            <Alert variant="info" title="Current Operation" isInline style={{ marginTop: '1rem' }}>
-              Moving group <strong>{groupName}</strong> to: <br />
-              <code>{getTargetOU()}</code>
+            <Alert>
+              <AlertDescription>
+                Moving group <strong>{groupName}</strong> to: <br />
+                <code className="text-sm bg-muted px-1 py-0.5 rounded">{getTargetOU()}</code>
+              </AlertDescription>
             </Alert>
           )}
-        </Form>
-      </Modal>
-    </>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={loading || !isFormValid()}
+          >
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {loading ? 'Moving...' : 'Move Group'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

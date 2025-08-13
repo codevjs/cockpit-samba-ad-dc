@@ -18,8 +18,8 @@ import {
   FlexItem,
   Card,
   CardBody
-} from '@patternfly/react-core';
-import { UsersIcon, SearchIcon } from '@patternfly/react-icons';
+} from '@/components/ui/dialog';
+import { UsersIcon, SearchIcon } from '@/components/ui/icons';
 import { useGroupMembers } from './hooks/useGroups';
 
 interface ListMembersDialogProps {

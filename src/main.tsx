@@ -1,4 +1,6 @@
 import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -189,15 +191,33 @@ const getBadgeVariant = (badge?: string): 'default' | 'secondary' | 'destructive
     }
 };
 
+// Create React Query client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      retry: (failureCount, error) => {
+        // Don't retry for 4xx errors
+        if ((error as any)?.status >= 400 && (error as any)?.status < 500) {
+          return false;
+        }
+        return failureCount < 3;
+      },
+    },
+  },
+});
+
 export default function Main(): JSX.Element {
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight">Samba AD DC Management</h1>
-                <p className="text-muted-foreground mt-2">
-                    Comprehensive Active Directory Domain Controller management interface
-                </p>
-            </div>
+        <QueryClientProvider client={queryClient}>
+            <div className="container mx-auto px-4 py-8">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold tracking-tight">Samba AD DC Management</h1>
+                    <p className="text-muted-foreground mt-2">
+                        Comprehensive Active Directory Domain Controller management interface
+                    </p>
+                </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {managementModules.map((module) => {
@@ -258,5 +278,6 @@ export default function Main(): JSX.Element {
                 </div>
             </div>
         </div>
+        </QueryClientProvider>
     );
 }

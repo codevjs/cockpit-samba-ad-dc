@@ -22,8 +22,8 @@ import {
   EmptyStateHeader,
   Skeleton,
   Spinner
-} from '@patternfly/react-core';
-import { UsersIcon, InfoCircleIcon } from '@patternfly/react-icons';
+} from '@/components/ui/dialog';
+import { UsersIcon, InfoCircleIcon } from '@/components/ui/icons';
 import { useGroupDetails, useGroupMembers } from './hooks/useGroups';
 
 interface GroupDetailsDialogProps {

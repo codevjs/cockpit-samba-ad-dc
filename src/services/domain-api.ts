@@ -28,7 +28,7 @@ export class DomainAPI extends BaseAPI {
       return this.parseDomainInfo(output);
     } catch (error) {
       throw new APIError(
-        `Failed to get domain info: ${error.message}`,
+        `Failed to get domain info: ${(error as Error).message}`,
         'DOMAIN_INFO_FAILED',
         error
       );
@@ -65,7 +65,7 @@ export class DomainAPI extends BaseAPI {
       return await this.executeCommand(command);
     } catch (error) {
       throw new APIError(
-        `Failed to join domain: ${error.message}`,
+        `Failed to join domain: ${(error as Error).message}`,
         'DOMAIN_JOIN_FAILED',
         error
       );
@@ -90,7 +90,7 @@ export class DomainAPI extends BaseAPI {
       return await this.executeCommand(command);
     } catch (error) {
       throw new APIError(
-        `Failed to demote domain controller: ${error.message}`,
+        `Failed to demote domain controller: ${(error as Error).message}`,
         'DOMAIN_DEMOTE_FAILED',
         error
       );
@@ -112,7 +112,7 @@ export class DomainAPI extends BaseAPI {
       return await this.executeCommand(command);
     } catch (error) {
       throw new APIError(
-        `Failed to promote to domain controller: ${error.message}`,
+        `Failed to promote to domain controller: ${(error as Error).message}`,
         'DOMAIN_PROMOTE_FAILED',
         error
       );
@@ -132,7 +132,7 @@ export class DomainAPI extends BaseAPI {
       return await this.executeCommand(command);
     } catch (error) {
       throw new APIError(
-        `Failed to perform classic upgrade: ${error.message}`,
+        `Failed to perform classic upgrade: ${(error as Error).message}`,
         'DOMAIN_CLASSIC_UPGRADE_FAILED',
         error
       );
@@ -159,7 +159,7 @@ export class DomainAPI extends BaseAPI {
       return this.parseBackupInfo(output, 'offline');
     } catch (error) {
       throw new APIError(
-        `Failed to create offline backup: ${error.message}`,
+        `Failed to create offline backup: ${(error as Error).message}`,
         'DOMAIN_BACKUP_OFFLINE_FAILED',
         error
       );
@@ -189,7 +189,7 @@ export class DomainAPI extends BaseAPI {
       return this.parseBackupInfo(output, 'online');
     } catch (error) {
       throw new APIError(
-        `Failed to create online backup: ${error.message}`,
+        `Failed to create online backup: ${(error as Error).message}`,
         'DOMAIN_BACKUP_ONLINE_FAILED',
         error
       );
@@ -214,7 +214,7 @@ export class DomainAPI extends BaseAPI {
       return await this.executeCommand(command);
     } catch (error) {
       throw new APIError(
-        `Failed to rename backup: ${error.message}`,
+        `Failed to rename backup: ${(error as Error).message}`,
         'DOMAIN_BACKUP_RENAME_FAILED',
         error
       );
@@ -242,7 +242,7 @@ export class DomainAPI extends BaseAPI {
       return await this.executeCommand(command);
     } catch (error) {
       throw new APIError(
-        `Failed to restore backup: ${error.message}`,
+        `Failed to restore backup: ${(error as Error).message}`,
         'DOMAIN_BACKUP_RESTORE_FAILED',
         error
       );
@@ -260,7 +260,7 @@ export class DomainAPI extends BaseAPI {
       return this.parseTrustList(output);
     } catch (error) {
       throw new APIError(
-        `Failed to list trusts: ${error.message}`,
+        `Failed to list trusts: ${(error as Error).message}`,
         'DOMAIN_TRUST_LIST_FAILED',
         error
       );
@@ -295,7 +295,7 @@ export class DomainAPI extends BaseAPI {
       return this.parseTrustInfo(output, trustData.domain);
     } catch (error) {
       throw new APIError(
-        `Failed to create trust: ${error.message}`,
+        `Failed to create trust: ${(error as Error).message}`,
         'DOMAIN_TRUST_CREATE_FAILED',
         error
       );
@@ -320,7 +320,7 @@ export class DomainAPI extends BaseAPI {
       await this.executeCommand(command);
     } catch (error) {
       throw new APIError(
-        `Failed to delete trust: ${error.message}`,
+        `Failed to delete trust: ${(error as Error).message}`,
         'DOMAIN_TRUST_DELETE_FAILED',
         error
       );
@@ -336,7 +336,7 @@ export class DomainAPI extends BaseAPI {
       return this.parseTrustInfo(output, domain);
     } catch (error) {
       throw new APIError(
-        `Failed to show trust details: ${error.message}`,
+        `Failed to show trust details: ${(error as Error).message}`,
         'DOMAIN_TRUST_SHOW_FAILED',
         error
       );
@@ -352,7 +352,7 @@ export class DomainAPI extends BaseAPI {
       return this.parseTrustValidation(output);
     } catch (error) {
       throw new APIError(
-        `Failed to validate trust: ${error.message}`,
+        `Failed to validate trust: ${(error as Error).message}`,
         'DOMAIN_TRUST_VALIDATE_FAILED',
         error
       );
@@ -368,7 +368,7 @@ export class DomainAPI extends BaseAPI {
       return output.trim().split('\n').filter(line => line.trim() !== '');
     } catch (error) {
       throw new APIError(
-        `Failed to list trust namespaces: ${error.message}`,
+        `Failed to list trust namespaces: ${(error as Error).message}`,
         'DOMAIN_TRUST_NAMESPACES_FAILED',
         error
       );

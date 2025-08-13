@@ -4,7 +4,7 @@ import Main from './main';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
-// @ts-expect-error - Cockpit module doesn't have types
+// @ts-expect-error: Cockpit module doesn't have types
 import cockpit from 'cockpit';
 
 interface ServerRoleState {

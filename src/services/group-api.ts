@@ -12,7 +12,7 @@ export class GroupAPI extends BaseAPI {
       return this.parseGroupList(output);
     } catch (error) {
       throw new APIError(
-        `Failed to fetch groups: ${error.message}`,
+        `Failed to fetch groups: ${(error as Error).message}`,
         'GROUP_LIST_FAILED',
         error
       );
@@ -28,7 +28,7 @@ export class GroupAPI extends BaseAPI {
       return this.parseGroupDetails(output, groupName);
     } catch (error) {
       throw new APIError(
-        `Failed to fetch group details: ${error.message}`,
+        `Failed to fetch group details: ${(error as Error).message}`,
         'GROUP_SHOW_FAILED',
         error
       );
@@ -57,7 +57,7 @@ export class GroupAPI extends BaseAPI {
       return await this.show(groupData.name);
     } catch (error) {
       throw new APIError(
-        `Failed to create group: ${error.message}`,
+        `Failed to create group: ${(error as Error).message}`,
         'GROUP_CREATE_FAILED',
         error
       );
@@ -72,7 +72,7 @@ export class GroupAPI extends BaseAPI {
       await this.executeCommand(['samba-tool', 'group', 'delete', groupName]);
     } catch (error) {
       throw new APIError(
-        `Failed to delete group: ${error.message}`,
+        `Failed to delete group: ${(error as Error).message}`,
         'GROUP_DELETE_FAILED',
         error
       );
@@ -93,7 +93,7 @@ export class GroupAPI extends BaseAPI {
       return await this.show(groupName);
     } catch (error) {
       throw new APIError(
-        `Failed to move group: ${error.message}`,
+        `Failed to move group: ${(error as Error).message}`,
         'GROUP_MOVE_FAILED',
         error
       );
@@ -109,7 +109,7 @@ export class GroupAPI extends BaseAPI {
       return output.trim().split('\n').filter(member => member.trim() !== '');
     } catch (error) {
       throw new APIError(
-        `Failed to list group members: ${error.message}`,
+        `Failed to list group members: ${(error as Error).message}`,
         'GROUP_LIST_MEMBERS_FAILED',
         error
       );
@@ -130,7 +130,7 @@ export class GroupAPI extends BaseAPI {
       }
     } catch (error) {
       throw new APIError(
-        `Failed to add group members: ${error.message}`,
+        `Failed to add group members: ${(error as Error).message}`,
         'GROUP_ADD_MEMBERS_FAILED',
         error
       );
@@ -151,7 +151,7 @@ export class GroupAPI extends BaseAPI {
       }
     } catch (error) {
       throw new APIError(
-        `Failed to remove group members: ${error.message}`,
+        `Failed to remove group members: ${(error as Error).message}`,
         'GROUP_REMOVE_MEMBERS_FAILED',
         error
       );
@@ -168,10 +168,11 @@ export class GroupAPI extends BaseAPI {
       name: groupName.trim(),
       description: '',
       members: [],
-      groupType: 'Security',
+      groupType: 'Security' as const,
+      groupScope: 'Global' as const,
+      memberOf: [],
       distinguishedName: `CN=${groupName.trim()},CN=Users,DC=domain,DC=local`,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date()
     }));
   }
 
@@ -184,10 +185,11 @@ export class GroupAPI extends BaseAPI {
       name: groupName,
       description: '',
       members: [],
-      groupType: 'Security',
+      groupType: 'Security' as const,
+      groupScope: 'Global' as const,
+      memberOf: [],
       distinguishedName: '',
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date()
     };
 
     lines.forEach(line => {

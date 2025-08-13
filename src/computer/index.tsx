@@ -120,7 +120,7 @@ function ComputerManagementPage({ initialView = 'list' }: ComputerManagementPage
                 </div>
 
                 {/* Main Content */}
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+                <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'list' | 'management')} className="space-y-4">
                     <div className="flex items-center justify-between">
                         <TabsList>
                             <TabsTrigger value="list">Computer List</TabsTrigger>

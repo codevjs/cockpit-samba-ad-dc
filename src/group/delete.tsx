@@ -1,19 +1,11 @@
 import React, { useState } from 'react';
-import {
-  Modal,
-  ModalVariant,
-  Button,
-  Form,
-  FormGroup,
-  TextInput,
-  Alert,
-  Text,
-  TextContent,
-  Spinner
-} from '@patternfly/react-core';
-import { ExclamationTriangleIcon } from '@patternfly/react-icons';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { AlertTriangle } from 'lucide-react';
 import { useGroupMutations } from './hooks/useGroupMutations';
-import { SuccessToast } from '../common';
+// import { SuccessToast } from '../common';
 
 interface DeleteGroupDialogProps {
   isOpen?: boolean;
@@ -74,14 +66,6 @@ export const DeleteGroupDialog: React.FC<DeleteGroupDialogProps> = ({
       // Error is already handled by the mutation hook
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleModalToggle = () => {
-    if (externalIsOpen === undefined) {
-      setInternalIsOpen(!internalIsOpen);
-    } else {
-      onClose();
     }
   };
 
