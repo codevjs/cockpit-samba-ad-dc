@@ -1,28 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  Eye, 
-  User, 
-  Mail, 
-  Phone, 
-  Building2, 
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Eye,
+  User,
+  Mail,
+  Phone,
+  Building2,
   Calendar,
   FileText,
   Contact as ContactIcon
-} from 'lucide-react';
-import { ContactAPI } from '@/services/contact-api';
-import type { SambaContact } from '@/types/samba';
+} from 'lucide-react'
+import { ContactAPI } from '@/services/contact-api'
+import type { SambaContact } from '@/types/samba'
 
 interface ShowContactDialogProps {
   isOpen: boolean;
@@ -30,39 +30,39 @@ interface ShowContactDialogProps {
   contactName: string;
 }
 
-export function ShowContactDialog({
+export function ShowContactDialog ({
   isOpen,
   onClose,
-  contactName,
+  contactName
 }: ShowContactDialogProps) {
-  const [contact, setContact] = useState<SambaContact | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [contact, setContact] = useState<SambaContact | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (isOpen && contactName) {
-      fetchContactDetails();
+      fetchContactDetails()
     }
-  }, [isOpen, contactName]);
+  }, [isOpen, contactName])
 
   const fetchContactDetails = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const data = await ContactAPI.show(contactName);
-      setContact(data);
+      setLoading(true)
+      setError(null)
+      const data = await ContactAPI.show(contactName)
+      setContact(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load contact details');
+      setError(err instanceof Error ? err.message : 'Failed to load contact details')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    setContact(null);
-    setError(null);
-    onClose();
-  };
+    setContact(null)
+    setError(null)
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -82,9 +82,9 @@ export function ShowContactDialog({
             <Alert variant="destructive">
               <AlertDescription>
                 {error}
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={fetchContactDetails}
                   className="ml-2"
                 >
@@ -164,7 +164,8 @@ export function ShowContactDialog({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {contact.mail ? (
+                  {contact.mail
+                    ? (
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-muted-foreground" />
                       <div>
@@ -172,14 +173,16 @@ export function ShowContactDialog({
                         <p>{contact.mail}</p>
                       </div>
                     </div>
-                  ) : (
+                      )
+                    : (
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Mail className="h-4 w-4" />
                       <span className="text-sm">No email address configured</span>
                     </div>
-                  )}
+                      )}
 
-                  {contact.telephoneNumber ? (
+                  {contact.telephoneNumber
+                    ? (
                     <div className="flex items-center gap-2">
                       <Phone className="h-4 w-4 text-muted-foreground" />
                       <div>
@@ -187,12 +190,13 @@ export function ShowContactDialog({
                         <p>{contact.telephoneNumber}</p>
                       </div>
                     </div>
-                  ) : (
+                      )
+                    : (
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Phone className="h-4 w-4" />
                       <span className="text-sm">No phone number configured</span>
                     </div>
-                  )}
+                      )}
                 </CardContent>
               </Card>
 
@@ -260,5 +264,5 @@ export function ShowContactDialog({
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

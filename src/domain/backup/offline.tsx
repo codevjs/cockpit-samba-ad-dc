@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info, Archive } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useDomainMutations } from '../hooks/useDomainMutations';
-import { toast } from 'sonner';
-import type { BackupOfflineInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Info, Archive } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useDomainMutations } from '../hooks/useDomainMutations'
+import { toast } from 'sonner'
+import type { BackupOfflineInput } from '@/types/samba'
 
 const backupOfflineSchema = z.object({
   targetdir: z.string().min(1, 'Target directory is required'),
   server: z.string().optional(),
-  realm: z.string().optional(),
-});
+  realm: z.string().optional()
+})
 
 type BackupOfflineFormData = z.infer<typeof backupOfflineSchema>;
 
@@ -26,53 +26,53 @@ interface BackupOfflineDialogProps {
   onBackupCompleted: () => void;
 }
 
-export function BackupOfflineDialog({
+export function BackupOfflineDialog ({
   isOpen,
   onClose,
-  onBackupCompleted,
+  onBackupCompleted
 }: BackupOfflineDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm<BackupOfflineFormData>({
-    resolver: zodResolver(backupOfflineSchema),
-  });
+    resolver: zodResolver(backupOfflineSchema)
+  })
 
   const { backupOffline } = useDomainMutations(
     () => {
-      toast.success('Offline backup completed successfully');
-      onBackupCompleted();
+      toast.success('Offline backup completed successfully')
+      onBackupCompleted()
     },
     (error) => {
-      toast.error(`Failed to create offline backup: ${error}`);
+      toast.error(`Failed to create offline backup: ${error}`)
     }
-  );
+  )
 
   const onSubmit = async (data: BackupOfflineFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: BackupOfflineInput = {
         targetdir: data.targetdir,
         server: data.server,
-        realm: data.realm,
-      };
-      await backupOffline(input);
-      handleClose();
+        realm: data.realm
+      }
+      await backupOffline(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -90,8 +90,8 @@ export function BackupOfflineDialog({
         <Alert className="border-blue-200 bg-blue-50">
           <Info className="h-4 w-4 text-blue-600" />
           <AlertDescription className="text-blue-800">
-            <strong>Offline Backup:</strong> This creates a complete backup of the domain 
-            data including the ntds.dit database, SYSVOL, and registry settings. The backup 
+            <strong>Offline Backup:</strong> This creates a complete backup of the domain
+            data including the ntds.dit database, SYSVOL, and registry settings. The backup
             can be used for disaster recovery.
           </AlertDescription>
         </Alert>
@@ -151,8 +151,8 @@ export function BackupOfflineDialog({
           <Alert className="border-orange-200 bg-orange-50">
             <Info className="h-4 w-4 text-orange-600" />
             <AlertDescription className="text-orange-800">
-              <strong>Note:</strong> The backup process may take a significant amount of time 
-              depending on the size of your domain data. Ensure adequate disk space is available 
+              <strong>Note:</strong> The backup process may take a significant amount of time
+              depending on the size of your domain data. Ensure adequate disk space is available
               in the target directory.
             </AlertDescription>
           </Alert>
@@ -168,7 +168,7 @@ export function BackupOfflineDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
-export default BackupOfflineDialog;
+export default BackupOfflineDialog

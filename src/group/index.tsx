@@ -1,66 +1,66 @@
-import React, { useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { Plus, Users, Search, Filter, UsersIcon } from 'lucide-react';
-import '../user/tailwind.css';
+import React, { useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Plus, Users, Search, Filter, UsersIcon } from 'lucide-react'
+import '../user/tailwind.css'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@/components/ui/tabs';
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@/components/ui/tabs'
 
 // Import modernized components
-import GroupList from './list';
-import CreateGroupDialog from './create';
-import DeleteGroupDialog from './delete';
-import GroupDetailsDialog from './show';
-import MoveGroupDialog from './move';
-import ListMembersDialog from './listmembers';
-import RemoveMembersDialog from './removemembers';
+import GroupList from './list'
+import CreateGroupDialog from './create'
+import DeleteGroupDialog from './delete'
+import GroupDetailsDialog from './show'
+import MoveGroupDialog from './move'
+import ListMembersDialog from './listmembers'
+import RemoveMembersDialog from './removemembers'
 
 // Import hooks
-import { useGroups } from './hooks/useGroups';
-import type { FilterOptions } from '@/types/samba';
+import { useGroups } from './hooks/useGroups'
+import type { FilterOptions } from '@/types/samba'
 
 interface GroupManagementPageProps {
     initialView?: 'list' | 'management';
 }
 
-function GroupManagementPage({ initialView = 'list' }: GroupManagementPageProps) {
-    const [activeTab, setActiveTab] = useState(initialView);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filters, setFilters] = useState<FilterOptions>({});
-    
-    const { 
-        groups, 
-        loading, 
-        error, 
-        refresh: refreshGroups 
-    } = useGroups();
+function GroupManagementPage ({ initialView = 'list' }: GroupManagementPageProps) {
+  const [activeTab, setActiveTab] = useState(initialView)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState<FilterOptions>({})
 
-    const handleSearch = (query: string) => {
-        setSearchQuery(query);
-        setFilters(prev => ({ ...prev, search: query }));
-    };
+  const {
+    groups,
+    loading,
+    error,
+    refresh: refreshGroups
+  } = useGroups()
 
-    const stats = {
-        total: groups.length,
-        security: groups.filter(group => group.groupType === 'Security').length,
-        distribution: groups.filter(group => group.groupType === 'Distribution').length,
-        global: groups.filter(group => group.groupScope === 'Global').length,
-    };
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setFilters(prev => ({ ...prev, search: query }))
+  }
 
-    return (
+  const stats = {
+    total: groups.length,
+    security: groups.filter(group => group.groupType === 'Security').length,
+    distribution: groups.filter(group => group.groupType === 'Distribution').length,
+    global: groups.filter(group => group.groupScope === 'Global').length
+  }
+
+  return (
         <div className="min-h-screen bg-background">
             <div className="container mx-auto p-6 space-y-6">
                 {/* Header */}
@@ -72,7 +72,7 @@ function GroupManagementPage({ initialView = 'list' }: GroupManagementPageProps)
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <CreateGroupDialog 
+                        <CreateGroupDialog
                             onGroupCreated={refreshGroups}
                             trigger={
                                 <Button>
@@ -131,7 +131,7 @@ function GroupManagementPage({ initialView = 'list' }: GroupManagementPageProps)
                             <TabsTrigger value="list">Group List</TabsTrigger>
                             <TabsTrigger value="management">Management</TabsTrigger>
                         </TabsList>
-                        
+
                         {activeTab === 'list' && (
                             <div className="flex gap-2">
                                 <div className="relative">
@@ -159,7 +159,7 @@ function GroupManagementPage({ initialView = 'list' }: GroupManagementPageProps)
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <GroupList 
+                                <GroupList
                                     groups={groups}
                                     loading={loading}
                                     error={error}
@@ -179,7 +179,7 @@ function GroupManagementPage({ initialView = 'list' }: GroupManagementPageProps)
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
-                                    <CreateGroupDialog 
+                                    <CreateGroupDialog
                                         onGroupCreated={refreshGroups}
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
@@ -188,7 +188,7 @@ function GroupManagementPage({ initialView = 'list' }: GroupManagementPageProps)
                                             </Button>
                                         }
                                     />
-                                    <DeleteGroupDialog 
+                                    <DeleteGroupDialog
                                         onGroupDeleted={refreshGroups}
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
@@ -196,7 +196,7 @@ function GroupManagementPage({ initialView = 'list' }: GroupManagementPageProps)
                                             </Button>
                                         }
                                     />
-                                    <MoveGroupDialog 
+                                    <MoveGroupDialog
                                         onGroupMoved={refreshGroups}
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
@@ -215,14 +215,14 @@ function GroupManagementPage({ initialView = 'list' }: GroupManagementPageProps)
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
-                                    <ListMembersDialog 
+                                    <ListMembersDialog
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
                                                 View Group Members
                                             </Button>
                                         }
                                     />
-                                    <RemoveMembersDialog 
+                                    <RemoveMembersDialog
                                         onMembersRemoved={refreshGroups}
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
@@ -241,7 +241,7 @@ function GroupManagementPage({ initialView = 'list' }: GroupManagementPageProps)
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
-                                    <GroupDetailsDialog 
+                                    <GroupDetailsDialog
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
                                                 View Group Details
@@ -255,29 +255,29 @@ function GroupManagementPage({ initialView = 'list' }: GroupManagementPageProps)
                 </Tabs>
             </div>
         </div>
-    );
+  )
 }
 
-export const GroupManagement = GroupManagementPage;
+export const GroupManagement = GroupManagementPage
 
 // Export individual components for use elsewhere
 export {
-    GroupList,
-    CreateGroupDialog,
-    DeleteGroupDialog,
-    GroupDetailsDialog,
-    MoveGroupDialog,
-    ListMembersDialog,
-    RemoveMembersDialog
-};
+  GroupList,
+  CreateGroupDialog,
+  DeleteGroupDialog,
+  GroupDetailsDialog,
+  MoveGroupDialog,
+  ListMembersDialog,
+  RemoveMembersDialog
+}
 
 // DOM mounting for standalone usage
-document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById("group");
-    if (container) {
-        const root = createRoot(container);
-        root.render(<GroupManagementPage />);
-    }
-});
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('group')
+  if (container) {
+    const root = createRoot(container)
+    root.render(<GroupManagementPage />)
+  }
+})
 
-export default GroupManagementPage;
+export default GroupManagementPage

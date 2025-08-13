@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertTriangle } from 'lucide-react';
-import { useFSMOMutations } from './hooks/useFSMO';
-import { toast } from 'sonner';
-import type { SeizeFSMORoleInput } from '@/types/samba';
+  SelectValue
+} from '@/components/ui/select'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Loader2, AlertTriangle } from 'lucide-react'
+import { useFSMOMutations } from './hooks/useFSMO'
+import { toast } from 'sonner'
+import type { SeizeFSMORoleInput } from '@/types/samba'
 
 interface SeizeRoleDialogProps {
   isOpen: boolean;
@@ -35,11 +35,11 @@ interface SeizeRoleDialogProps {
 
 const seizeRoleSchema = z.object({
   role: z.enum(['SchemaMaster', 'DomainNamingMaster', 'PDCEmulator', 'RIDMaster', 'InfrastructureMaster'], {
-    required_error: 'FSMO role is required',
+    required_error: 'FSMO role is required'
   }),
   confirmationText: z.string()
-    .min(1, 'Confirmation text is required'),
-});
+    .min(1, 'Confirmation text is required')
+})
 
 type SeizeRoleFormData = z.infer<typeof seizeRoleSchema>;
 
@@ -48,17 +48,17 @@ const fsmoRoleOptions = [
   { value: 'DomainNamingMaster', label: 'Domain Naming Master', scope: 'Forest-wide', risk: 'High' },
   { value: 'PDCEmulator', label: 'PDC Emulator', scope: 'Domain-wide', risk: 'Critical' },
   { value: 'RIDMaster', label: 'RID Master', scope: 'Domain-wide', risk: 'Medium' },
-  { value: 'InfrastructureMaster', label: 'Infrastructure Master', scope: 'Domain-wide', risk: 'Medium' },
-] as const;
+  { value: 'InfrastructureMaster', label: 'Infrastructure Master', scope: 'Domain-wide', risk: 'Medium' }
+] as const
 
-export function SeizeRoleDialog({
+export function SeizeRoleDialog ({
   isOpen,
   onClose,
   onRoleSeized,
-  preselectedRole,
+  preselectedRole
 }: SeizeRoleDialogProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const {
     register,
@@ -66,75 +66,75 @@ export function SeizeRoleDialog({
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors }
   } = useForm<SeizeRoleFormData>({
     resolver: zodResolver(seizeRoleSchema),
     defaultValues: {
       role: 'PDCEmulator',
-      confirmationText: '',
-    },
-  });
+      confirmationText: ''
+    }
+  })
 
-  const selectedRole = watch('role');
-  const confirmationText = watch('confirmationText');
+  const selectedRole = watch('role')
+  const confirmationText = watch('confirmationText')
 
   // Set preselected role when dialog opens
   useEffect(() => {
     if (preselectedRole && isOpen) {
-      setValue('role', preselectedRole as SeizeRoleFormData['role']);
+      setValue('role', preselectedRole as SeizeRoleFormData['role'])
     }
-  }, [preselectedRole, isOpen, setValue]);
+  }, [preselectedRole, isOpen, setValue])
 
   const { seizeRole } = useFSMOMutations(
     () => {
       // Success callback
-      const roleOption = fsmoRoleOptions.find(r => r.value === selectedRole);
-      toast.success(`${roleOption?.label} role seized successfully`);
-      resetForm();
-      onRoleSeized?.();
-      onClose();
+      const roleOption = fsmoRoleOptions.find(r => r.value === selectedRole)
+      toast.success(`${roleOption?.label} role seized successfully`)
+      resetForm()
+      onRoleSeized?.()
+      onClose()
     },
     (errorMessage: string) => {
       // Error callback
-      setError(errorMessage);
+      setError(errorMessage)
     }
-  );
+  )
 
   const resetForm = () => {
-    reset();
-    setError(null);
-  };
+    reset()
+    setError(null)
+  }
 
   const handleClose = () => {
-    resetForm();
-    onClose();
-  };
+    resetForm()
+    onClose()
+  }
 
   const onSubmit = async (data: SeizeRoleFormData) => {
-    const expectedConfirmation = 'SEIZE ROLE';
+    const expectedConfirmation = 'SEIZE ROLE'
     if (data.confirmationText.toUpperCase() !== expectedConfirmation) {
-      setError(`You must type "${expectedConfirmation}" to confirm this dangerous operation`);
-      return;
+      setError(`You must type "${expectedConfirmation}" to confirm this dangerous operation`)
+      return
     }
 
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
       const seizeData: SeizeFSMORoleInput = {
-        role: data.role,
-      };
+        role: data.role
+      }
 
-      await seizeRole(seizeData);
+      await seizeRole(seizeData)
     } catch (err) {
       // Error is already handled by the mutation hook
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const selectedRoleInfo = fsmoRoleOptions.find(r => r.value === selectedRole);
-  const isConfirmationValid = confirmationText.toUpperCase() === 'SEIZE ROLE';
+  const selectedRoleInfo = fsmoRoleOptions.find(r => r.value === selectedRole)
+  const isConfirmationValid = confirmationText.toUpperCase() === 'SEIZE ROLE'
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -145,7 +145,7 @@ export function SeizeRoleDialog({
             Seize FSMO Role
           </DialogTitle>
           <DialogDescription>
-            <strong>WARNING:</strong> Seizing an FSMO role is a forceful operation that should only be used 
+            <strong>WARNING:</strong> Seizing an FSMO role is a forceful operation that should only be used
             when normal transfer fails or the current role holder is permanently offline.
           </DialogDescription>
         </DialogHeader>
@@ -252,9 +252,9 @@ export function SeizeRoleDialog({
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              variant="destructive" 
+            <Button
+              type="submit"
+              variant="destructive"
               disabled={loading || !isConfirmationValid}
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -264,5 +264,5 @@ export function SeizeRoleDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

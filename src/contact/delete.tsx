@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, Loader2 } from 'lucide-react';
-import { useContactMutations } from './hooks/useContactMutations';
-import { toast } from 'sonner';
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle, Loader2 } from 'lucide-react'
+import { useContactMutations } from './hooks/useContactMutations'
+import { toast } from 'sonner'
 
 interface DeleteContactDialogProps {
   isOpen: boolean;
@@ -22,81 +22,81 @@ interface DeleteContactDialogProps {
   contactName?: string;
 }
 
-export function DeleteContactDialog({
+export function DeleteContactDialog ({
   isOpen,
   onClose,
   onContactDeleted,
   contactName: externalContactName
 }: DeleteContactDialogProps) {
-  const [internalContactName, setInternalContactName] = useState('');
-  const [confirmationText, setConfirmationText] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [internalContactName, setInternalContactName] = useState('')
+  const [confirmationText, setConfirmationText] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const contactName = externalContactName || internalContactName;
+  const contactName = externalContactName || internalContactName
 
   const { deleteContact } = useContactMutations(
     () => {
       // Success callback
-      toast.success(`Contact "${contactName}" deleted successfully`);
-      resetForm();
-      onContactDeleted?.();
-      onClose();
+      toast.success(`Contact "${contactName}" deleted successfully`)
+      resetForm()
+      onContactDeleted?.()
+      onClose()
     },
     (errorMessage: string) => {
       // Error callback
-      setError(errorMessage);
+      setError(errorMessage)
     }
-  );
+  )
 
   const resetForm = () => {
-    setConfirmationText('');
-    setInternalContactName('');
-    setError(null);
-  };
+    setConfirmationText('')
+    setInternalContactName('')
+    setError(null)
+  }
 
   const handleClose = () => {
-    resetForm();
-    onClose();
-  };
+    resetForm()
+    onClose()
+  }
 
   const handleConfirmationChange = (value: string) => {
-    setConfirmationText(value);
+    setConfirmationText(value)
     if (error) {
-      setError(null);
+      setError(null)
     }
-  };
+  }
 
   const handleContactNameChange = (value: string) => {
-    setInternalContactName(value);
+    setInternalContactName(value)
     if (error) {
-      setError(null);
+      setError(null)
     }
-  };
+  }
 
   const handleSubmit = async () => {
     if (!contactName) {
-      setError('Contact name is required');
-      return;
+      setError('Contact name is required')
+      return
     }
 
     if (confirmationText !== contactName) {
-      setError('Confirmation text must match the contact name exactly');
-      return;
+      setError('Confirmation text must match the contact name exactly')
+      return
     }
 
     try {
-      setLoading(true);
-      setError(null);
-      await deleteContact(contactName);
+      setLoading(true)
+      setError(null)
+      await deleteContact(contactName)
     } catch (err) {
       // Error is already handled by the mutation hook
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const isConfirmationValid = confirmationText === contactName && contactName.length > 0;
+  const isConfirmationValid = confirmationText === contactName && contactName.length > 0
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -175,5 +175,5 @@ export function DeleteContactDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

@@ -1,26 +1,26 @@
-import React, { useMemo } from 'react';
-import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import React, { useMemo } from 'react'
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ErrorAlert } from '@/components/ui/error-alert';
-import { 
-  MoreVertical, 
-  Eye, 
-  Trash2, 
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import { ErrorAlert } from '@/components/ui/error-alert'
+import {
+  MoreVertical,
+  Eye,
+  Trash2,
   Move,
   Mail,
   Phone,
   Contact as ContactIcon,
   Building2
-} from 'lucide-react';
-import type { SambaContact } from '@/types/samba';
+} from 'lucide-react'
+import type { SambaContact } from '@/types/samba'
 
 interface ContactListProps {
   contacts: SambaContact[];
@@ -32,14 +32,14 @@ interface ContactListProps {
   onMoveContact: (contactName: string) => void;
 }
 
-export function ContactList({
+export function ContactList ({
   contacts,
   loading,
   error,
   onRefresh,
   onShowContact,
   onDeleteContact,
-  onMoveContact,
+  onMoveContact
 }: ContactListProps) {
   const columns = useMemo<DataTableColumn<SambaContact>[]>(() => [
     {
@@ -59,7 +59,7 @@ export function ContactList({
             )}
           </div>
         </div>
-      ),
+      )
     },
     {
       key: 'contact_info',
@@ -82,7 +82,7 @@ export function ContactList({
             <span className="text-sm text-muted-foreground">No contact info</span>
           )}
         </div>
-      ),
+      )
     },
     {
       key: 'organizational_unit',
@@ -95,7 +95,7 @@ export function ContactList({
             {contact.organizationalUnit || 'Default'}
           </span>
         </div>
-      ),
+      )
     },
     {
       key: 'description',
@@ -104,7 +104,7 @@ export function ContactList({
         <span className="text-sm text-muted-foreground">
           {contact.description || '-'}
         </span>
-      ),
+      )
     },
     {
       key: 'created_date',
@@ -114,7 +114,7 @@ export function ContactList({
         <span className="text-sm text-muted-foreground">
           {contact.createdAt.toLocaleDateString()}
         </span>
-      ),
+      )
     },
     {
       key: 'actions',
@@ -138,7 +138,7 @@ export function ContactList({
               Move to OU
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => onDeleteContact(contact.name)}
               className="text-destructive"
             >
@@ -147,20 +147,20 @@ export function ContactList({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      ),
-    },
-  ], [onShowContact, onDeleteContact, onMoveContact]);
+      )
+    }
+  ], [onShowContact, onDeleteContact, onMoveContact])
 
   if (error) {
     return (
       <div className="space-y-4">
-        <ErrorAlert 
+        <ErrorAlert
           error={error}
           onRetry={onRefresh}
           className="mb-4"
         />
       </div>
-    );
+    )
   }
 
   return (
@@ -172,5 +172,5 @@ export function ContactList({
         emptyMessage="No contacts found. Create your first contact to get started."
       />
     </div>
-  );
+  )
 }

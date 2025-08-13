@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -6,18 +6,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Users, AlertTriangle } from 'lucide-react';
-import { useGroupMembers } from './hooks/useGroups';
-import { useGroupMutations } from './hooks/useGroupMutations';
-import { toast } from 'sonner';
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { Users, AlertTriangle } from 'lucide-react'
+import { useGroupMembers } from './hooks/useGroups'
+import { useGroupMutations } from './hooks/useGroupMutations'
+import { toast } from 'sonner'
 
 interface RemoveMembersDialogProps {
   isOpen?: boolean;
@@ -32,80 +32,80 @@ export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({
   onClose: externalOnClose,
   groupName: externalGroupName
 }) => {
-  const [internalIsOpen, setInternalIsOpen] = useState(false);
-  const [internalGroupName, setInternalGroupName] = useState('');
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isRemoving, setIsRemoving] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false)
+  const [internalGroupName, setInternalGroupName] = useState('')
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isRemoving, setIsRemoving] = useState(false)
 
   // Use external props if provided, otherwise use internal state
-  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const onClose = externalOnClose || (() => setInternalIsOpen(false));
-  const groupName = externalGroupName || internalGroupName;
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen
+  const onClose = externalOnClose || (() => setInternalIsOpen(false))
+  const groupName = externalGroupName || internalGroupName
 
-  const { members, loading: membersLoading, error: membersError, refresh } = useGroupMembers(groupName);
+  const { members, loading: membersLoading, error: membersError, refresh } = useGroupMembers(groupName)
   const { removeMembers } = useGroupMutations(
     () => {
-      toast.success('Members removed successfully');
-      setSelectedMembers([]);
-      refresh();
+      toast.success('Members removed successfully')
+      setSelectedMembers([])
+      refresh()
     },
     (error) => {
-      toast.error(`Failed to remove members: ${error}`);
+      toast.error(`Failed to remove members: ${error}`)
     }
-  );
+  )
 
   const filteredMembers = members?.filter(member =>
     member.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  ) || []
 
   const handleShowDialog = () => {
-    setInternalIsOpen(true);
-  };
+    setInternalIsOpen(true)
+  }
 
   const handleInputChange = (value: string) => {
-    setInternalGroupName(value);
-  };
+    setInternalGroupName(value)
+  }
 
   const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-  };
+    setSearchTerm(value)
+  }
 
   const handleMemberToggle = (member: string, checked: boolean) => {
     if (checked) {
-      setSelectedMembers(prev => [...prev, member]);
+      setSelectedMembers(prev => [...prev, member])
     } else {
-      setSelectedMembers(prev => prev.filter(m => m !== member));
+      setSelectedMembers(prev => prev.filter(m => m !== member))
     }
-  };
+  }
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedMembers(filteredMembers);
+      setSelectedMembers(filteredMembers)
     } else {
-      setSelectedMembers([]);
+      setSelectedMembers([])
     }
-  };
+  }
 
   const handleRemoveMembers = async () => {
-    if (selectedMembers.length === 0) return;
+    if (selectedMembers.length === 0) return
 
-    setIsRemoving(true);
+    setIsRemoving(true)
     try {
-      await removeMembers(groupName, selectedMembers);
-      handleClose();
+      await removeMembers(groupName, selectedMembers)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsRemoving(false);
+      setIsRemoving(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    setSelectedMembers([]);
-    setSearchTerm('');
-    onClose();
-  };
+    setSelectedMembers([])
+    setSearchTerm('')
+    onClose()
+  }
 
   if (!isOpen && !externalIsOpen) {
     return (
@@ -116,7 +116,7 @@ export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({
             value={internalGroupName}
             onChange={(e) => handleInputChange(e.target.value)}
           />
-          <Button 
+          <Button
             onClick={handleShowDialog}
             disabled={!internalGroupName.trim()}
           >
@@ -124,7 +124,7 @@ export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -174,11 +174,14 @@ export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {membersLoading ? (
+              {membersLoading
+                ? (
                 <div className="flex justify-center py-8">
                   <LoadingSpinner />
                 </div>
-              ) : filteredMembers.length === 0 ? (
+                  )
+                : filteredMembers.length === 0
+                  ? (
                 <div className="text-center py-8">
                   <Users className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-2 text-sm font-medium">No members found</h3>
@@ -186,7 +189,8 @@ export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({
                     {searchTerm ? 'No members match your search criteria.' : 'This group has no members.'}
                   </p>
                 </div>
-              ) : (
+                    )
+                  : (
                 <div className="max-h-64 overflow-y-auto space-y-2">
                   {filteredMembers.map((member, index) => (
                     <div key={index} className="flex items-center space-x-2 p-2 rounded hover:bg-muted/50">
@@ -198,7 +202,7 @@ export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({
                     </div>
                   ))}
                 </div>
-              )}
+                    )}
             </CardContent>
           </Card>
 
@@ -206,7 +210,7 @@ export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({
             <Alert className="border-orange-200 bg-orange-50">
               <AlertTriangle className="h-4 w-4 text-orange-600" />
               <AlertDescription className="text-orange-800">
-                <strong>Warning:</strong> You are about to remove {selectedMembers.length} member(s) from the group. 
+                <strong>Warning:</strong> You are about to remove {selectedMembers.length} member(s) from the group.
                 This action cannot be undone.
               </AlertDescription>
             </Alert>
@@ -217,7 +221,7 @@ export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({
           <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleRemoveMembers}
             disabled={selectedMembers.length === 0 || isRemoving}
             variant="destructive"
@@ -227,7 +231,7 @@ export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default RemoveMembersDialog;
+export default RemoveMembersDialog

@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useGPOMutations } from './hooks/useGPO';
-import { toast } from 'sonner';
-import type { BackupGPOInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useGPOMutations } from './hooks/useGPO'
+import { toast } from 'sonner'
+import type { BackupGPOInput } from '@/types/samba'
 
 const backupGPOSchema = z.object({
   name: z.string().min(1, 'GPO name is required'),
-  backupPath: z.string().min(1, 'Backup path is required'),
-});
+  backupPath: z.string().min(1, 'Backup path is required')
+})
 
 type BackupGPOFormData = z.infer<typeof backupGPOSchema>;
 
@@ -23,52 +23,52 @@ interface BackupGPODialogProps {
   onBackupCompleted: () => void;
 }
 
-export function BackupGPODialog({
+export function BackupGPODialog ({
   isOpen,
   onClose,
-  onBackupCompleted,
+  onBackupCompleted
 }: BackupGPODialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm<BackupGPOFormData>({
-    resolver: zodResolver(backupGPOSchema),
-  });
+    resolver: zodResolver(backupGPOSchema)
+  })
 
   const { backupGPO } = useGPOMutations(
     () => {
-      toast.success('GPO backup completed successfully');
-      onBackupCompleted();
+      toast.success('GPO backup completed successfully')
+      onBackupCompleted()
     },
     (error) => {
-      toast.error(`Failed to backup GPO: ${error}`);
+      toast.error(`Failed to backup GPO: ${error}`)
     }
-  );
+  )
 
   const onSubmit = async (data: BackupGPOFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: BackupGPOInput = {
         name: data.name,
-        backupPath: data.backupPath,
-      };
-      await backupGPO(input);
-      handleClose();
+        backupPath: data.backupPath
+      }
+      await backupGPO(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -118,5 +118,5 @@ export function BackupGPODialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

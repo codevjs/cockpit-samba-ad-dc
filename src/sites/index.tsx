@@ -1,77 +1,77 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  MapPin, 
-  Network, 
-  Plus, 
-  Trash2, 
+import React, { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
+  MapPin,
+  Network,
+  Plus,
+  Trash2,
   Server,
   Globe,
   ArrowLeft
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { useSites, useSubnets, useSitesMutations } from './hooks/useSites';
-import { CreateSiteDialog } from './create-site';
-import { CreateSubnetDialog } from './create-subnet';
-import { SetSiteDialog } from './set-site';
-import { toast } from 'sonner';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { useSites, useSubnets, useSitesMutations } from './hooks/useSites'
+import { CreateSiteDialog } from './create-site'
+import { CreateSubnetDialog } from './create-subnet'
+import { SetSiteDialog } from './set-site'
+import { toast } from 'sonner'
 
-export default function SitesManagement() {
-  const { sites, loading: sitesLoading, refresh: refreshSites } = useSites();
-  const { subnets, loading: subnetsLoading, refresh: refreshSubnets } = useSubnets();
-  
+export default function SitesManagement () {
+  const { sites, loading: sitesLoading, refresh: refreshSites } = useSites()
+  const { subnets, loading: subnetsLoading, refresh: refreshSubnets } = useSubnets()
+
   // Dialog states
-  const [createSiteDialogOpen, setCreateSiteDialogOpen] = useState(false);
-  const [createSubnetDialogOpen, setCreateSubnetDialogOpen] = useState(false);
-  const [setSiteDialogOpen, setSetSiteDialogOpen] = useState(false);
-  
+  const [createSiteDialogOpen, setCreateSiteDialogOpen] = useState(false)
+  const [createSubnetDialogOpen, setCreateSubnetDialogOpen] = useState(false)
+  const [setSiteDialogOpen, setSetSiteDialogOpen] = useState(false)
+
   const { removeSite, removeSubnet } = useSitesMutations(
     () => {
-      refreshSites();
-      refreshSubnets();
+      refreshSites()
+      refreshSubnets()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleCreateSiteSuccess = () => {
-    refreshSites();
-    setCreateSiteDialogOpen(false);
-  };
+    refreshSites()
+    setCreateSiteDialogOpen(false)
+  }
 
   const handleCreateSubnetSuccess = () => {
-    refreshSubnets();
-    setCreateSubnetDialogOpen(false);
-  };
+    refreshSubnets()
+    setCreateSubnetDialogOpen(false)
+  }
 
   const handleSetSiteSuccess = () => {
-    refreshSites();
-    setSetSiteDialogOpen(false);
-  };
+    refreshSites()
+    setSetSiteDialogOpen(false)
+  }
 
   const handleRemoveSite = async (siteName: string) => {
     if (confirm(`Are you sure you want to remove site "${siteName}"?`)) {
       try {
-        await removeSite(siteName);
-        toast.success(`Site "${siteName}" removed successfully`);
+        await removeSite(siteName)
+        toast.success(`Site "${siteName}" removed successfully`)
       } catch (error) {
         // Error already handled by mutation hook
       }
     }
-  };
+  }
 
   const handleRemoveSubnet = async (subnetName: string) => {
     if (confirm(`Are you sure you want to remove subnet "${subnetName}"?`)) {
       try {
-        await removeSubnet(subnetName);
-        toast.success(`Subnet "${subnetName}" removed successfully`);
+        await removeSubnet(subnetName)
+        toast.success(`Subnet "${subnetName}" removed successfully`)
       } catch (error) {
         // Error already handled by mutation hook
       }
     }
-  };
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -99,7 +99,7 @@ export default function SitesManagement() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Subnets</CardTitle>
@@ -158,8 +158,9 @@ export default function SitesManagement() {
 
         <TabsContent value="sites">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sitesLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
+            {sitesLoading
+              ? (
+                  Array.from({ length: 3 }).map((_, i) => (
                 <Card key={i}>
                   <CardHeader>
                     <div className="animate-pulse">
@@ -168,8 +169,10 @@ export default function SitesManagement() {
                     </div>
                   </CardHeader>
                 </Card>
-              ))
-            ) : sites.length === 0 ? (
+                  ))
+                )
+              : sites.length === 0
+                ? (
               <Card className="col-span-full">
                 <CardContent className="text-center py-8">
                   <MapPin className="mx-auto h-12 w-12 text-muted-foreground" />
@@ -182,8 +185,9 @@ export default function SitesManagement() {
                   </Button>
                 </CardContent>
               </Card>
-            ) : (
-              sites.map((site) => (
+                  )
+                : (
+                    sites.map((site) => (
                 <Card key={site.name}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -217,15 +221,16 @@ export default function SitesManagement() {
                     </div>
                   </CardContent>
                 </Card>
-              ))
-            )}
+                    ))
+                  )}
           </div>
         </TabsContent>
 
         <TabsContent value="subnets">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {subnetsLoading ? (
-              Array.from({ length: 4 }).map((_, i) => (
+            {subnetsLoading
+              ? (
+                  Array.from({ length: 4 }).map((_, i) => (
                 <Card key={i}>
                   <CardHeader>
                     <div className="animate-pulse">
@@ -234,8 +239,10 @@ export default function SitesManagement() {
                     </div>
                   </CardHeader>
                 </Card>
-              ))
-            ) : subnets.length === 0 ? (
+                  ))
+                )
+              : subnets.length === 0
+                ? (
               <Card className="col-span-full">
                 <CardContent className="text-center py-8">
                   <Network className="mx-auto h-12 w-12 text-muted-foreground" />
@@ -248,8 +255,9 @@ export default function SitesManagement() {
                   </Button>
                 </CardContent>
               </Card>
-            ) : (
-              subnets.map((subnet) => (
+                  )
+                : (
+                    subnets.map((subnet) => (
                 <Card key={subnet.name}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -279,8 +287,8 @@ export default function SitesManagement() {
                     </div>
                   </CardContent>
                 </Card>
-              ))
-            )}
+                    ))
+                  )}
           </div>
         </TabsContent>
       </Tabs>
@@ -306,5 +314,5 @@ export default function SitesManagement() {
         sites={sites}
       />
     </div>
-  );
+  )
 }

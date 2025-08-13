@@ -1,55 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Move, Loader2, FolderTree } from 'lucide-react';
-import { z } from 'zod';
+import React, { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Move, Loader2, FolderTree } from 'lucide-react'
+import { z } from 'zod'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form'
 
-import { useUserMutations } from './hooks/useUserMutations';
-import { ErrorToast, SuccessToast } from '@/common';
-import type { SambaUser, SambaOrganizationalUnit } from '@/types/samba';
+import { useUserMutations } from './hooks/useUserMutations'
+import { ErrorToast, SuccessToast } from '@/common'
+import type { SambaUser, SambaOrganizationalUnit } from '@/types/samba'
 
 // Move user schema
 const moveUserSchema = z.object({
-    username: z.string().min(1, 'Username is required'),
-    targetOU: z.string().min(1, 'Target Organizational Unit is required'),
-    customOU: z.string().optional(),
+  username: z.string().min(1, 'Username is required'),
+  targetOU: z.string().min(1, 'Target Organizational Unit is required'),
+  customOU: z.string().optional()
 }).refine((data) => {
-    if (data.targetOU === 'custom' && !data.customOU?.trim()) {
-        return false;
-    }
-    return true;
+  if (data.targetOU === 'custom' && !data.customOU?.trim()) {
+    return false
+  }
+  return true
 }, {
-    message: "Please specify the custom Organizational Unit path",
-    path: ["customOU"],
-});
+  message: 'Please specify the custom Organizational Unit path',
+  path: ['customOU']
+})
 
 type MoveUserFormData = z.infer<typeof moveUserSchema>;
 
@@ -62,97 +62,97 @@ interface MoveUserDialogProps {
 
 // Common organizational units in AD
 const COMMON_ORG_UNITS: SambaOrganizationalUnit[] = [
-    { name: 'Users', distinguishedName: 'CN=Users,DC=domain,DC=local', description: 'Default Users container', createdAt: new Date(), children: [] },
-    { name: 'Computers', distinguishedName: 'CN=Computers,DC=domain,DC=local', description: 'Default Computers container', createdAt: new Date(), children: [] },
-    { name: 'Domain Controllers', distinguishedName: 'OU=Domain Controllers,DC=domain,DC=local', description: 'Domain Controllers OU', createdAt: new Date(), children: [] },
-    { name: 'IT Department', distinguishedName: 'OU=IT,DC=domain,DC=local', description: 'IT Department OU', createdAt: new Date(), children: [] },
-    { name: 'Sales Department', distinguishedName: 'OU=Sales,DC=domain,DC=local', description: 'Sales Department OU', createdAt: new Date(), children: [] },
-    { name: 'HR Department', distinguishedName: 'OU=HR,DC=domain,DC=local', description: 'Human Resources OU', createdAt: new Date(), children: [] },
-    { name: 'Finance Department', distinguishedName: 'OU=Finance,DC=domain,DC=local', description: 'Finance Department OU', createdAt: new Date(), children: [] },
-];
+  { name: 'Users', distinguishedName: 'CN=Users,DC=domain,DC=local', description: 'Default Users container', createdAt: new Date(), children: [] },
+  { name: 'Computers', distinguishedName: 'CN=Computers,DC=domain,DC=local', description: 'Default Computers container', createdAt: new Date(), children: [] },
+  { name: 'Domain Controllers', distinguishedName: 'OU=Domain Controllers,DC=domain,DC=local', description: 'Domain Controllers OU', createdAt: new Date(), children: [] },
+  { name: 'IT Department', distinguishedName: 'OU=IT,DC=domain,DC=local', description: 'IT Department OU', createdAt: new Date(), children: [] },
+  { name: 'Sales Department', distinguishedName: 'OU=Sales,DC=domain,DC=local', description: 'Sales Department OU', createdAt: new Date(), children: [] },
+  { name: 'HR Department', distinguishedName: 'OU=HR,DC=domain,DC=local', description: 'Human Resources OU', createdAt: new Date(), children: [] },
+  { name: 'Finance Department', distinguishedName: 'OU=Finance,DC=domain,DC=local', description: 'Finance Department OU', createdAt: new Date(), children: [] }
+]
 
-export default function MoveUserDialog({ 
-    user, 
-    username: propUsername, 
-    onUserMoved, 
-    trigger 
+export default function MoveUserDialog ({
+  user,
+  username: propUsername,
+  onUserMoved,
+  trigger
 }: MoveUserDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [showToasts, setShowToasts] = useState({ success: false, error: false });
-    const [availableOUs, setAvailableOUs] = useState<SambaOrganizationalUnit[]>(COMMON_ORG_UNITS);
+  const [isOpen, setIsOpen] = useState(false)
+  const [showToasts, setShowToasts] = useState({ success: false, error: false })
+  const [availableOUs, setAvailableOUs] = useState<SambaOrganizationalUnit[]>(COMMON_ORG_UNITS)
 
-    const username = user?.username || propUsername || '';
-    const displayName = user?.displayName || user?.username || username;
-    const currentOU = user?.organizationalUnit || 'CN=Users,DC=domain,DC=local';
+  const username = user?.username || propUsername || ''
+  const displayName = user?.displayName || user?.username || username
+  const currentOU = user?.organizationalUnit || 'CN=Users,DC=domain,DC=local'
 
-    const form = useForm<MoveUserFormData>({
-        resolver: zodResolver(moveUserSchema),
-        defaultValues: {
-            username: username,
-            targetOU: '',
-            customOU: '',
-        },
-    });
+  const form = useForm<MoveUserFormData>({
+    resolver: zodResolver(moveUserSchema),
+    defaultValues: {
+      username,
+      targetOU: '',
+      customOU: ''
+    }
+  })
 
-    const { move: moveUser, moving, error, clearError } = useUserMutations({
-        onSuccess: (action, result) => {
-            if (action === 'move') {
-                setShowToasts({ success: true, error: false });
-                setIsOpen(false);
-                form.reset();
-                onUserMoved?.(username, result.organizationalUnit);
-            }
-        },
-        onError: () => {
-            setShowToasts({ success: false, error: true });
-        },
-    });
+  const { move: moveUser, moving, error, clearError } = useUserMutations({
+    onSuccess: (action, result) => {
+      if (action === 'move') {
+        setShowToasts({ success: true, error: false })
+        setIsOpen(false)
+        form.reset()
+        onUserMoved?.(username, result.organizationalUnit)
+      }
+    },
+    onError: () => {
+      setShowToasts({ success: false, error: true })
+    }
+  })
 
-    const watchedTargetOU = form.watch('targetOU');
+  const watchedTargetOU = form.watch('targetOU')
 
-    // Load available OUs from the domain (in a real implementation)
-    useEffect(() => {
-        // In a real implementation, you would fetch actual OUs from the domain
-        // For now, we'll use the common OUs defined above
-        setAvailableOUs(COMMON_ORG_UNITS);
-    }, []);
+  // Load available OUs from the domain (in a real implementation)
+  useEffect(() => {
+    // In a real implementation, you would fetch actual OUs from the domain
+    // For now, we'll use the common OUs defined above
+    setAvailableOUs(COMMON_ORG_UNITS)
+  }, [])
 
-    const onSubmit = async (data: MoveUserFormData) => {
-        clearError();
-        
-        const targetOUPath = data.targetOU === 'custom' 
-            ? data.customOU! 
-            : data.targetOU;
-        
-        await moveUser(data.username, targetOUPath);
-    };
+  const onSubmit = async (data: MoveUserFormData) => {
+    clearError()
 
-    const handleOpenChange = (open: boolean) => {
-        setIsOpen(open);
-        if (!open) {
-            form.reset();
-            clearError();
-        }
-    };
+    const targetOUPath = data.targetOU === 'custom'
+      ? data.customOU!
+      : data.targetOU
 
-    const getOUDisplayName = (ouDn: string) => {
-        // Extract the OU name from the distinguished name
-        const match = ouDn.match(/^(CN|OU)=([^,]+)/);
-        return match ? match[2] : ouDn;
-    };
+    await moveUser(data.username, targetOUPath)
+  }
 
-    return (
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) {
+      form.reset()
+      clearError()
+    }
+  }
+
+  const getOUDisplayName = (ouDn: string) => {
+    // Extract the OU name from the distinguished name
+    const match = ouDn.match(/^(CN|OU)=([^,]+)/)
+    return match ? match[2] : ouDn
+  }
+
+  return (
         <>
             {showToasts.error && error && (
-                <ErrorToast 
-                    errorMessage={error} 
-                    closeModal={() => setShowToasts({ ...showToasts, error: false })} 
+                <ErrorToast
+                    errorMessage={error}
+                    closeModal={() => setShowToasts({ ...showToasts, error: false })}
                 />
             )}
             {showToasts.success && (
-                <SuccessToast 
-                    successMessage={`User "${username}" moved successfully to new organizational unit.`} 
-                    closeModal={() => setShowToasts({ ...showToasts, success: false })} 
+                <SuccessToast
+                    successMessage={`User "${username}" moved successfully to new organizational unit.`}
+                    closeModal={() => setShowToasts({ ...showToasts, success: false })}
                 />
             )}
 
@@ -196,8 +196,8 @@ export default function MoveUserDialog({
                                     <FormItem>
                                         <FormLabel>Username</FormLabel>
                                         <FormControl>
-                                            <Input 
-                                                {...field} 
+                                            <Input
+                                                {...field}
                                                 placeholder="Enter username"
                                                 disabled={!!user}
                                             />
@@ -221,8 +221,8 @@ export default function MoveUserDialog({
                                             </FormControl>
                                             <SelectContent>
                                                 {availableOUs.map((ou) => (
-                                                    <SelectItem 
-                                                        key={ou.distinguishedName} 
+                                                    <SelectItem
+                                                        key={ou.distinguishedName}
                                                         value={ou.distinguishedName}
                                                         disabled={ou.distinguishedName === currentOU}
                                                     >
@@ -260,8 +260,8 @@ export default function MoveUserDialog({
                                         <FormItem>
                                             <FormLabel>Custom OU Path</FormLabel>
                                             <FormControl>
-                                                <Input 
-                                                    {...field} 
+                                                <Input
+                                                    {...field}
                                                     placeholder="OU=Department,DC=domain,DC=local"
                                                 />
                                             </FormControl>
@@ -275,9 +275,9 @@ export default function MoveUserDialog({
                             )}
 
                             <DialogFooter>
-                                <Button 
-                                    type="button" 
-                                    variant="outline" 
+                                <Button
+                                    type="button"
+                                    variant="outline"
                                     onClick={() => handleOpenChange(false)}
                                 >
                                     Cancel
@@ -292,5 +292,5 @@ export default function MoveUserDialog({
                 </DialogContent>
             </Dialog>
         </>
-    );
+  )
 }

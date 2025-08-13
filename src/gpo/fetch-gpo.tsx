@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useGPOMutations } from './hooks/useGPO';
-import { toast } from 'sonner';
-import type { FetchGPOInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useGPOMutations } from './hooks/useGPO'
+import { toast } from 'sonner'
+import type { FetchGPOInput } from '@/types/samba'
 
 const fetchGPOSchema = z.object({
   name: z.string().min(1, 'GPO name is required'),
-  targetPath: z.string().min(1, 'Target path is required'),
-});
+  targetPath: z.string().min(1, 'Target path is required')
+})
 
 type FetchGPOFormData = z.infer<typeof fetchGPOSchema>;
 
@@ -23,52 +23,52 @@ interface FetchGPODialogProps {
   onFetchCompleted: () => void;
 }
 
-export function FetchGPODialog({
+export function FetchGPODialog ({
   isOpen,
   onClose,
-  onFetchCompleted,
+  onFetchCompleted
 }: FetchGPODialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm<FetchGPOFormData>({
-    resolver: zodResolver(fetchGPOSchema),
-  });
+    resolver: zodResolver(fetchGPOSchema)
+  })
 
   const { fetchGPO } = useGPOMutations(
     () => {
-      toast.success('GPO fetch completed successfully');
-      onFetchCompleted();
+      toast.success('GPO fetch completed successfully')
+      onFetchCompleted()
     },
     (error) => {
-      toast.error(`Failed to fetch GPO: ${error}`);
+      toast.error(`Failed to fetch GPO: ${error}`)
     }
-  );
+  )
 
   const onSubmit = async (data: FetchGPOFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: FetchGPOInput = {
         name: data.name,
-        targetPath: data.targetPath,
-      };
-      await fetchGPO(input);
-      handleClose();
+        targetPath: data.targetPath
+      }
+      await fetchGPO(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -118,5 +118,5 @@ export function FetchGPODialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

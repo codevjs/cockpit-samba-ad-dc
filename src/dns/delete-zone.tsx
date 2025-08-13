@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useDNSMutations } from './hooks/useDNS';
-import { toast } from 'sonner';
-import type { DeleteDNSZoneInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useDNSMutations } from './hooks/useDNS'
+import { toast } from 'sonner'
+import type { DeleteDNSZoneInput } from '@/types/samba'
 
 const deleteZoneSchema = z.object({
   server: z.string().min(1, 'Server is required'),
   zoneName: z.string().min(1, 'Zone name is required'),
   password: z.string().optional(),
-  confirmationText: z.string().min(1, 'Please type DELETE to confirm'),
-});
+  confirmationText: z.string().min(1, 'Please type DELETE to confirm')
+})
 
 type DeleteZoneFormData = z.infer<typeof deleteZoneSchema>;
 
@@ -29,74 +29,74 @@ interface DeleteZoneDialogProps {
   defaultPassword?: string;
 }
 
-export function DeleteZoneDialog({
+export function DeleteZoneDialog ({
   isOpen,
   onClose,
   onZoneDeleted,
   defaultServer,
-  defaultPassword,
+  defaultPassword
 }: DeleteZoneDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
     watch,
-    formState: { errors },
+    formState: { errors }
   } = useForm<DeleteZoneFormData>({
     resolver: zodResolver(deleteZoneSchema.refine(
       (data) => data.confirmationText === 'DELETE',
       {
         message: 'Please type DELETE to confirm zone deletion',
-        path: ['confirmationText'],
+        path: ['confirmationText']
       }
     )),
     defaultValues: {
       server: defaultServer || '',
-      password: defaultPassword || '',
-    },
-  });
+      password: defaultPassword || ''
+    }
+  })
 
   const { deleteZone } = useDNSMutations(
     () => {
-      toast.success('DNS zone deleted successfully');
-      onZoneDeleted();
+      toast.success('DNS zone deleted successfully')
+      onZoneDeleted()
     },
     (error) => {
-      toast.error(`Failed to delete DNS zone: ${error}`);
+      toast.error(`Failed to delete DNS zone: ${error}`)
     }
-  );
+  )
 
-  const confirmationText = watch('confirmationText');
-  const isConfirmed = confirmationText === 'DELETE';
+  const confirmationText = watch('confirmationText')
+  const isConfirmed = confirmationText === 'DELETE'
 
   const onSubmit = async (data: DeleteZoneFormData) => {
     if (!isConfirmed) {
-      toast.error('Please type DELETE to confirm zone deletion');
-      return;
+      toast.error('Please type DELETE to confirm zone deletion')
+      return
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: DeleteDNSZoneInput = {
         server: data.server,
         zoneName: data.zoneName,
-        password: data.password,
-      };
-      await deleteZone(input);
-      handleClose();
+        password: data.password
+      }
+      await deleteZone(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -111,8 +111,8 @@ export function DeleteZoneDialog({
         <Alert className="border-red-200 bg-red-50">
           <AlertTriangle className="h-4 w-4 text-red-600" />
           <AlertDescription className="text-red-800">
-            <strong>Warning:</strong> This action cannot be undone. Deleting a DNS zone will 
-            permanently remove the zone and all DNS records within it. This may cause service 
+            <strong>Warning:</strong> This action cannot be undone. Deleting a DNS zone will
+            permanently remove the zone and all DNS records within it. This may cause service
             disruptions for domains that rely on this zone.
           </AlertDescription>
         </Alert>
@@ -193,9 +193,9 @@ export function DeleteZoneDialog({
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              variant="destructive" 
+            <Button
+              type="submit"
+              variant="destructive"
               disabled={isSubmitting || !isConfirmed}
             >
               {isSubmitting ? 'Deleting...' : 'Delete Zone'}
@@ -204,5 +204,5 @@ export function DeleteZoneDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

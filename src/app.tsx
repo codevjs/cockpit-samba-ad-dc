@@ -1,11 +1,11 @@
 import React from 'react';
+import './app.scss';
 import ServerRole from './ad-dc-status';
-import './globals.css';
 
-export function Application(): JSX.Element {
+export function Application(): React.ReactElement {
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <>
             <ServerRole />
-        </div>
+        </>
     );
 }

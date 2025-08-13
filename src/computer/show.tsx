@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
-import { Eye, Monitor, Calendar, HardDrive, Network, Building, Copy } from 'lucide-react';
+import React, { useState } from 'react'
+import { Eye, Monitor, Calendar, HardDrive, Network, Building, Copy } from 'lucide-react'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 
-import type { SambaComputer } from '@/types/samba';
+import type { SambaComputer } from '@/types/samba'
 
 interface ShowComputerDialogProps {
     computer?: SambaComputer;
@@ -28,51 +28,51 @@ interface ShowComputerDialogProps {
     trigger?: React.ReactNode;
 }
 
-export default function ShowComputerDialog({ 
-    computer, 
-    computerName: propComputerName, 
-    trigger 
+export default function ShowComputerDialog ({
+  computer,
+  computerName: propComputerName,
+  trigger
 }: ShowComputerDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
-    const computerName = computer?.name || propComputerName || '';
-    const displayName = computer?.name || computerName;
+  const computerName = computer?.name || propComputerName || ''
+  const displayName = computer?.name || computerName
 
-    const handleCopyToClipboard = async (text: string) => {
-        try {
-            await navigator.clipboard.writeText(text);
-        } catch (err) {
-            console.error('Failed to copy text: ', err);
-        }
-    };
+  const handleCopyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
 
-    const formatDate = (date?: Date) => {
-        if (!date) return 'Not available';
-        return new Intl.DateTimeFormat('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        }).format(date);
-    };
+  const formatDate = (date?: Date) => {
+    if (!date) return 'Not available'
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date)
+  }
 
-    const formatLastLogon = (lastLogon?: Date) => {
-        if (!lastLogon) return 'Never';
-        
-        const now = new Date();
-        const diffInMs = now.getTime() - lastLogon.getTime();
-        const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-        
-        if (diffInDays === 0) return 'Today';
-        if (diffInDays === 1) return 'Yesterday';
-        if (diffInDays < 30) return `${diffInDays} days ago`;
-        
-        return formatDate(lastLogon);
-    };
+  const formatLastLogon = (lastLogon?: Date) => {
+    if (!lastLogon) return 'Never'
 
-    if (!computer) {
-        return (
+    const now = new Date()
+    const diffInMs = now.getTime() - lastLogon.getTime()
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+
+    if (diffInDays === 0) return 'Today'
+    if (diffInDays === 1) return 'Yesterday'
+    if (diffInDays < 30) return `${diffInDays} days ago`
+
+    return formatDate(lastLogon)
+  }
+
+  if (!computer) {
+    return (
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
                     {trigger || (
@@ -91,10 +91,10 @@ export default function ShowComputerDialog({
                     </DialogHeader>
                 </DialogContent>
             </Dialog>
-        );
-    }
+    )
+  }
 
-    return (
+  return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 {trigger || (
@@ -162,7 +162,7 @@ export default function ShowComputerDialog({
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {computer.description && (
                                 <>
                                     <Separator />
@@ -280,5 +280,5 @@ export default function ShowComputerDialog({
                 </div>
             </DialogContent>
         </Dialog>
-    );
+  )
 }

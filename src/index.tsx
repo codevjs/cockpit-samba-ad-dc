@@ -17,19 +17,19 @@
  * along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
  */
 
-import "core-js/stable";
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { Application } from './app';
-import './globals.css';
+import 'core-js/stable'
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import { Application } from './app'
+import './globals.css'
 
-document.addEventListener("DOMContentLoaded", function (): void {
-    const container = document.getElementById('app');
-    if (!container) {
-        console.error('Could not find app container element');
-        return;
-    }
+document.addEventListener('DOMContentLoaded', function (): void {
+  const container = document.getElementById('app')
+  if (!container) {
+    console.error('Could not find app container element')
+    return
+  }
 
-    const root = createRoot(container);
-    root.render(React.createElement(Application, {}));
-});
+  const root = createRoot(container)
+  root.render(React.createElement(Application, {}))
+})

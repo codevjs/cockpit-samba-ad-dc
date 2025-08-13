@@ -135,7 +135,6 @@ export interface DNSRecord {
   ttl?: number;
 }
 
-
 export interface SambaGPO {
   name: string;
   displayName: string;
@@ -463,7 +462,7 @@ export interface SetDSHeuristicsInput {
   value: string;
 }
 
-// Organization Unit Management Types  
+// Organization Unit Management Types
 export interface SambaOU {
   name: string;
   distinguishedName: string;

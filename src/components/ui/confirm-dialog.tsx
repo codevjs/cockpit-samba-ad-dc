@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -7,11 +7,11 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
-} from './alert-dialog';
-import { Button } from './button';
-import { cn } from '@/lib/utils';
-import { AlertTriangle, Trash2, Info, HelpCircle } from 'lucide-react';
+  AlertDialogTitle
+} from './alert-dialog'
+import { Button } from './button'
+import { cn } from '@/lib/utils'
+import { AlertTriangle, Trash2, Info, HelpCircle } from 'lucide-react'
 
 export interface ConfirmDialogProps {
   isOpen: boolean;
@@ -32,24 +32,24 @@ const variantConfig = {
   default: {
     icon: HelpCircle,
     iconClassName: 'text-blue-500',
-    confirmClassName: '',
+    confirmClassName: ''
   },
   destructive: {
     icon: Trash2,
     iconClassName: 'text-destructive',
-    confirmClassName: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+    confirmClassName: 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
   },
   warning: {
     icon: AlertTriangle,
     iconClassName: 'text-orange-500',
-    confirmClassName: 'bg-orange-500 text-white hover:bg-orange-600',
+    confirmClassName: 'bg-orange-500 text-white hover:bg-orange-600'
   },
   info: {
     icon: Info,
     iconClassName: 'text-blue-500',
-    confirmClassName: 'bg-blue-500 text-white hover:bg-blue-600',
-  },
-};
+    confirmClassName: 'bg-blue-500 text-white hover:bg-blue-600'
+  }
+}
 
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   isOpen,
@@ -63,21 +63,21 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   disabled = false,
   onConfirm,
   onCancel,
-  children,
+  children
 }) => {
-  const config = variantConfig[variant];
-  const IconComponent = config.icon;
+  const config = variantConfig[variant]
+  const IconComponent = config.icon
 
   const handleConfirm = async () => {
-    if (loading || disabled) return;
-    
+    if (loading || disabled) return
+
     try {
-      await onConfirm();
+      await onConfirm()
     } catch (error) {
       // Error handling should be done by the parent component
-      console.error('Confirmation action failed:', error);
+      console.error('Confirmation action failed:', error)
     }
-  };
+  }
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onCancel}>
@@ -93,7 +93,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             {message}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        
+
         {children && (
           <div className="py-4">
             {children}
@@ -101,7 +101,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         )}
 
         <AlertDialogFooter className="flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-          <AlertDialogCancel 
+          <AlertDialogCancel
             onClick={onCancel}
             disabled={loading}
             className="mt-3 sm:mt-0"
@@ -116,20 +116,22 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               loading && 'opacity-50 cursor-not-allowed'
             )}
           >
-            {loading ? (
+            {loading
+              ? (
               <div className="flex items-center space-x-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
                 <span>Loading...</span>
               </div>
-            ) : (
-              confirmLabel
-            )}
+                )
+              : (
+                  confirmLabel
+                )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  );
-};
+  )
+}
 
 // Specific confirmation dialogs for common use cases
 export interface DeleteConfirmDialogProps {
@@ -151,14 +153,14 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
   message,
   loading = false,
   onConfirm,
-  onCancel,
+  onCancel
 }) => {
-  const defaultTitle = title || `Delete ${itemType}`;
-  const defaultMessage = message || 
-    (itemName 
+  const defaultTitle = title || `Delete ${itemType}`
+  const defaultMessage = message ||
+    (itemName
       ? `Are you sure you want to delete "${itemName}"? This action cannot be undone.`
       : `Are you sure you want to delete this ${itemType}? This action cannot be undone.`
-    );
+    )
 
   return (
     <ConfirmDialog
@@ -172,8 +174,8 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
       onConfirm={onConfirm}
       onCancel={onCancel}
     />
-  );
-};
+  )
+}
 
 export interface BulkDeleteConfirmDialogProps {
   isOpen: boolean;
@@ -190,10 +192,10 @@ export const BulkDeleteConfirmDialog: React.FC<BulkDeleteConfirmDialogProps> = (
   itemType = 'items',
   loading = false,
   onConfirm,
-  onCancel,
+  onCancel
 }) => {
-  const title = `Delete ${count} ${itemType}`;
-  const message = `Are you sure you want to delete ${count} ${itemType}? This action cannot be undone.`;
+  const title = `Delete ${count} ${itemType}`
+  const message = `Are you sure you want to delete ${count} ${itemType}? This action cannot be undone.`
 
   return (
     <ConfirmDialog
@@ -207,38 +209,38 @@ export const BulkDeleteConfirmDialog: React.FC<BulkDeleteConfirmDialogProps> = (
       onConfirm={onConfirm}
       onCancel={onCancel}
     />
-  );
-};
+  )
+}
 
 // Hook for managing confirmation dialog state
 export const useConfirmDialog = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
 
-  const openDialog = () => setIsOpen(true);
+  const openDialog = () => setIsOpen(true)
   const closeDialog = () => {
-    setIsOpen(false);
-    setLoading(false);
-  };
+    setIsOpen(false)
+    setLoading(false)
+  }
 
   const confirmWithLoading = async (action: () => Promise<void>) => {
     try {
-      setLoading(true);
-      await action();
-      closeDialog();
+      setLoading(true)
+      await action()
+      closeDialog()
     } catch (error) {
-      setLoading(false);
-      throw error; // Re-throw so parent can handle
+      setLoading(false)
+      throw error // Re-throw so parent can handle
     }
-  };
+  }
 
   return {
     isOpen,
     loading,
     openDialog,
     closeDialog,
-    confirmWithLoading,
-  };
-};
+    confirmWithLoading
+  }
+}
 
-export default ConfirmDialog;
+export default ConfirmDialog

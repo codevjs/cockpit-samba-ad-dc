@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { Trash2, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react'
+import { Trash2, AlertTriangle } from 'lucide-react'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
-import { useUserMutations } from './hooks/useUserMutations';
-import { ErrorToast, SuccessToast } from '@/common';
-import type { SambaUser } from '@/types/samba';
+import { useUserMutations } from './hooks/useUserMutations'
+import { ErrorToast, SuccessToast } from '@/common'
+import type { SambaUser } from '@/types/samba'
 
 interface DeleteUserDialogProps {
     user?: SambaUser;
@@ -27,67 +27,67 @@ interface DeleteUserDialogProps {
     trigger?: React.ReactNode;
 }
 
-export default function DeleteUserDialog({ 
-    user, 
-    username: propUsername, 
-    onUserDeleted, 
-    trigger 
+export default function DeleteUserDialog ({
+  user,
+  username: propUsername,
+  onUserDeleted,
+  trigger
 }: DeleteUserDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [confirmUsername, setConfirmUsername] = useState('');
-    const [showToasts, setShowToasts] = useState({ success: false, error: false });
+  const [isOpen, setIsOpen] = useState(false)
+  const [confirmUsername, setConfirmUsername] = useState('')
+  const [showToasts, setShowToasts] = useState({ success: false, error: false })
 
-    const username = user?.username || propUsername || '';
-    const displayName = user?.displayName || user?.username || username;
+  const username = user?.username || propUsername || ''
+  const displayName = user?.displayName || user?.username || username
 
-    const { delete: deleteUser, deleting, error, clearError } = useUserMutations({
-        onSuccess: (action, data) => {
-            if (action === 'delete') {
-                setShowToasts({ success: true, error: false });
-                setIsOpen(false);
-                setConfirmUsername('');
-                onUserDeleted?.(data.username);
-            }
-        },
-        onError: () => {
-            setShowToasts({ success: false, error: true });
-        },
-    });
+  const { delete: deleteUser, deleting, error, clearError } = useUserMutations({
+    onSuccess: (action, data) => {
+      if (action === 'delete') {
+        setShowToasts({ success: true, error: false })
+        setIsOpen(false)
+        setConfirmUsername('')
+        onUserDeleted?.(data.username)
+      }
+    },
+    onError: () => {
+      setShowToasts({ success: false, error: true })
+    }
+  })
 
-    const handleDelete = async () => {
-        if (confirmUsername !== username) {
-            return;
-        }
-        
-        clearError();
-        const success = await deleteUser(username);
-        if (success) {
-            setConfirmUsername('');
-        }
-    };
+  const handleDelete = async () => {
+    if (confirmUsername !== username) {
+      return
+    }
 
-    const handleOpenChange = (open: boolean) => {
-        setIsOpen(open);
-        if (!open) {
-            setConfirmUsername('');
-            clearError();
-        }
-    };
+    clearError()
+    const success = await deleteUser(username)
+    if (success) {
+      setConfirmUsername('')
+    }
+  }
 
-    const canDelete = confirmUsername === username && !deleting;
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) {
+      setConfirmUsername('')
+      clearError()
+    }
+  }
 
-    return (
+  const canDelete = confirmUsername === username && !deleting
+
+  return (
         <>
             {showToasts.error && error && (
-                <ErrorToast 
-                    errorMessage={error} 
-                    closeModal={() => setShowToasts({ ...showToasts, error: false })} 
+                <ErrorToast
+                    errorMessage={error}
+                    closeModal={() => setShowToasts({ ...showToasts, error: false })}
                 />
             )}
             {showToasts.success && (
-                <SuccessToast 
-                    successMessage={`User "${username}" has been deleted successfully.`} 
-                    closeModal={() => setShowToasts({ ...showToasts, success: false })} 
+                <SuccessToast
+                    successMessage={`User "${username}" has been deleted successfully.`}
+                    closeModal={() => setShowToasts({ ...showToasts, success: false })}
                 />
             )}
 
@@ -140,7 +140,7 @@ export default function DeleteUserDialog({
                     </div>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel 
+                        <AlertDialogCancel
                             onClick={() => handleOpenChange(false)}
                             disabled={deleting}
                         >
@@ -151,21 +151,23 @@ export default function DeleteUserDialog({
                             disabled={!canDelete}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
-                            {deleting ? (
+                            {deleting
+                              ? (
                                 <>
                                     <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
                                     Deleting...
                                 </>
-                            ) : (
+                                )
+                              : (
                                 <>
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     Delete User
                                 </>
-                            )}
+                                )}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </>
-    );
+  )
 }

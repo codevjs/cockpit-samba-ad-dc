@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,27 +17,27 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { useDelegationMutations } from './hooks/useDelegation';
-import { toast } from 'sonner';
-import type { SetAnyProtocolInput } from '@/types/samba';
+  SelectValue
+} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle } from 'lucide-react'
+import { useDelegationMutations } from './hooks/useDelegation'
+import { toast } from 'sonner'
+import type { SetAnyProtocolInput } from '@/types/samba'
 
 const setAnyProtocolSchema = z.object({
   accountName: z.string().min(1, 'Account name is required'),
-  action: z.enum(['enable', 'disable']),
-});
+  action: z.enum(['enable', 'disable'])
+})
 
 type SetAnyProtocolFormData = z.infer<typeof setAnyProtocolSchema>;
 
@@ -47,46 +47,46 @@ interface SetAnyProtocolDialogProps {
   onAnyProtocolSet: () => void;
 }
 
-export function SetAnyProtocolDialog({ isOpen, onClose, onAnyProtocolSet }: SetAnyProtocolDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function SetAnyProtocolDialog ({ isOpen, onClose, onAnyProtocolSet }: SetAnyProtocolDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<SetAnyProtocolFormData>({
     resolver: zodResolver(setAnyProtocolSchema),
     defaultValues: {
       accountName: '',
-      action: 'disable',
-    },
-  });
+      action: 'disable'
+    }
+  })
 
   const { setAnyProtocol } = useDelegationMutations(
     () => {
-      onAnyProtocolSet();
-      handleClose();
+      onAnyProtocolSet()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: SetAnyProtocolFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: SetAnyProtocolInput = {
         accountName: data.accountName,
-        enable: data.action === 'enable',
-      };
-      
-      await setAnyProtocol(input);
-      toast.success(`Any protocol delegation ${data.action}d for "${data.accountName}"`);
+        enable: data.action === 'enable'
+      }
+
+      await setAnyProtocol(input)
+      toast.success(`Any protocol delegation ${data.action}d for "${data.accountName}"`)
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -97,7 +97,7 @@ export function SetAnyProtocolDialog({ isOpen, onClose, onAnyProtocolSet }: SetA
             Configure whether the account can use any authentication protocol for delegation.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <Alert>
@@ -106,8 +106,8 @@ export function SetAnyProtocolDialog({ isOpen, onClose, onAnyProtocolSet }: SetA
                 <div className="space-y-2">
                   <p className="font-medium">Security Consideration</p>
                   <p className="text-sm">
-                    Enabling "any protocol" delegation allows the account to use any 
-                    authentication protocol (including less secure ones) for delegation. 
+                    Enabling "any protocol" delegation allows the account to use any
+                    authentication protocol (including less secure ones) for delegation.
                     Consider the security implications before enabling this setting.
                   </p>
                 </div>
@@ -180,5 +180,5 @@ export function SetAnyProtocolDialog({ isOpen, onClose, onAnyProtocolSet }: SetA
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

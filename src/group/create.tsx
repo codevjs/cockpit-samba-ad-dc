@@ -1,51 +1,51 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Plus, Users } from 'lucide-react';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2, Plus, Users } from 'lucide-react'
+import { z } from 'zod'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form'
 
-import { useGroupMutations } from './hooks/useGroupMutations';
-import type { CreateGroupInput } from '@/types/samba';
+import { useGroupMutations } from './hooks/useGroupMutations'
+import type { CreateGroupInput } from '@/types/samba'
 
 const createGroupSchema = z.object({
-    name: z.string()
-        .min(1, 'Group name is required')
-        .regex(/^[a-zA-Z0-9_-]+$/, 'Group name can only contain letters, numbers, underscores, and hyphens'),
-    displayName: z.string().optional(),
-    description: z.string().optional(),
-    groupType: z.enum(['Security', 'Distribution']),
-    groupScope: z.enum(['DomainLocal', 'Global', 'Universal']).optional(),
-    organizationalUnit: z.string().optional(),
-});
+  name: z.string()
+    .min(1, 'Group name is required')
+    .regex(/^[a-zA-Z0-9_-]+$/, 'Group name can only contain letters, numbers, underscores, and hyphens'),
+  displayName: z.string().optional(),
+  description: z.string().optional(),
+  groupType: z.enum(['Security', 'Distribution']),
+  groupScope: z.enum(['DomainLocal', 'Global', 'Universal']).optional(),
+  organizationalUnit: z.string().optional()
+})
 
 type CreateGroupFormData = z.infer<typeof createGroupSchema>;
 
@@ -54,46 +54,46 @@ interface CreateGroupDialogProps {
     trigger?: React.ReactNode;
 }
 
-export default function CreateGroupDialog({ onGroupCreated, trigger }: CreateGroupDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
+export default function CreateGroupDialog ({ onGroupCreated, trigger }: CreateGroupDialogProps) {
+  const [isOpen, setIsOpen] = useState(false)
 
-    const form = useForm<CreateGroupFormData>({
-        resolver: zodResolver(createGroupSchema),
-        defaultValues: {
-            name: '',
-            displayName: '',
-            description: '',
-            groupType: 'Security',
-            groupScope: 'Global',
-            organizationalUnit: '',
-        },
-    });
+  const form = useForm<CreateGroupFormData>({
+    resolver: zodResolver(createGroupSchema),
+    defaultValues: {
+      name: '',
+      displayName: '',
+      description: '',
+      groupType: 'Security',
+      groupScope: 'Global',
+      organizationalUnit: ''
+    }
+  })
 
-    const { createGroup, isLoading, error } = useGroupMutations(
-        () => {
-            // Success callback
-            setIsOpen(false);
-            form.reset();
-            onGroupCreated?.({});
-        },
-        (errorMessage: string) => {
-            // Error callback is already handled by the hook
-            console.error('Create group error:', errorMessage);
-        }
-    );
+  const { createGroup, isLoading, error } = useGroupMutations(
+    () => {
+      // Success callback
+      setIsOpen(false)
+      form.reset()
+      onGroupCreated?.({})
+    },
+    (errorMessage: string) => {
+      // Error callback is already handled by the hook
+      console.error('Create group error:', errorMessage)
+    }
+  )
 
-    const onSubmit = async (data: CreateGroupFormData) => {
-        await createGroup(data);
-    };
+  const onSubmit = async (data: CreateGroupFormData) => {
+    await createGroup(data)
+  }
 
-    const handleOpenChange = (open: boolean) => {
-        setIsOpen(open);
-        if (!open) {
-            form.reset();
-        }
-    };
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) {
+      form.reset()
+    }
+  }
 
-    return (
+  return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 {trigger || (
@@ -156,10 +156,10 @@ export default function CreateGroupDialog({ onGroupCreated, trigger }: CreateGro
                                 <FormItem>
                                     <FormLabel>Description</FormLabel>
                                     <FormControl>
-                                        <Textarea 
-                                            placeholder="Enter group description" 
-                                            className="resize-none" 
-                                            {...field} 
+                                        <Textarea
+                                            placeholder="Enter group description"
+                                            className="resize-none"
+                                            {...field}
                                         />
                                     </FormControl>
                                     <FormDescription>
@@ -241,9 +241,9 @@ export default function CreateGroupDialog({ onGroupCreated, trigger }: CreateGro
                         />
 
                         <DialogFooter>
-                            <Button 
-                                type="button" 
-                                variant="outline" 
+                            <Button
+                                type="button"
+                                variant="outline"
                                 onClick={() => handleOpenChange(false)}
                             >
                                 Cancel
@@ -257,5 +257,5 @@ export default function CreateGroupDialog({ onGroupCreated, trigger }: CreateGro
                 </Form>
             </DialogContent>
         </Dialog>
-    );
+  )
 }

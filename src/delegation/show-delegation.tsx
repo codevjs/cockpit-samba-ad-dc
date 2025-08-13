@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,19 +17,19 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, Loader2 } from 'lucide-react';
-import { useDelegation } from './hooks/useDelegation';
-import { toast } from 'sonner';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Shield, Loader2 } from 'lucide-react'
+import { useDelegation } from './hooks/useDelegation'
+import { toast } from 'sonner'
 
 const showDelegationSchema = z.object({
-  accountName: z.string().min(1, 'Account name is required'),
-});
+  accountName: z.string().min(1, 'Account name is required')
+})
 
 type ShowDelegationFormData = z.infer<typeof showDelegationSchema>;
 
@@ -38,36 +38,36 @@ interface ShowDelegationDialogProps {
   onClose: () => void;
 }
 
-export function ShowDelegationDialog({ isOpen, onClose }: ShowDelegationDialogProps) {
-  const [currentAccount, setCurrentAccount] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function ShowDelegationDialog ({ isOpen, onClose }: ShowDelegationDialogProps) {
+  const [currentAccount, setCurrentAccount] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<ShowDelegationFormData>({
     resolver: zodResolver(showDelegationSchema),
     defaultValues: {
-      accountName: '',
-    },
-  });
+      accountName: ''
+    }
+  })
 
-  const { delegation, loading, error } = useDelegation(currentAccount, !!currentAccount);
+  const { delegation, loading, error } = useDelegation(currentAccount, !!currentAccount)
 
   const handleClose = () => {
-    form.reset();
-    setCurrentAccount(null);
-    onClose();
-  };
+    form.reset()
+    setCurrentAccount(null)
+    onClose()
+  }
 
   const onSubmit = async (data: ShowDelegationFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
-      setCurrentAccount(data.accountName);
-      toast.success('Getting delegation settings...');
+      setCurrentAccount(data.accountName)
+      toast.success('Getting delegation settings...')
     } catch (error) {
-      toast.error('Failed to get delegation settings');
+      toast.error('Failed to get delegation settings')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -78,7 +78,7 @@ export function ShowDelegationDialog({ isOpen, onClose }: ShowDelegationDialogPr
             View the current delegation configuration for a service account.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -142,7 +142,7 @@ export function ShowDelegationDialog({ isOpen, onClose }: ShowDelegationDialogPr
                     </div>
                     <div>
                       <h4 className="font-medium mb-2">Any Service</h4>
-                      <Badge variant={delegation.anyService ? "destructive" : "default"}>
+                      <Badge variant={delegation.anyService ? 'destructive' : 'default'}>
                         {delegation.anyService ? 'Enabled' : 'Disabled'}
                       </Badge>
                     </div>
@@ -151,7 +151,7 @@ export function ShowDelegationDialog({ isOpen, onClose }: ShowDelegationDialogPr
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <h4 className="font-medium mb-2">Any Protocol</h4>
-                      <Badge variant={delegation.anyProtocol ? "destructive" : "default"}>
+                      <Badge variant={delegation.anyProtocol ? 'destructive' : 'default'}>
                         {delegation.anyProtocol ? 'Enabled' : 'Disabled'}
                       </Badge>
                     </div>
@@ -165,9 +165,11 @@ export function ShowDelegationDialog({ isOpen, onClose }: ShowDelegationDialogPr
 
                   <div>
                     <h4 className="font-medium mb-2">Allowed Services</h4>
-                    {delegation.allowedServices.length === 0 ? (
+                    {delegation.allowedServices.length === 0
+                      ? (
                       <p className="text-sm text-muted-foreground">No specific services configured</p>
-                    ) : (
+                        )
+                      : (
                       <div className="space-y-2 max-h-32 overflow-y-auto">
                         {delegation.allowedServices.map((service, index) => (
                           <div key={index} className="bg-muted p-2 rounded">
@@ -175,7 +177,7 @@ export function ShowDelegationDialog({ isOpen, onClose }: ShowDelegationDialogPr
                           </div>
                         ))}
                       </div>
-                    )}
+                        )}
                   </div>
 
                   {delegation.protocols.length > 0 && (
@@ -215,5 +217,5 @@ export function ShowDelegationDialog({ isOpen, onClose }: ShowDelegationDialogPr
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

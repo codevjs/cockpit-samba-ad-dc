@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { Shield, ShieldCheck, ShieldX, UserCheck, UserX } from 'lucide-react';
+import React, { useState } from 'react'
+import { Shield, ShieldCheck, ShieldX, UserCheck, UserX } from 'lucide-react'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog'
+import { Badge } from '@/components/ui/badge'
 
-import { useUserMutations } from './hooks/useUserMutations';
-import { ErrorToast, SuccessToast } from '@/common';
-import type { SambaUser } from '@/types/samba';
+import { useUserMutations } from './hooks/useUserMutations'
+import { ErrorToast, SuccessToast } from '@/common'
+import type { SambaUser } from '@/types/samba'
 
 interface UserStatusToggleProps {
     user?: SambaUser;
@@ -29,130 +29,136 @@ interface UserStatusToggleProps {
     size?: 'default' | 'sm' | 'lg' | 'icon';
 }
 
-export default function UserStatusToggle({ 
-    user, 
-    username: propUsername, 
-    currentStatus, 
-    onStatusChanged,
-    trigger,
-    variant = 'button',
-    size = 'sm'
+export default function UserStatusToggle ({
+  user,
+  username: propUsername,
+  currentStatus,
+  onStatusChanged,
+  trigger,
+  variant = 'button',
+  size = 'sm'
 }: UserStatusToggleProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [showToasts, setShowToasts] = useState({ success: false, error: false });
+  const [isOpen, setIsOpen] = useState(false)
+  const [showToasts, setShowToasts] = useState({ success: false, error: false })
 
-    const username = user?.username || propUsername || '';
-    const displayName = user?.displayName || user?.username || username;
-    const isEnabled = user?.enabled ?? currentStatus ?? true;
-    const targetStatus = !isEnabled; // What we want to change to
-    const action = targetStatus ? 'enable' : 'disable';
-    const actionPastTense = targetStatus ? 'enabled' : 'disabled';
+  const username = user?.username || propUsername || ''
+  const displayName = user?.displayName || user?.username || username
+  const isEnabled = user?.enabled ?? currentStatus ?? true
+  const targetStatus = !isEnabled // What we want to change to
+  const action = targetStatus ? 'enable' : 'disable'
+  const actionPastTense = targetStatus ? 'enabled' : 'disabled'
 
-    const { 
-        enable, 
-        disable, 
-        enablingDisabling, 
-        error, 
-        clearError 
-    } = useUserMutations({
-        onSuccess: (actionType, updatedUser) => {
-            if (actionType === 'enable' || actionType === 'disable') {
-                setShowToasts({ success: true, error: false });
-                setIsOpen(false);
-                onStatusChanged?.(username, updatedUser.enabled);
-            }
-        },
-        onError: () => {
-            setShowToasts({ success: false, error: true });
-        },
-    });
+  const {
+    enable,
+    disable,
+    enablingDisabling,
+    error,
+    clearError
+  } = useUserMutations({
+    onSuccess: (actionType, updatedUser) => {
+      if (actionType === 'enable' || actionType === 'disable') {
+        setShowToasts({ success: true, error: false })
+        setIsOpen(false)
+        onStatusChanged?.(username, updatedUser.enabled)
+      }
+    },
+    onError: () => {
+      setShowToasts({ success: false, error: true })
+    }
+  })
 
-    const handleStatusChange = async () => {
-        clearError();
-        
-        if (targetStatus) {
-            await enable(username);
-        } else {
-            await disable(username);
-        }
-    };
+  const handleStatusChange = async () => {
+    clearError()
 
-    const handleOpenChange = (open: boolean) => {
-        setIsOpen(open);
-        if (!open) {
-            clearError();
-        }
-    };
+    if (targetStatus) {
+      await enable(username)
+    } else {
+      await disable(username)
+    }
+  }
 
-    const renderTrigger = () => {
-        if (trigger) return trigger;
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) {
+      clearError()
+    }
+  }
 
-        switch (variant) {
-            case 'badge':
-                return (
-                    <Badge 
+  const renderTrigger = () => {
+    if (trigger) return trigger
+
+    switch (variant) {
+      case 'badge':
+        return (
+                    <Badge
                         variant={isEnabled ? 'default' : 'destructive'}
                         className="cursor-pointer hover:opacity-80"
                     >
-                        {isEnabled ? (
+                        {isEnabled
+                          ? (
                             <>
                                 <ShieldCheck className="mr-1 h-3 w-3" />
                                 Enabled
                             </>
-                        ) : (
+                            )
+                          : (
                             <>
                                 <ShieldX className="mr-1 h-3 w-3" />
                                 Disabled
                             </>
-                        )}
+                            )}
                     </Badge>
-                );
-            
-            case 'icon':
-                return (
+        )
+
+      case 'icon':
+        return (
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        {isEnabled ? (
+                        {isEnabled
+                          ? (
                             <UserCheck className="h-4 w-4 text-green-600" />
-                        ) : (
+                            )
+                          : (
                             <UserX className="h-4 w-4 text-red-600" />
-                        )}
+                            )}
                     </Button>
-                );
-            
-            default: // button
-                return (
-                    <Button 
-                        variant={targetStatus ? "default" : "destructive"} 
+        )
+
+      default: // button
+        return (
+                    <Button
+                        variant={targetStatus ? 'default' : 'destructive'}
                         size={size}
                     >
-                        {targetStatus ? (
+                        {targetStatus
+                          ? (
                             <>
                                 <UserCheck className="mr-2 h-4 w-4" />
                                 Enable User
                             </>
-                        ) : (
+                            )
+                          : (
                             <>
                                 <UserX className="mr-2 h-4 w-4" />
                                 Disable User
                             </>
-                        )}
+                            )}
                     </Button>
-                );
-        }
-    };
+        )
+    }
+  }
 
-    return (
+  return (
         <>
             {showToasts.error && error && (
-                <ErrorToast 
-                    errorMessage={error} 
-                    closeModal={() => setShowToasts({ ...showToasts, error: false })} 
+                <ErrorToast
+                    errorMessage={error}
+                    closeModal={() => setShowToasts({ ...showToasts, error: false })}
                 />
             )}
             {showToasts.success && (
-                <SuccessToast 
-                    successMessage={`User "${username}" has been ${actionPastTense} successfully.`} 
-                    closeModal={() => setShowToasts({ ...showToasts, success: false })} 
+                <SuccessToast
+                    successMessage={`User "${username}" has been ${actionPastTense} successfully.`}
+                    closeModal={() => setShowToasts({ ...showToasts, success: false })}
                 />
             )}
 
@@ -174,8 +180,9 @@ export default function UserStatusToggle({
                                     Are you sure you want to {action} the user account for{' '}
                                     <strong>"{displayName}"</strong>?
                                 </p>
-                                
-                                {targetStatus ? (
+
+                                {targetStatus
+                                  ? (
                                     <div className="bg-green-50 border border-green-200 rounded-md p-3">
                                         <p className="text-sm text-green-800">
                                             <strong>Enabling this account will:</strong>
@@ -186,7 +193,8 @@ export default function UserStatusToggle({
                                             <li>Reactivate all assigned permissions</li>
                                         </ul>
                                     </div>
-                                ) : (
+                                    )
+                                  : (
                                     <div className="bg-orange-50 border border-orange-200 rounded-md p-3">
                                         <p className="text-sm text-orange-800">
                                             <strong>Disabling this account will:</strong>
@@ -198,7 +206,7 @@ export default function UserStatusToggle({
                                             <li>Allow the account to be re-enabled later</li>
                                         </ul>
                                     </div>
-                                )}
+                                    )}
 
                                 <p className="text-xs text-muted-foreground">
                                     Note: This action can be reversed at any time.
@@ -208,7 +216,7 @@ export default function UserStatusToggle({
                     </AlertDialogHeader>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel 
+                        <AlertDialogCancel
                             onClick={() => handleOpenChange(false)}
                             disabled={enablingDisabling}
                         >
@@ -217,30 +225,34 @@ export default function UserStatusToggle({
                         <AlertDialogAction
                             onClick={handleStatusChange}
                             disabled={enablingDisabling}
-                            className={targetStatus ? 
-                                "bg-primary text-primary-foreground hover:bg-primary/90" : 
-                                "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            className={targetStatus
+                              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                              : 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
                             }
                         >
-                            {enablingDisabling ? (
+                            {enablingDisabling
+                              ? (
                                 <>
                                     <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
                                     {targetStatus ? 'Enabling...' : 'Disabling...'}
                                 </>
-                            ) : (
+                                )
+                              : (
                                 <>
-                                    {targetStatus ? (
+                                    {targetStatus
+                                      ? (
                                         <UserCheck className="mr-2 h-4 w-4" />
-                                    ) : (
+                                        )
+                                      : (
                                         <UserX className="mr-2 h-4 w-4" />
-                                    )}
+                                        )}
                                     {targetStatus ? 'Enable User' : 'Disable User'}
                                 </>
-                            )}
+                                )}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </>
-    );
+  )
 }

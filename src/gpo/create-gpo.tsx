@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useGPOMutations } from './hooks/useGPO';
-import { toast } from 'sonner';
-import type { CreateGPOInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Info } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useGPOMutations } from './hooks/useGPO'
+import { toast } from 'sonner'
+import type { CreateGPOInput } from '@/types/samba'
 
 const createGPOSchema = z.object({
   name: z.string()
@@ -23,8 +23,8 @@ const createGPOSchema = z.object({
     .max(255, 'Display name must be less than 255 characters'),
   description: z.string()
     .max(1024, 'Description must be less than 1024 characters')
-    .optional(),
-});
+    .optional()
+})
 
 type CreateGPOFormData = z.infer<typeof createGPOSchema>;
 
@@ -34,53 +34,53 @@ interface CreateGPODialogProps {
   onGPOCreated: () => void;
 }
 
-export function CreateGPODialog({
+export function CreateGPODialog ({
   isOpen,
   onClose,
-  onGPOCreated,
+  onGPOCreated
 }: CreateGPODialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm<CreateGPOFormData>({
-    resolver: zodResolver(createGPOSchema),
-  });
+    resolver: zodResolver(createGPOSchema)
+  })
 
   const { createGPO } = useGPOMutations(
     () => {
-      toast.success('GPO created successfully');
-      onGPOCreated();
+      toast.success('GPO created successfully')
+      onGPOCreated()
     },
     (error) => {
-      toast.error(`Failed to create GPO: ${error}`);
+      toast.error(`Failed to create GPO: ${error}`)
     }
-  );
+  )
 
   const onSubmit = async (data: CreateGPOFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: CreateGPOInput = {
         name: data.name,
         displayName: data.displayName,
-        description: data.description,
-      };
-      await createGPO(input);
-      handleClose();
+        description: data.description
+      }
+      await createGPO(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -95,7 +95,7 @@ export function CreateGPODialog({
         <Alert className="border-blue-200 bg-blue-50">
           <Info className="h-4 w-4 text-blue-600" />
           <AlertDescription className="text-blue-800">
-            <strong>Note:</strong> After creating the GPO, you'll need to link it to 
+            <strong>Note:</strong> After creating the GPO, you'll need to link it to
             organizational units or domains to apply its policies to users and computers.
           </AlertDescription>
         </Alert>
@@ -171,5 +171,5 @@ export function CreateGPODialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

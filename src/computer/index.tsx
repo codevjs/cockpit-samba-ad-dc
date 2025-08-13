@@ -1,61 +1,61 @@
-import React, { useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { Plus, Monitor, Search, Filter, HardDrive } from 'lucide-react';
-import '../user/tailwind.css';
+import React, { useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Plus, Monitor, Search, Filter, HardDrive } from 'lucide-react'
+import '../user/tailwind.css'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@/components/ui/tabs';
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@/components/ui/tabs'
 
 // Import computer management components
-import ComputerList from './list';
-import CreateComputerDialog from './create';
-import DeleteComputerDialog from './delete';
-import MoveComputerDialog from './move';
-import ShowComputerDialog from './show';
+import ComputerList from './list'
+import CreateComputerDialog from './create'
+import DeleteComputerDialog from './delete'
+import MoveComputerDialog from './move'
+import ShowComputerDialog from './show'
 
 // Import hooks
-import { useComputers } from './hooks/useComputers';
-import type { FilterOptions } from '@/types/samba';
+import { useComputers } from './hooks/useComputers'
+import type { FilterOptions } from '@/types/samba'
 
 interface ComputerManagementPageProps {
     initialView?: 'list' | 'management';
 }
 
-function ComputerManagementPage({ initialView = 'list' }: ComputerManagementPageProps) {
-    const [activeTab, setActiveTab] = useState(initialView);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filters, setFilters] = useState<FilterOptions>({});
-    
-    const { 
-        computers, 
-        loading, 
-        error, 
-        refreshComputers,
-        stats 
-    } = useComputers({
-        initialFilters: filters,
-        autoRefresh: true,
-    });
+function ComputerManagementPage ({ initialView = 'list' }: ComputerManagementPageProps) {
+  const [activeTab, setActiveTab] = useState(initialView)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState<FilterOptions>({})
 
-    const handleSearch = (query: string) => {
-        setSearchQuery(query);
-        setFilters(prev => ({ ...prev, search: query }));
-    };
+  const {
+    computers,
+    loading,
+    error,
+    refreshComputers,
+    stats
+  } = useComputers({
+    initialFilters: filters,
+    autoRefresh: true
+  })
 
-    return (
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setFilters(prev => ({ ...prev, search: query }))
+  }
+
+  return (
         <div className="min-h-screen bg-background">
             <div className="container mx-auto p-6 space-y-6">
                 {/* Header */}
@@ -67,7 +67,7 @@ function ComputerManagementPage({ initialView = 'list' }: ComputerManagementPage
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <CreateComputerDialog 
+                        <CreateComputerDialog
                             onComputerCreated={refreshComputers}
                             trigger={
                                 <Button>
@@ -126,7 +126,7 @@ function ComputerManagementPage({ initialView = 'list' }: ComputerManagementPage
                             <TabsTrigger value="list">Computer List</TabsTrigger>
                             <TabsTrigger value="management">Management</TabsTrigger>
                         </TabsList>
-                        
+
                         {activeTab === 'list' && (
                             <div className="flex gap-2">
                                 <div className="relative">
@@ -154,7 +154,7 @@ function ComputerManagementPage({ initialView = 'list' }: ComputerManagementPage
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <ComputerList 
+                                <ComputerList
                                     computers={computers}
                                     loading={loading}
                                     error={error}
@@ -174,7 +174,7 @@ function ComputerManagementPage({ initialView = 'list' }: ComputerManagementPage
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
-                                    <CreateComputerDialog 
+                                    <CreateComputerDialog
                                         onComputerCreated={refreshComputers}
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
@@ -183,7 +183,7 @@ function ComputerManagementPage({ initialView = 'list' }: ComputerManagementPage
                                             </Button>
                                         }
                                     />
-                                    <DeleteComputerDialog 
+                                    <DeleteComputerDialog
                                         onComputerDeleted={refreshComputers}
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
@@ -191,7 +191,7 @@ function ComputerManagementPage({ initialView = 'list' }: ComputerManagementPage
                                             </Button>
                                         }
                                     />
-                                    <MoveComputerDialog 
+                                    <MoveComputerDialog
                                         onComputerMoved={refreshComputers}
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
@@ -210,7 +210,7 @@ function ComputerManagementPage({ initialView = 'list' }: ComputerManagementPage
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
-                                    <ShowComputerDialog 
+                                    <ShowComputerDialog
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
                                                 View Computer Details
@@ -242,7 +242,7 @@ function ComputerManagementPage({ initialView = 'list' }: ComputerManagementPage
                                             <span className="font-medium text-red-600">{stats.disabled}</span>
                                         </div>
                                     </div>
-                                    
+
                                     {Object.keys(stats.byOS).length > 0 && (
                                         <div className="pt-2 border-t">
                                             <div className="text-sm font-medium mb-2">Operating Systems:</div>
@@ -263,16 +263,16 @@ function ComputerManagementPage({ initialView = 'list' }: ComputerManagementPage
                 </Tabs>
             </div>
         </div>
-    );
+  )
 }
 
 // Entry point for standalone computer management page
-document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById("computer");
-    if (container) {
-        const root = createRoot(container);
-        root.render(<ComputerManagementPage />);
-    }
-});
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('computer')
+  if (container) {
+    const root = createRoot(container)
+    root.render(<ComputerManagementPage />)
+  }
+})
 
-export default ComputerManagementPage;
+export default ComputerManagementPage

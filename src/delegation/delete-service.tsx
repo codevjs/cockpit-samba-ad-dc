@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,18 +17,18 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useDelegationMutations } from './hooks/useDelegation';
-import { toast } from 'sonner';
-import type { DeleteServiceDelegationInput } from '@/types/samba';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { useDelegationMutations } from './hooks/useDelegation'
+import { toast } from 'sonner'
+import type { DeleteServiceDelegationInput } from '@/types/samba'
 
 const deleteServiceSchema = z.object({
   accountName: z.string().min(1, 'Account name is required'),
-  principal: z.string().min(1, 'Service principal is required'),
-});
+  principal: z.string().min(1, 'Service principal is required')
+})
 
 type DeleteServiceFormData = z.infer<typeof deleteServiceSchema>;
 
@@ -38,46 +38,46 @@ interface DeleteServiceDialogProps {
   onServiceDeleted: () => void;
 }
 
-export function DeleteServiceDialog({ isOpen, onClose, onServiceDeleted }: DeleteServiceDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function DeleteServiceDialog ({ isOpen, onClose, onServiceDeleted }: DeleteServiceDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<DeleteServiceFormData>({
     resolver: zodResolver(deleteServiceSchema),
     defaultValues: {
       accountName: '',
-      principal: '',
-    },
-  });
+      principal: ''
+    }
+  })
 
   const { deleteService } = useDelegationMutations(
     () => {
-      onServiceDeleted();
-      handleClose();
+      onServiceDeleted()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: DeleteServiceFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: DeleteServiceDelegationInput = {
         accountName: data.accountName,
-        principal: data.principal,
-      };
-      
-      await deleteService(input);
-      toast.success(`Service "${data.principal}" removed from delegation for "${data.accountName}"`);
+        principal: data.principal
+      }
+
+      await deleteService(input)
+      toast.success(`Service "${data.principal}" removed from delegation for "${data.accountName}"`)
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -88,7 +88,7 @@ export function DeleteServiceDialog({ isOpen, onClose, onServiceDeleted }: Delet
             Remove a service principal from the constrained delegation list.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -145,5 +145,5 @@ export function DeleteServiceDialog({ isOpen, onClose, onServiceDeleted }: Delet
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

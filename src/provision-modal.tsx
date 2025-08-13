@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, Server, Shield, Network, Database } from 'lucide-react';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Progress } from '@/components/ui/progress'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertTriangle, Server, Shield, Network, Database } from 'lucide-react'
 
-import cockpit from 'cockpit';
+import cockpit from 'cockpit'
 
 interface ProvisionFormData {
     domain: string;
@@ -36,123 +36,123 @@ interface ProvisionState {
 }
 
 const initialFormData: ProvisionFormData = {
-    domain: '',
-    adminPassword: '',
-    confirmPassword: '',
-    dnsForwarder: '8.8.8.8',
-};
+  domain: '',
+  adminPassword: '',
+  confirmPassword: '',
+  dnsForwarder: '8.8.8.8'
+}
 
 const provisionSteps = [
-    { id: 1, name: 'Validation', description: 'Validating system requirements' },
-    { id: 2, name: 'Configuration', description: 'Preparing domain configuration' },
-    { id: 3, name: 'Provisioning', description: 'Creating Active Directory structure' },
-    { id: 4, name: 'DNS Setup', description: 'Configuring DNS services' },
-    { id: 5, name: 'Finalization', description: 'Completing domain controller setup' },
-];
+  { id: 1, name: 'Validation', description: 'Validating system requirements' },
+  { id: 2, name: 'Configuration', description: 'Preparing domain configuration' },
+  { id: 3, name: 'Provisioning', description: 'Creating Active Directory structure' },
+  { id: 4, name: 'DNS Setup', description: 'Configuring DNS services' },
+  { id: 5, name: 'Finalization', description: 'Completing domain controller setup' }
+]
 
-export default function Provision(): JSX.Element {
-    const [state, setState] = useState<ProvisionState>({
-        isOpen: false,
+export default function Provision (): JSX.Element {
+  const [state, setState] = useState<ProvisionState>({
+    isOpen: false,
+    isProvisioning: false,
+    progress: 0,
+    currentStep: '',
+    formData: initialFormData,
+    formErrors: {}
+  })
+
+  const validateForm = (): boolean => {
+    const errors: Partial<ProvisionFormData> = {}
+
+    if (!state.formData.domain.trim()) {
+      errors.domain = 'Domain name is required'
+    } else if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(state.formData.domain.trim())) {
+      errors.domain = 'Please enter a valid domain name (e.g., company.local)'
+    }
+
+    if (!state.formData.adminPassword) {
+      errors.adminPassword = 'Administrator password is required'
+    } else if (state.formData.adminPassword.length < 8) {
+      errors.adminPassword = 'Password must be at least 8 characters long'
+    }
+
+    if (state.formData.adminPassword !== state.formData.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match'
+    }
+
+    if (!state.formData.dnsForwarder.trim()) {
+      errors.dnsForwarder = 'DNS forwarder is required'
+    } else if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(state.formData.dnsForwarder.trim())) {
+      errors.dnsForwarder = 'Please enter a valid IP address'
+    }
+
+    setState(prev => ({ ...prev, formErrors: errors }))
+    return Object.keys(errors).length === 0
+  }
+
+  const handleInputChange = (field: keyof ProvisionFormData, value: string): void => {
+    setState(prev => ({
+      ...prev,
+      formData: { ...prev.formData, [field]: value },
+      formErrors: { ...prev.formErrors, [field]: undefined }
+    }))
+  }
+
+  const startProvisioning = async (): Promise<void> => {
+    if (!validateForm()) return
+
+    setState(prev => ({
+      ...prev,
+      isProvisioning: true,
+      progress: 0,
+      error: undefined
+    }))
+
+    try {
+      const { domain, adminPassword, dnsForwarder } = state.formData
+
+      for (let i = 0; i < provisionSteps.length; i++) {
+        const step = provisionSteps[i]
+        setState(prev => ({
+          ...prev,
+          currentStep: step.description,
+          progress: ((i + 1) / provisionSteps.length) * 100
+        }))
+
+        // Simulate provisioning delay
+        await new Promise(resolve => setTimeout(resolve, 2000))
+
+        if (i === provisionSteps.length - 1) {
+          // Execute actual provisioning command
+          const command = `samba-tool domain provision --realm=${domain.toUpperCase()} --domain=${domain.split('.')[0].toUpperCase()} --adminpass="${adminPassword}" --dns-backend=SAMBA_INTERNAL --option="dns forwarder = ${dnsForwarder}"`
+          await cockpit.script(command, { superuser: true, err: 'message' })
+        }
+      }
+
+      // Refresh the page to show the new AD DC status
+      window.location.reload()
+    } catch (error: any) {
+      console.error('Provisioning failed:', error)
+      setState(prev => ({
+        ...prev,
         isProvisioning: false,
-        progress: 0,
-        currentStep: '',
+        error: error?.message || 'Failed to provision Active Directory Domain Controller'
+      }))
+    }
+  }
+
+  const handleClose = (): void => {
+    if (!state.isProvisioning) {
+      setState(prev => ({
+        ...prev,
+        isOpen: false,
         formData: initialFormData,
         formErrors: {},
-    });
+        error: undefined
+      }))
+    }
+  }
 
-    const validateForm = (): boolean => {
-        const errors: Partial<ProvisionFormData> = {};
-
-        if (!state.formData.domain.trim()) {
-            errors.domain = 'Domain name is required';
-        } else if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(state.formData.domain.trim())) {
-            errors.domain = 'Please enter a valid domain name (e.g., company.local)';
-        }
-
-        if (!state.formData.adminPassword) {
-            errors.adminPassword = 'Administrator password is required';
-        } else if (state.formData.adminPassword.length < 8) {
-            errors.adminPassword = 'Password must be at least 8 characters long';
-        }
-
-        if (state.formData.adminPassword !== state.formData.confirmPassword) {
-            errors.confirmPassword = 'Passwords do not match';
-        }
-
-        if (!state.formData.dnsForwarder.trim()) {
-            errors.dnsForwarder = 'DNS forwarder is required';
-        } else if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(state.formData.dnsForwarder.trim())) {
-            errors.dnsForwarder = 'Please enter a valid IP address';
-        }
-
-        setState(prev => ({ ...prev, formErrors: errors }));
-        return Object.keys(errors).length === 0;
-    };
-
-    const handleInputChange = (field: keyof ProvisionFormData, value: string): void => {
-        setState(prev => ({
-            ...prev,
-            formData: { ...prev.formData, [field]: value },
-            formErrors: { ...prev.formErrors, [field]: undefined }
-        }));
-    };
-
-    const startProvisioning = async (): Promise<void> => {
-        if (!validateForm()) return;
-
-        setState(prev => ({
-            ...prev,
-            isProvisioning: true,
-            progress: 0,
-            error: undefined
-        }));
-
-        try {
-            const { domain, adminPassword, dnsForwarder } = state.formData;
-
-            for (let i = 0; i < provisionSteps.length; i++) {
-                const step = provisionSteps[i];
-                setState(prev => ({
-                    ...prev,
-                    currentStep: step.description,
-                    progress: ((i + 1) / provisionSteps.length) * 100
-                }));
-
-                // Simulate provisioning delay
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-                if (i === provisionSteps.length - 1) {
-                    // Execute actual provisioning command
-                    const command = `samba-tool domain provision --realm=${domain.toUpperCase()} --domain=${domain.split('.')[0].toUpperCase()} --adminpass="${adminPassword}" --dns-backend=SAMBA_INTERNAL --option="dns forwarder = ${dnsForwarder}"`;
-                    await cockpit.script(command, { superuser: true, err: "message" });
-                }
-            }
-
-            // Refresh the page to show the new AD DC status
-            window.location.reload();
-        } catch (error: any) {
-            console.error('Provisioning failed:', error);
-            setState(prev => ({
-                ...prev,
-                isProvisioning: false,
-                error: error?.message || 'Failed to provision Active Directory Domain Controller'
-            }));
-        }
-    };
-
-    const handleClose = (): void => {
-        if (!state.isProvisioning) {
-            setState(prev => ({
-                ...prev,
-                isOpen: false,
-                formData: initialFormData,
-                formErrors: {},
-                error: undefined
-            }));
-        }
-    };
-
-    return (
+  return (
         <Dialog open={state.isOpen} onOpenChange={(open) => setState(prev => ({ ...prev, isOpen: open }))}>
             <DialogTrigger asChild>
                 <Button variant="default" size="lg" className="w-full">
@@ -185,7 +185,7 @@ export default function Provision(): JSX.Element {
                 )}
 
                 {state.isProvisioning
-? (
+                  ? (
     <div className="space-y-6">
         <Card>
             <CardHeader>
@@ -215,11 +215,11 @@ export default function Provision(): JSX.Element {
                         <div className="text-xs text-muted-foreground">{step.description}</div>
                     </div>
                 </div>
-                            ))}
+            ))}
         </div>
     </div>
-                )
-: (
+                    )
+                  : (
     <div className="space-y-6">
         <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/20">
             <CardContent className="pt-6">
@@ -246,7 +246,7 @@ export default function Provision(): JSX.Element {
                                 />
                 {state.formErrors.domain && (
                 <p className="text-sm text-destructive">{state.formErrors.domain}</p>
-                                )}
+                )}
             </div>
 
             <div className="space-y-2">
@@ -261,7 +261,7 @@ export default function Provision(): JSX.Element {
                                 />
                 {state.formErrors.adminPassword && (
                 <p className="text-sm text-destructive">{state.formErrors.adminPassword}</p>
-                                )}
+                )}
             </div>
 
             <div className="space-y-2">
@@ -276,7 +276,7 @@ export default function Provision(): JSX.Element {
                                 />
                 {state.formErrors.confirmPassword && (
                 <p className="text-sm text-destructive">{state.formErrors.confirmPassword}</p>
-                                )}
+                )}
             </div>
 
             <div className="space-y-2">
@@ -290,7 +290,7 @@ export default function Provision(): JSX.Element {
                                 />
                 {state.formErrors.dnsForwarder && (
                 <p className="text-sm text-destructive">{state.formErrors.dnsForwarder}</p>
-                                )}
+                )}
                 <p className="text-xs text-muted-foreground">
                     IP address of upstream DNS server for external lookups
                 </p>
@@ -315,7 +315,7 @@ export default function Provision(): JSX.Element {
             </div>
         </div>
     </div>
-                )}
+                    )}
 
                 <DialogFooter>
                     {!state.isProvisioning && (
@@ -331,5 +331,5 @@ export default function Provision(): JSX.Element {
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-    );
+  )
 }

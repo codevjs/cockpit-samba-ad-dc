@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useDomainMutations } from './hooks/useDomainMutations';
-import { toast } from 'sonner';
-import type { DomainJoinInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Info } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useDomainMutations } from './hooks/useDomainMutations'
+import { toast } from 'sonner'
+import type { DomainJoinInput } from '@/types/samba'
 
 const domainJoinSchema = z.object({
   domain: z.string().min(1, 'Domain is required'),
   username: z.string().min(1, 'Username is required'),
   password: z.string().min(1, 'Password is required'),
   organizationalUnit: z.string().optional(),
-  computerName: z.string().optional(),
-});
+  computerName: z.string().optional()
+})
 
 type DomainJoinFormData = z.infer<typeof domainJoinSchema>;
 
@@ -28,55 +28,55 @@ interface DomainJoinDialogProps {
   onJoinCompleted: () => void;
 }
 
-export function DomainJoinDialog({
+export function DomainJoinDialog ({
   isOpen,
   onClose,
-  onJoinCompleted,
+  onJoinCompleted
 }: DomainJoinDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm<DomainJoinFormData>({
-    resolver: zodResolver(domainJoinSchema),
-  });
+    resolver: zodResolver(domainJoinSchema)
+  })
 
   const { joinDomain } = useDomainMutations(
     () => {
-      toast.success('Successfully joined domain');
-      onJoinCompleted();
+      toast.success('Successfully joined domain')
+      onJoinCompleted()
     },
     (error) => {
-      toast.error(`Failed to join domain: ${error}`);
+      toast.error(`Failed to join domain: ${error}`)
     }
-  );
+  )
 
   const onSubmit = async (data: DomainJoinFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: DomainJoinInput = {
         domain: data.domain,
         username: data.username,
         password: data.password,
         organizationalUnit: data.organizationalUnit,
-        computerName: data.computerName,
-      };
-      await joinDomain(input);
-      handleClose();
+        computerName: data.computerName
+      }
+      await joinDomain(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -91,7 +91,7 @@ export function DomainJoinDialog({
         <Alert className="border-blue-200 bg-blue-50">
           <Info className="h-4 w-4 text-blue-600" />
           <AlertDescription className="text-blue-800">
-            <strong>Important:</strong> This operation will join the server to the domain 
+            <strong>Important:</strong> This operation will join the server to the domain
             as a domain controller. Ensure you have proper credentials and network connectivity.
           </AlertDescription>
         </Alert>
@@ -192,7 +192,7 @@ export function DomainJoinDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
-export default DomainJoinDialog;
+export default DomainJoinDialog

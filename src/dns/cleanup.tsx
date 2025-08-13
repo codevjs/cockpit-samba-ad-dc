@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  AlertTriangle, 
-  Info, 
-  Trash2, 
-  CheckCircle, 
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Progress } from '@/components/ui/progress'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
+  AlertTriangle,
+  Info,
+  Trash2,
+  CheckCircle,
   Clock,
   Database
-} from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useDNSMutations } from './hooks/useDNS';
-import { toast } from 'sonner';
-import type { DNSCleanupInput } from '@/types/samba';
+} from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useDNSMutations } from './hooks/useDNS'
+import { toast } from 'sonner'
+import type { DNSCleanupInput } from '@/types/samba'
 
 const cleanupSchema = z.object({
   server: z.string().min(1, 'Server is required'),
-  password: z.string().optional(),
-});
+  password: z.string().optional()
+})
 
 type CleanupFormData = z.infer<typeof cleanupSchema>;
 
@@ -37,67 +37,67 @@ interface CleanupDialogProps {
   defaultPassword?: string;
 }
 
-export function CleanupDialog({
+export function CleanupDialog ({
   isOpen,
   onClose,
   onCleanupCompleted,
   defaultServer,
-  defaultPassword,
+  defaultPassword
 }: CleanupDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cleanupResults, setCleanupResults] = useState<string[]>([]);
-  const [showResults, setShowResults] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [cleanupResults, setCleanupResults] = useState<string[]>([])
+  const [showResults, setShowResults] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm<CleanupFormData>({
     resolver: zodResolver(cleanupSchema),
     defaultValues: {
       server: defaultServer || '',
-      password: defaultPassword || '',
-    },
-  });
+      password: defaultPassword || ''
+    }
+  })
 
   const { cleanup } = useDNSMutations(
     () => {
-      toast.success('DNS cleanup completed successfully');
-      onCleanupCompleted();
+      toast.success('DNS cleanup completed successfully')
+      onCleanupCompleted()
     },
     (error) => {
-      toast.error(`DNS cleanup failed: ${error}`);
+      toast.error(`DNS cleanup failed: ${error}`)
     }
-  );
+  )
 
   const onSubmit = async (data: CleanupFormData) => {
-    setIsSubmitting(true);
-    setShowResults(false);
-    setCleanupResults([]);
-    
+    setIsSubmitting(true)
+    setShowResults(false)
+    setCleanupResults([])
+
     try {
       const input: DNSCleanupInput = {
         server: data.server,
-        password: data.password,
-      };
-      
-      const results = await cleanup(input);
-      setCleanupResults(results);
-      setShowResults(true);
+        password: data.password
+      }
+
+      const results = await cleanup(input)
+      setCleanupResults(results)
+      setShowResults(true)
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    setCleanupResults([]);
-    setShowResults(false);
-    onClose();
-  };
+    reset()
+    setCleanupResults([])
+    setShowResults(false)
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -117,8 +117,8 @@ export function CleanupDialog({
             <Alert className="border-blue-200 bg-blue-50">
               <Info className="h-4 w-4 text-blue-600" />
               <AlertDescription className="text-blue-800">
-                <strong>DNS Cleanup Process:</strong> This operation will scan the DNS server 
-                for stale records, orphaned entries, and configuration inconsistencies, then 
+                <strong>DNS Cleanup Process:</strong> This operation will scan the DNS server
+                for stale records, orphaned entries, and configuration inconsistencies, then
                 attempt to resolve them automatically.
               </AlertDescription>
             </Alert>
@@ -126,8 +126,8 @@ export function CleanupDialog({
             <Alert className="border-orange-200 bg-orange-50">
               <AlertTriangle className="h-4 w-4 text-orange-600" />
               <AlertDescription className="text-orange-800">
-                <strong>Warning:</strong> DNS cleanup may modify or remove DNS records. 
-                Ensure you have proper backups before proceeding. This operation should 
+                <strong>Warning:</strong> DNS cleanup may modify or remove DNS records.
+                Ensure you have proper backups before proceeding. This operation should
                 be performed during maintenance windows.
               </AlertDescription>
             </Alert>
@@ -244,7 +244,8 @@ export function CleanupDialog({
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {cleanupResults.length === 0 ? (
+                {cleanupResults.length === 0
+                  ? (
                   <div className="text-center py-4">
                     <CheckCircle className="mx-auto h-8 w-8 text-green-600 mb-2" />
                     <p className="text-sm font-medium">No Issues Found</p>
@@ -252,7 +253,8 @@ export function CleanupDialog({
                       The DNS server is clean and no stale records were detected.
                     </p>
                   </div>
-                ) : (
+                    )
+                  : (
                   <div className="space-y-2">
                     {cleanupResults.map((result, index) => (
                       <div key={index} className="flex items-start gap-2 p-2 bg-muted/50 rounded">
@@ -263,7 +265,7 @@ export function CleanupDialog({
                       </div>
                     ))}
                   </div>
-                )}
+                    )}
               </CardContent>
             </Card>
 
@@ -274,5 +276,5 @@ export function CleanupDialog({
         )}
       </DialogContent>
     </Dialog>
-  );
+  )
 }

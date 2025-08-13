@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useGPOMutations } from './hooks/useGPO';
-import { toast } from 'sonner';
-import type { SetGPOInheritanceInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useGPOMutations } from './hooks/useGPO'
+import { toast } from 'sonner'
+import type { SetGPOInheritanceInput } from '@/types/samba'
 
 const inheritanceSchema = z.object({
   containerDN: z.string().min(1, 'Container DN is required'),
   inheritance: z.enum(['Enabled', 'Disabled'], {
-    required_error: 'Inheritance setting is required',
-  }),
-});
+    required_error: 'Inheritance setting is required'
+  })
+})
 
 type InheritanceFormData = z.infer<typeof inheritanceSchema>;
 
@@ -26,12 +26,12 @@ interface InheritanceDialogProps {
   onInheritanceSet: () => void;
 }
 
-export function InheritanceDialog({
+export function InheritanceDialog ({
   isOpen,
   onClose,
-  onInheritanceSet,
+  onInheritanceSet
 }: InheritanceDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
@@ -39,41 +39,41 @@ export function InheritanceDialog({
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors }
   } = useForm<InheritanceFormData>({
-    resolver: zodResolver(inheritanceSchema),
-  });
+    resolver: zodResolver(inheritanceSchema)
+  })
 
   const { setGPOInheritance } = useGPOMutations(
     () => {
-      toast.success('GPO inheritance set successfully');
-      onInheritanceSet();
+      toast.success('GPO inheritance set successfully')
+      onInheritanceSet()
     },
     (error) => {
-      toast.error(`Failed to set GPO inheritance: ${error}`);
+      toast.error(`Failed to set GPO inheritance: ${error}`)
     }
-  );
+  )
 
   const onSubmit = async (data: InheritanceFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: SetGPOInheritanceInput = {
         containerDN: data.containerDN,
-        inheritance: data.inheritance,
-      };
-      await setGPOInheritance(input);
-      handleClose();
+        inheritance: data.inheritance
+      }
+      await setGPOInheritance(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -129,5 +129,5 @@ export function InheritanceDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

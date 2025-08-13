@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useGPOMutations } from './hooks/useGPO';
-import { toast } from 'sonner';
-import type { RestoreGPOInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useGPOMutations } from './hooks/useGPO'
+import { toast } from 'sonner'
+import type { RestoreGPOInput } from '@/types/samba'
 
 const restoreGPOSchema = z.object({
   name: z.string().min(1, 'GPO name is required'),
   backupPath: z.string().min(1, 'Backup path is required'),
-  newName: z.string().optional(),
-});
+  newName: z.string().optional()
+})
 
 type RestoreGPOFormData = z.infer<typeof restoreGPOSchema>;
 
@@ -24,53 +24,53 @@ interface RestoreGPODialogProps {
   onRestoreCompleted: () => void;
 }
 
-export function RestoreGPODialog({
+export function RestoreGPODialog ({
   isOpen,
   onClose,
-  onRestoreCompleted,
+  onRestoreCompleted
 }: RestoreGPODialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm<RestoreGPOFormData>({
-    resolver: zodResolver(restoreGPOSchema),
-  });
+    resolver: zodResolver(restoreGPOSchema)
+  })
 
   const { restoreGPO } = useGPOMutations(
     () => {
-      toast.success('GPO restore completed successfully');
-      onRestoreCompleted();
+      toast.success('GPO restore completed successfully')
+      onRestoreCompleted()
     },
     (error) => {
-      toast.error(`Failed to restore GPO: ${error}`);
+      toast.error(`Failed to restore GPO: ${error}`)
     }
-  );
+  )
 
   const onSubmit = async (data: RestoreGPOFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: RestoreGPOInput = {
         name: data.name,
         backupPath: data.backupPath,
-        newName: data.newName,
-      };
-      await restoreGPO(input);
-      handleClose();
+        newName: data.newName
+      }
+      await restoreGPO(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -129,5 +129,5 @@ export function RestoreGPODialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

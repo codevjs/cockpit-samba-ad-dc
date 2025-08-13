@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Globe, 
-  Plus, 
+import React, { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Globe,
+  Plus,
   Trash2,
   Search,
   Settings,
@@ -15,45 +15,45 @@ import {
   Server,
   ArrowLeft,
   Info
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { useDNSZones, useDNSServerInfo } from './hooks/useDNS';
-import { CreateRecordDialog } from './create-record';
-import { DeleteRecordDialog } from './delete-record';
-import { CreateZoneDialog } from './create-zone';
-import { DeleteZoneDialog } from './delete-zone';
-import { ServerInfoDialog } from './server-info';
-import { CleanupDialog } from './cleanup';
-import { toast } from 'sonner';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { useDNSZones, useDNSServerInfo } from './hooks/useDNS'
+import { CreateRecordDialog } from './create-record'
+import { DeleteRecordDialog } from './delete-record'
+import { CreateZoneDialog } from './create-zone'
+import { DeleteZoneDialog } from './delete-zone'
+import { ServerInfoDialog } from './server-info'
+import { CleanupDialog } from './cleanup'
+import { toast } from 'sonner'
 
-export default function DNSManagement() {
-  const [serverName, setServerName] = useState('');
-  const [password, setPassword] = useState('');
-  const [selectedServer, setSelectedServer] = useState<string | null>(null);
-  
+export default function DNSManagement () {
+  const [serverName, setServerName] = useState('')
+  const [password, setPassword] = useState('')
+  const [selectedServer, setSelectedServer] = useState<string | null>(null)
+
   // Dialog states
-  const [createRecordDialogOpen, setCreateRecordDialogOpen] = useState(false);
-  const [deleteRecordDialogOpen, setDeleteRecordDialogOpen] = useState(false);
-  const [createZoneDialogOpen, setCreateZoneDialogOpen] = useState(false);
-  const [deleteZoneDialogOpen, setDeleteZoneDialogOpen] = useState(false);
-  const [serverInfoDialogOpen, setServerInfoDialogOpen] = useState(false);
-  const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false);
+  const [createRecordDialogOpen, setCreateRecordDialogOpen] = useState(false)
+  const [deleteRecordDialogOpen, setDeleteRecordDialogOpen] = useState(false)
+  const [createZoneDialogOpen, setCreateZoneDialogOpen] = useState(false)
+  const [deleteZoneDialogOpen, setDeleteZoneDialogOpen] = useState(false)
+  const [serverInfoDialogOpen, setServerInfoDialogOpen] = useState(false)
+  const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false)
 
-  const { zones, loading: zonesLoading, refresh: refreshZones } = useDNSZones(selectedServer, password);
-  const { serverInfo, loading: serverLoading, refresh: refreshServerInfo } = useDNSServerInfo(selectedServer, password);
+  const { zones, loading: zonesLoading, refresh: refreshZones } = useDNSZones(selectedServer, password)
+  const { serverInfo, loading: serverLoading, refresh: refreshServerInfo } = useDNSServerInfo(selectedServer, password)
 
   const handleOperationSuccess = () => {
-    refreshZones();
-    refreshServerInfo();
-  };
+    refreshZones()
+    refreshServerInfo()
+  }
 
   const handleConnectServer = () => {
     if (serverName.trim()) {
-      setSelectedServer(serverName.trim());
+      setSelectedServer(serverName.trim())
     } else {
-      toast.error('Please enter a server name');
+      toast.error('Please enter a server name')
     }
-  };
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -129,7 +129,7 @@ export default function DNSManagement() {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Zones</CardTitle>
@@ -208,7 +208,7 @@ export default function DNSManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setCreateRecordDialogOpen(true)}
                   className="w-full"
                   disabled={!selectedServer}
@@ -229,7 +229,7 @@ export default function DNSManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setDeleteRecordDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -251,7 +251,7 @@ export default function DNSManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setCreateZoneDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -273,7 +273,7 @@ export default function DNSManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setDeleteZoneDialogOpen(true)}
                   className="w-full"
                   variant="destructive"
@@ -295,7 +295,7 @@ export default function DNSManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setServerInfoDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -317,7 +317,7 @@ export default function DNSManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setCleanupDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -340,7 +340,8 @@ export default function DNSManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {zonesLoading ? (
+                {zonesLoading
+                  ? (
                   <div className="space-y-3">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <div key={i} className="animate-pulse">
@@ -348,7 +349,9 @@ export default function DNSManagement() {
                       </div>
                     ))}
                   </div>
-                ) : zones.length === 0 ? (
+                    )
+                  : zones.length === 0
+                    ? (
                   <div className="text-center py-8">
                     <Globe className="mx-auto h-12 w-12 text-muted-foreground" />
                     <h3 className="mt-2 text-sm font-semibold">No DNS Zones</h3>
@@ -359,7 +362,8 @@ export default function DNSManagement() {
                       Create Zone
                     </Button>
                   </div>
-                ) : (
+                      )
+                    : (
                   <div className="space-y-2">
                     {zones.map((zone, index) => (
                       <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
@@ -374,7 +378,7 @@ export default function DNSManagement() {
                       </div>
                     ))}
                   </div>
-                )}
+                      )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -388,8 +392,8 @@ export default function DNSManagement() {
           <div className="space-y-2">
             <p className="font-medium">DNS Management</p>
             <p className="text-sm">
-              This module provides tools for managing DNS zones and records on 
-              Samba AD DC servers. DNS is critical for Active Directory functionality 
+              This module provides tools for managing DNS zones and records on
+              Samba AD DC servers. DNS is critical for Active Directory functionality
               and should be managed carefully.
             </p>
           </div>
@@ -444,5 +448,5 @@ export default function DNSManagement() {
         defaultPassword={password}
       />
     </div>
-  );
+  )
 }

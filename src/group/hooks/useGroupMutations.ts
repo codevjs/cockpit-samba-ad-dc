@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
-import { GroupAPI } from '../../services/group-api';
-import { CreateGroupInput, UpdateGroupInput } from '../../types/samba';
-import { APIError } from '../../lib/errors';
+import { useCallback } from 'react'
+import { GroupAPI } from '../../services/group-api'
+import { CreateGroupInput, UpdateGroupInput } from '../../types/samba'
+import { APIError } from '../../lib/errors'
 
 export interface UseGroupMutationsReturn {
   createGroup: (groupData: CreateGroupInput) => Promise<void>;
@@ -19,58 +19,58 @@ export interface UseGroupMutationsReturn {
 export const useGroupMutations = (onSuccess?: () => void, onError?: (error: string) => void): UseGroupMutationsReturn => {
   const createGroup = useCallback(async (groupData: CreateGroupInput) => {
     try {
-      await GroupAPI.create(groupData);
-      onSuccess?.();
+      await GroupAPI.create(groupData)
+      onSuccess?.()
     } catch (err) {
-      const errorMessage = err instanceof APIError ? err.message : 'Failed to create group';
-      onError?.(errorMessage);
-      throw err;
+      const errorMessage = err instanceof APIError ? err.message : 'Failed to create group'
+      onError?.(errorMessage)
+      throw err
     }
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError])
 
   const deleteGroup = useCallback(async (groupName: string) => {
     try {
-      await GroupAPI.delete(groupName);
-      onSuccess?.();
+      await GroupAPI.delete(groupName)
+      onSuccess?.()
     } catch (err) {
-      const errorMessage = err instanceof APIError ? err.message : 'Failed to delete group';
-      onError?.(errorMessage);
-      throw err;
+      const errorMessage = err instanceof APIError ? err.message : 'Failed to delete group'
+      onError?.(errorMessage)
+      throw err
     }
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError])
 
   const moveGroup = useCallback(async (groupName: string, targetOU: string) => {
     try {
-      await GroupAPI.move(groupName, targetOU);
-      onSuccess?.();
+      await GroupAPI.move(groupName, targetOU)
+      onSuccess?.()
     } catch (err) {
-      const errorMessage = err instanceof APIError ? err.message : 'Failed to move group';
-      onError?.(errorMessage);
-      throw err;
+      const errorMessage = err instanceof APIError ? err.message : 'Failed to move group'
+      onError?.(errorMessage)
+      throw err
     }
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError])
 
   const addMembers = useCallback(async (groupName: string, memberNames: string[]) => {
     try {
-      await GroupAPI.addMembers(groupName, memberNames);
-      onSuccess?.();
+      await GroupAPI.addMembers(groupName, memberNames)
+      onSuccess?.()
     } catch (err) {
-      const errorMessage = err instanceof APIError ? err.message : 'Failed to add group members';
-      onError?.(errorMessage);
-      throw err;
+      const errorMessage = err instanceof APIError ? err.message : 'Failed to add group members'
+      onError?.(errorMessage)
+      throw err
     }
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError])
 
   const removeMembers = useCallback(async (groupName: string, memberNames: string[]) => {
     try {
-      await GroupAPI.removeMembers(groupName, memberNames);
-      onSuccess?.();
+      await GroupAPI.removeMembers(groupName, memberNames)
+      onSuccess?.()
     } catch (err) {
-      const errorMessage = err instanceof APIError ? err.message : 'Failed to remove group members';
-      onError?.(errorMessage);
-      throw err;
+      const errorMessage = err instanceof APIError ? err.message : 'Failed to remove group members'
+      onError?.(errorMessage)
+      throw err
     }
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError])
 
   return {
     createGroup,
@@ -80,5 +80,5 @@ export const useGroupMutations = (onSuccess?: () => void, onError?: (error: stri
     removeMembers,
     isLoading: false, // We handle loading states at the component level
     error: null // We handle errors via the callbacks
-  };
-};
+  }
+}

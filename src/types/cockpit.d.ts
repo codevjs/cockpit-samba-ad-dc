@@ -8,6 +8,6 @@ declare module 'cockpit' {
     script(command: string, options?: ScriptOptions): Promise<string>;
   }
 
-  const cockpit: CockpitModule;
-  export default cockpit;
+  const cockpit: CockpitModule
+  export default cockpit
 }

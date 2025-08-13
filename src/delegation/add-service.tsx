@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,20 +17,20 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
-import { useDelegationMutations } from './hooks/useDelegation';
-import { toast } from 'sonner';
-import type { AddServiceDelegationInput } from '@/types/samba';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Info } from 'lucide-react'
+import { useDelegationMutations } from './hooks/useDelegation'
+import { toast } from 'sonner'
+import type { AddServiceDelegationInput } from '@/types/samba'
 
 const addServiceSchema = z.object({
   accountName: z.string().min(1, 'Account name is required'),
-  principal: z.string().min(1, 'Service principal is required'),
-});
+  principal: z.string().min(1, 'Service principal is required')
+})
 
 type AddServiceFormData = z.infer<typeof addServiceSchema>;
 
@@ -40,46 +40,46 @@ interface AddServiceDialogProps {
   onServiceAdded: () => void;
 }
 
-export function AddServiceDialog({ isOpen, onClose, onServiceAdded }: AddServiceDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function AddServiceDialog ({ isOpen, onClose, onServiceAdded }: AddServiceDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<AddServiceFormData>({
     resolver: zodResolver(addServiceSchema),
     defaultValues: {
       accountName: '',
-      principal: '',
-    },
-  });
+      principal: ''
+    }
+  })
 
   const { addService } = useDelegationMutations(
     () => {
-      onServiceAdded();
-      handleClose();
+      onServiceAdded()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: AddServiceFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: AddServiceDelegationInput = {
         accountName: data.accountName,
-        principal: data.principal,
-      };
-      
-      await addService(input);
-      toast.success(`Service "${data.principal}" added to delegation for "${data.accountName}"`);
+        principal: data.principal
+      }
+
+      await addService(input)
+      toast.success(`Service "${data.principal}" added to delegation for "${data.accountName}"`)
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -90,7 +90,7 @@ export function AddServiceDialog({ isOpen, onClose, onServiceAdded }: AddService
             Add a service principal to the constrained delegation list for an account.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <Alert>
@@ -99,7 +99,7 @@ export function AddServiceDialog({ isOpen, onClose, onServiceAdded }: AddService
                 <div className="space-y-2">
                   <p className="font-medium">Constrained Delegation</p>
                   <p className="text-sm">
-                    This adds a service principal to the msDS-AllowedToDelegateTo attribute, 
+                    This adds a service principal to the msDS-AllowedToDelegateTo attribute,
                     allowing the account to delegate credentials to the specified service.
                   </p>
                 </div>
@@ -170,5 +170,5 @@ export function AddServiceDialog({ isOpen, onClose, onServiceAdded }: AddService
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

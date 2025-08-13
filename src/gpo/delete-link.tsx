@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useGPOMutations } from './hooks/useGPO';
-import { toast } from 'sonner';
-import type { DeleteGPOLinkInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useGPOMutations } from './hooks/useGPO'
+import { toast } from 'sonner'
+import type { DeleteGPOLinkInput } from '@/types/samba'
 
 const deleteLinkSchema = z.object({
   containerDN: z.string().min(1, 'Container DN is required'),
-  gpoName: z.string().min(1, 'GPO name is required'),
-});
+  gpoName: z.string().min(1, 'GPO name is required')
+})
 
 type DeleteLinkFormData = z.infer<typeof deleteLinkSchema>;
 
@@ -23,52 +23,52 @@ interface DeleteLinkDialogProps {
   onLinkDeleted: () => void;
 }
 
-export function DeleteLinkDialog({
+export function DeleteLinkDialog ({
   isOpen,
   onClose,
-  onLinkDeleted,
+  onLinkDeleted
 }: DeleteLinkDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm<DeleteLinkFormData>({
-    resolver: zodResolver(deleteLinkSchema),
-  });
+    resolver: zodResolver(deleteLinkSchema)
+  })
 
   const { deleteGPOLink } = useGPOMutations(
     () => {
-      toast.success('GPO link deleted successfully');
-      onLinkDeleted();
+      toast.success('GPO link deleted successfully')
+      onLinkDeleted()
     },
     (error) => {
-      toast.error(`Failed to delete GPO link: ${error}`);
+      toast.error(`Failed to delete GPO link: ${error}`)
     }
-  );
+  )
 
   const onSubmit = async (data: DeleteLinkFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: DeleteGPOLinkInput = {
         containerDN: data.containerDN,
-        gpoName: data.gpoName,
-      };
-      await deleteGPOLink(input);
-      handleClose();
+        gpoName: data.gpoName
+      }
+      await deleteGPOLink(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -118,5 +118,5 @@ export function DeleteLinkDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

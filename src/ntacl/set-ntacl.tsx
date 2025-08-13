@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,16 +17,16 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { useNTACLMutations } from './hooks/useNTACL';
-import { toast } from 'sonner';
-import type { SetNTACLInput } from '@/types/samba';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle } from 'lucide-react'
+import { useNTACLMutations } from './hooks/useNTACL'
+import { toast } from 'sonner'
+import type { SetNTACLInput } from '@/types/samba'
 
 const setNTACLSchema = z.object({
   acl: z.string().min(1, 'ACL is required'),
@@ -35,8 +35,8 @@ const setNTACLSchema = z.object({
   eadbFile: z.string().optional(),
   useNtvfs: z.string().optional(),
   useS3fs: z.string().optional(),
-  service: z.string().optional(),
-});
+  service: z.string().optional()
+})
 
 type SetNTACLFormData = z.infer<typeof setNTACLSchema>;
 
@@ -46,9 +46,9 @@ interface SetNTACLDialogProps {
   onNTACLSet: () => void;
 }
 
-export function SetNTACLDialog({ isOpen, onClose, onNTACLSet }: SetNTACLDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function SetNTACLDialog ({ isOpen, onClose, onNTACLSet }: SetNTACLDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<SetNTACLFormData>({
     resolver: zodResolver(setNTACLSchema),
     defaultValues: {
@@ -58,25 +58,25 @@ export function SetNTACLDialog({ isOpen, onClose, onNTACLSet }: SetNTACLDialogPr
       eadbFile: '',
       useNtvfs: '',
       useS3fs: '',
-      service: '',
-    },
-  });
+      service: ''
+    }
+  })
 
   const { setNTACL } = useNTACLMutations(
     () => {
-      onNTACLSet();
-      handleClose();
+      onNTACLSet()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: SetNTACLFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: SetNTACLInput = {
         acl: data.acl,
@@ -85,17 +85,17 @@ export function SetNTACLDialog({ isOpen, onClose, onNTACLSet }: SetNTACLDialogPr
         eadbFile: data.eadbFile || undefined,
         useNtvfs: data.useNtvfs || undefined,
         useS3fs: data.useS3fs || undefined,
-        service: data.service || undefined,
-      };
-      
-      await setNTACL(input);
-      toast.success(`NT ACL set successfully for "${data.file}"`);
+        service: data.service || undefined
+      }
+
+      await setNTACL(input)
+      toast.success(`NT ACL set successfully for "${data.file}"`)
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -106,7 +106,7 @@ export function SetNTACLDialog({ isOpen, onClose, onNTACLSet }: SetNTACLDialogPr
             Set Windows NT Access Control Lists for a file or directory.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <Alert>
@@ -115,8 +115,8 @@ export function SetNTACLDialog({ isOpen, onClose, onNTACLSet }: SetNTACLDialogPr
                 <div className="space-y-2">
                   <p className="font-medium">Warning</p>
                   <p className="text-sm">
-                    Setting NT ACLs will modify file system permissions. Incorrect ACLs 
-                    can make files inaccessible or compromise security. Ensure you understand 
+                    Setting NT ACLs will modify file system permissions. Incorrect ACLs
+                    can make files inaccessible or compromise security. Ensure you understand
                     the ACL format before proceeding.
                   </p>
                 </div>
@@ -297,5 +297,5 @@ export function SetNTACLDialog({ isOpen, onClose, onNTACLSet }: SetNTACLDialogPr
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,25 +17,25 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { useSitesMutations } from './hooks/useSites';
-import { toast } from 'sonner';
-import type { SetSiteInput, SambaSite } from '@/types/samba';
+  SelectValue
+} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { useSitesMutations } from './hooks/useSites'
+import { toast } from 'sonner'
+import type { SetSiteInput, SambaSite } from '@/types/samba'
 
 const setSiteSchema = z.object({
   server: z.string().min(1, 'Server name is required'),
-  site: z.string().min(1, 'Site is required'),
-});
+  site: z.string().min(1, 'Site is required')
+})
 
 type SetSiteFormData = z.infer<typeof setSiteSchema>;
 
@@ -46,46 +46,46 @@ interface SetSiteDialogProps {
   sites: SambaSite[];
 }
 
-export function SetSiteDialog({ isOpen, onClose, onSiteSet, sites }: SetSiteDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function SetSiteDialog ({ isOpen, onClose, onSiteSet, sites }: SetSiteDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<SetSiteFormData>({
     resolver: zodResolver(setSiteSchema),
     defaultValues: {
       server: '',
-      site: '',
-    },
-  });
+      site: ''
+    }
+  })
 
   const { setSite } = useSitesMutations(
     () => {
-      onSiteSet();
-      handleClose();
+      onSiteSet()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: SetSiteFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const setSiteData: SetSiteInput = {
         server: data.server,
-        site: data.site,
-      };
-      
-      await setSite(setSiteData);
-      toast.success(`Server "${data.server}" moved to site "${data.site}" successfully`);
+        site: data.site
+      }
+
+      await setSite(setSiteData)
+      toast.success(`Server "${data.server}" moved to site "${data.site}" successfully`)
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -96,7 +96,7 @@ export function SetSiteDialog({ isOpen, onClose, onSiteSet, sites }: SetSiteDial
             Move a domain controller server to a different site for optimal replication topology.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -161,8 +161,8 @@ export function SetSiteDialog({ isOpen, onClose, onSiteSet, sites }: SetSiteDial
                   </h3>
                   <div className="mt-2 text-sm text-yellow-700">
                     <p>
-                      Moving a server to a different site will affect replication 
-                      topology. Ensure the target site has appropriate subnets 
+                      Moving a server to a different site will affect replication
+                      topology. Ensure the target site has appropriate subnets
                       configured for optimal network routing.
                     </p>
                   </div>
@@ -182,5 +182,5 @@ export function SetSiteDialog({ isOpen, onClose, onSiteSet, sites }: SetSiteDial
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

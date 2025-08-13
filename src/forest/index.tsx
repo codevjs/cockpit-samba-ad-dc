@@ -1,35 +1,35 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  TreePine, 
-  Settings, 
+import React, { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  TreePine,
+  Settings,
   Database,
   Shield,
   Info,
   ArrowLeft,
   Cog
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { useForest, useDirectoryService } from './hooks/useForest';
-import { DSHeuristicsDialog } from './dsheuristics-dialog';
-import { toast } from 'sonner';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { useForest, useDirectoryService } from './hooks/useForest'
+import { DSHeuristicsDialog } from './dsheuristics-dialog'
+import { toast } from 'sonner'
 
-export default function ForestManagement() {
-  const { forest, loading: forestLoading, refresh: refreshForest } = useForest();
-  const { settings, loading: settingsLoading, refresh: refreshSettings } = useDirectoryService();
-  
+export default function ForestManagement () {
+  const { forest, loading: forestLoading, refresh: refreshForest } = useForest()
+  const { settings, loading: settingsLoading, refresh: refreshSettings } = useDirectoryService()
+
   // Dialog states
-  const [dsHeuristicsDialogOpen, setDSHeuristicsDialogOpen] = useState(false);
+  const [dsHeuristicsDialogOpen, setDSHeuristicsDialogOpen] = useState(false)
 
   const handleDSHeuristicsSuccess = () => {
-    refreshForest();
-    refreshSettings();
-    setDSHeuristicsDialogOpen(false);
-  };
+    refreshForest()
+    refreshSettings()
+    setDSHeuristicsDialogOpen(false)
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -57,7 +57,7 @@ export default function ForestManagement() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Forest Function Level</CardTitle>
@@ -112,8 +112,8 @@ export default function ForestManagement() {
           </TabsList>
 
           <div className="flex items-center gap-2">
-            <Button 
-              onClick={() => setDSHeuristicsDialogOpen(true)} 
+            <Button
+              onClick={() => setDSHeuristicsDialogOpen(true)}
               className="flex items-center gap-2"
             >
               <Cog className="h-4 w-4" />
@@ -131,7 +131,8 @@ export default function ForestManagement() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {settingsLoading ? (
+              {settingsLoading
+                ? (
                 <div className="space-y-3">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="animate-pulse">
@@ -139,7 +140,9 @@ export default function ForestManagement() {
                     </div>
                   ))}
                 </div>
-              ) : settings.length === 0 ? (
+                  )
+                : settings.length === 0
+                  ? (
                 <div className="text-center py-8">
                   <Settings className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-2 text-sm font-semibold">No Settings Found</h3>
@@ -147,7 +150,8 @@ export default function ForestManagement() {
                     No directory service settings are currently configured
                   </p>
                 </div>
-              ) : (
+                    )
+                  : (
                 <div className="space-y-3">
                   {settings.map((setting, index) => (
                     <Alert key={index}>
@@ -169,7 +173,7 @@ export default function ForestManagement() {
                     </Alert>
                   ))}
                 </div>
-              )}
+                    )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -183,7 +187,8 @@ export default function ForestManagement() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {forestLoading ? (
+              {forestLoading
+                ? (
                 <div className="space-y-3">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i} className="animate-pulse">
@@ -192,7 +197,9 @@ export default function ForestManagement() {
                     </div>
                   ))}
                 </div>
-              ) : forest ? (
+                  )
+                : forest
+                  ? (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -217,13 +224,14 @@ export default function ForestManagement() {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-muted-foreground mb-2">DSHeuristics</h4>
-                      <Badge variant={forest.dsheuristics ? "default" : "secondary"}>
+                      <Badge variant={forest.dsheuristics ? 'default' : 'secondary'}>
                         {forest.dsheuristics || 'Not Set'}
                       </Badge>
                     </div>
                   </div>
                 </div>
-              ) : (
+                    )
+                  : (
                 <div className="text-center py-8">
                   <TreePine className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-2 text-sm font-semibold">No Forest Information</h3>
@@ -231,7 +239,7 @@ export default function ForestManagement() {
                     Unable to retrieve forest information
                   </p>
                 </div>
-              )}
+                    )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -244,5 +252,5 @@ export default function ForestManagement() {
         onHeuristicsSet={handleDSHeuristicsSuccess}
       />
     </div>
-  );
+  )
 }

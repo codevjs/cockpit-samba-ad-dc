@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { DSACLApi } from '@/services/dsacl-api';
-import type { DSACLInfo, SetDSACLInput } from '@/types/samba';
+import { useCallback } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { DSACLApi } from '@/services/dsacl-api'
+import type { DSACLInfo, SetDSACLInput } from '@/types/samba'
 
 export interface UseDSACLReturn {
   dsacl: DSACLInfo | null;
@@ -11,32 +11,32 @@ export interface UseDSACLReturn {
 }
 
 export const useDSACL = (objectDN?: string, autoFetch: boolean = true): UseDSACLReturn => {
-  const { 
-    data: dsacl = null, 
-    isLoading: loading, 
+  const {
+    data: dsacl = null,
+    isLoading: loading,
     error: queryError,
-    refetch 
+    refetch
   } = useQuery({
     queryKey: ['dsacl', objectDN],
     queryFn: () => DSACLApi.getDSACL(objectDN),
     enabled: autoFetch,
     staleTime: 3 * 60 * 1000, // 3 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
-  });
+    gcTime: 10 * 60 * 1000 // 10 minutes
+  })
 
-  const error = queryError ? (queryError as Error).message : null;
+  const error = queryError ? (queryError as Error).message : null
 
   const refresh = useCallback(async () => {
-    await refetch();
-  }, [refetch]);
+    await refetch()
+  }, [refetch])
 
   return {
     dsacl,
     loading,
     error,
-    refresh,
-  };
-};
+    refresh
+  }
+}
 
 export interface UseDSACLMutationsReturn {
   setDSACL: (aclData: SetDSACLInput) => Promise<void>;
@@ -50,18 +50,18 @@ export interface UseDSACLMutationsReturn {
 export const useDSACLMutations = (onSuccess?: () => void, onError?: (error: string) => void): UseDSACLMutationsReturn => {
   const setDSACL = useCallback(async (aclData: SetDSACLInput) => {
     try {
-      await DSACLApi.setDSACL(aclData);
-      onSuccess?.();
+      await DSACLApi.setDSACL(aclData)
+      onSuccess?.()
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to set DSACL';
-      onError?.(errorMessage);
-      throw err;
+      const errorMessage = err instanceof Error ? err.message : 'Failed to set DSACL'
+      onError?.(errorMessage)
+      throw err
     }
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError])
 
   return {
     setDSACL,
     isLoading: false, // We handle loading states at the component level
     error: null // We handle errors via the callbacks
-  };
-};
+  }
+}

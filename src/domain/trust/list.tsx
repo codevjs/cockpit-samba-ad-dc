@@ -1,71 +1,71 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Link, 
-  Plus, 
+import React, { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Link,
+  Plus,
   Search,
   Shield,
   Clock,
   Info,
   Eye,
   Trash2
-} from 'lucide-react';
-import { DataTable } from '@/components/ui/data-table';
-import { useTrusts } from '../hooks/useDomain';
-import { toast } from 'sonner';
-import type { TrustRelationship } from '@/types/samba';
-import type { DataTableColumn } from '@/components/ui/data-table';
+} from 'lucide-react'
+import { DataTable } from '@/components/ui/data-table'
+import { useTrusts } from '../hooks/useDomain'
+import { toast } from 'sonner'
+import type { TrustRelationship } from '@/types/samba'
+import type { DataTableColumn } from '@/components/ui/data-table'
 
-export function TrustListCard() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const { trusts, loading, error, refresh } = useTrusts();
+export function TrustListCard () {
+  const [searchTerm, setSearchTerm] = useState('')
+  const { trusts, loading, error, refresh } = useTrusts()
 
   const filteredTrusts = trusts.filter(trust =>
     trust.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  )
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Active':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-100 text-green-800 border-green-200'
       case 'Inactive':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-100 text-gray-800 border-gray-200'
       case 'Broken':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-100 text-red-800 border-red-200'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-100 text-gray-800 border-gray-200'
     }
-  };
+  }
 
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'External':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-blue-100 text-blue-800 border-blue-200'
       case 'Forest':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-100 text-green-800 border-green-200'
       case 'Realm':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
+        return 'bg-purple-100 text-purple-800 border-purple-200'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-100 text-gray-800 border-gray-200'
     }
-  };
+  }
 
   const getDirectionColor = (direction: string) => {
     switch (direction) {
       case 'Incoming':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
+        return 'bg-orange-100 text-orange-800 border-orange-200'
       case 'Outgoing':
-        return 'bg-cyan-100 text-cyan-800 border-cyan-200';
+        return 'bg-cyan-100 text-cyan-800 border-cyan-200'
       case 'Bidirectional':
-        return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+        return 'bg-indigo-100 text-indigo-800 border-indigo-200'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-100 text-gray-800 border-gray-200'
     }
-  };
+  }
 
   const trustColumns: DataTableColumn<TrustRelationship>[] = [
     {
@@ -73,7 +73,7 @@ export function TrustListCard() {
       header: 'Trust Domain',
       render: (trust) => (
         <div className="font-medium">{trust.name}</div>
-      ),
+      )
     },
     {
       key: 'type',
@@ -82,7 +82,7 @@ export function TrustListCard() {
         <Badge className={getTypeColor(trust.type)}>
           {trust.type}
         </Badge>
-      ),
+      )
     },
     {
       key: 'direction',
@@ -91,7 +91,7 @@ export function TrustListCard() {
         <Badge className={getDirectionColor(trust.direction)}>
           {trust.direction}
         </Badge>
-      ),
+      )
     },
     {
       key: 'status',
@@ -100,7 +100,7 @@ export function TrustListCard() {
         <Badge className={getStatusColor(trust.status)}>
           {trust.status}
         </Badge>
-      ),
+      )
     },
     {
       key: 'createdAt',
@@ -109,7 +109,7 @@ export function TrustListCard() {
         <div className="text-sm text-muted-foreground">
           {trust.createdAt.toLocaleDateString()}
         </div>
-      ),
+      )
     },
     {
       key: 'actions',
@@ -120,7 +120,7 @@ export function TrustListCard() {
             variant="outline"
             size="sm"
             onClick={() => {
-              toast.info('Trust details functionality not implemented yet');
+              toast.info('Trust details functionality not implemented yet')
             }}
           >
             <Eye className="h-4 w-4" />
@@ -129,15 +129,15 @@ export function TrustListCard() {
             variant="outline"
             size="sm"
             onClick={() => {
-              toast.info('Trust deletion functionality not implemented yet');
+              toast.info('Trust deletion functionality not implemented yet')
             }}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
-      ),
-    },
-  ];
+      )
+    }
+  ]
 
   if (loading) {
     return (
@@ -159,7 +159,7 @@ export function TrustListCard() {
           </div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   if (error) {
@@ -181,7 +181,7 @@ export function TrustListCard() {
           </Alert>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
@@ -216,14 +216,15 @@ export function TrustListCard() {
             </Button>
           </div>
 
-          {trusts.length === 0 ? (
+          {trusts.length === 0
+            ? (
             <div className="text-center py-8">
               <Link className="mx-auto h-12 w-12 text-muted-foreground" />
               <h3 className="mt-2 text-sm font-semibold">No Trust Relationships</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 No trust relationships have been established with other domains.
               </p>
-              <Button 
+              <Button
                 onClick={() => toast.info('Create trust functionality not implemented yet')}
                 className="mt-4"
               >
@@ -231,26 +232,27 @@ export function TrustListCard() {
                 Create Trust
               </Button>
             </div>
-          ) : (
+              )
+            : (
             <DataTable
               columns={trustColumns}
               data={filteredTrusts}
               loading={loading}
             />
-          )}
+              )}
 
           <Alert className="border-blue-200 bg-blue-50">
             <Shield className="h-4 w-4 text-blue-600" />
             <AlertDescription className="text-blue-800">
-              <strong>Trust Relationships:</strong> Trust relationships allow users from 
-              trusted domains to access resources in this domain. Manage trust relationships 
+              <strong>Trust Relationships:</strong> Trust relationships allow users from
+              trusted domains to access resources in this domain. Manage trust relationships
               carefully as they affect security and authentication.
             </AlertDescription>
           </Alert>
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
-export default TrustListCard;
+export default TrustListCard

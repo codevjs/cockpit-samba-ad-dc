@@ -1,21 +1,21 @@
-import React from 'react';
+import React from 'react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Users, 
-  Computer, 
-  UserCheck, 
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
+  Users,
+  Computer,
+  UserCheck,
   Mail,
   Loader2
-} from 'lucide-react';
-import { useOUObjects } from './hooks/useOU';
+} from 'lucide-react'
+import { useOUObjects } from './hooks/useOU'
 
 interface ListObjectsDialogProps {
   isOpen: boolean;
@@ -23,49 +23,49 @@ interface ListObjectsDialogProps {
   ouDN: string | null;
 }
 
-export function ListObjectsDialog({ isOpen, onClose, ouDN }: ListObjectsDialogProps) {
-  const { objects, loading, error } = useOUObjects(ouDN, isOpen && !!ouDN);
+export function ListObjectsDialog ({ isOpen, onClose, ouDN }: ListObjectsDialogProps) {
+  const { objects, loading, error } = useOUObjects(ouDN, isOpen && !!ouDN)
 
   const getObjectIcon = (type: string) => {
     switch (type) {
       case 'User':
-        return <Users className="h-4 w-4 text-blue-600" />;
+        return <Users className="h-4 w-4 text-blue-600" />
       case 'Computer':
-        return <Computer className="h-4 w-4 text-green-600" />;
+        return <Computer className="h-4 w-4 text-green-600" />
       case 'Group':
-        return <UserCheck className="h-4 w-4 text-purple-600" />;
+        return <UserCheck className="h-4 w-4 text-purple-600" />
       case 'Contact':
-        return <Mail className="h-4 w-4 text-orange-600" />;
+        return <Mail className="h-4 w-4 text-orange-600" />
       default:
-        return <Users className="h-4 w-4 text-gray-600" />;
+        return <Users className="h-4 w-4 text-gray-600" />
     }
-  };
+  }
 
   const getObjectTypeColor = (type: string) => {
     switch (type) {
       case 'User':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800'
       case 'Computer':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'Group':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-100 text-purple-800'
       case 'Contact':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 text-orange-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
-  };
+  }
 
   // Group objects by type
   const groupedObjects = objects.reduce((acc, obj) => {
     if (!acc[obj.type]) {
-      acc[obj.type] = [];
+      acc[obj.type] = []
     }
-    acc[obj.type].push(obj);
-    return acc;
-  }, {} as Record<string, typeof objects>);
+    acc[obj.type].push(obj)
+    return acc
+  }, {} as Record<string, typeof objects>)
 
-  if (!ouDN) return null;
+  if (!ouDN) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -135,15 +135,15 @@ export function ListObjectsDialog({ isOpen, onClose, ouDN }: ListObjectsDialogPr
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Badge 
-                                variant="secondary" 
+                              <Badge
+                                variant="secondary"
                                 className={`text-xs ${getObjectTypeColor(object.type)}`}
                               >
                                 {object.type}
                               </Badge>
                               {object.enabled !== undefined && (
-                                <Badge 
-                                  variant={object.enabled ? "default" : "destructive"} 
+                                <Badge
+                                  variant={object.enabled ? 'default' : 'destructive'}
                                   className="text-xs"
                                 >
                                   {object.enabled ? 'Enabled' : 'Disabled'}
@@ -162,5 +162,5 @@ export function ListObjectsDialog({ isOpen, onClose, ouDN }: ListObjectsDialogPr
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Move } from 'lucide-react';
-import { useGroupMutations } from './hooks/useGroupMutations';
-import { toast } from 'sonner';
+  SelectValue
+} from '@/components/ui/select'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Loader2, Move } from 'lucide-react'
+import { useGroupMutations } from './hooks/useGroupMutations'
+import { toast } from 'sonner'
 
 interface MoveGroupDialogProps {
   isOpen?: boolean;
@@ -40,7 +40,7 @@ const COMMON_OUS = [
   { value: 'OU=HR,DC=domain,DC=local', label: 'HR Department' },
   { value: 'OU=Finance,DC=domain,DC=local', label: 'Finance Department' },
   { value: 'OU=Custom', label: 'Custom OU (specify below)' }
-];
+]
 
 export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
   isOpen,
@@ -48,100 +48,100 @@ export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
   onGroupMoved,
   groupName: externalGroupName
 }) => {
-  const [internalGroupName, setInternalGroupName] = useState('');
-  const [selectedOU, setSelectedOU] = useState('CN=Users,DC=domain,DC=local');
-  const [customOU, setCustomOU] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [internalGroupName, setInternalGroupName] = useState('')
+  const [selectedOU, setSelectedOU] = useState('CN=Users,DC=domain,DC=local')
+  const [customOU, setCustomOU] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const groupName = externalGroupName || internalGroupName;
+  const groupName = externalGroupName || internalGroupName
 
   const { moveGroup } = useGroupMutations(
     () => {
       // Success callback
-      const targetOU = selectedOU === 'OU=Custom' ? customOU : selectedOU;
-      toast.success(`Group "${groupName}" moved to ${targetOU} successfully`);
-      resetForm();
-      onGroupMoved?.();
-      onClose?.();
+      const targetOU = selectedOU === 'OU=Custom' ? customOU : selectedOU
+      toast.success(`Group "${groupName}" moved to ${targetOU} successfully`)
+      resetForm()
+      onGroupMoved?.()
+      onClose?.()
     },
     (errorMessage: string) => {
       // Error callback
-      setError(errorMessage);
+      setError(errorMessage)
     }
-  );
+  )
 
   const handleSubmit = async () => {
     if (!groupName) {
-      setError('Group name is required');
-      return;
+      setError('Group name is required')
+      return
     }
 
-    const targetOU = selectedOU === 'OU=Custom' ? customOU : selectedOU;
+    const targetOU = selectedOU === 'OU=Custom' ? customOU : selectedOU
 
     if (!targetOU.trim()) {
-      setError('Target Organizational Unit is required');
-      return;
+      setError('Target Organizational Unit is required')
+      return
     }
 
     // Basic OU format validation
     if (!targetOU.includes('DC=') || (!targetOU.includes('OU=') && !targetOU.includes('CN='))) {
-      setError('Invalid OU format. Expected format: OU=Name,DC=domain,DC=local or CN=Name,DC=domain,DC=local');
-      return;
+      setError('Invalid OU format. Expected format: OU=Name,DC=domain,DC=local or CN=Name,DC=domain,DC=local')
+      return
     }
 
     try {
-      setLoading(true);
-      setError(null);
-      await moveGroup(groupName, targetOU);
+      setLoading(true)
+      setError(null)
+      await moveGroup(groupName, targetOU)
     } catch (err) {
       // Error is already handled by the mutation hook
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const resetForm = () => {
-    setInternalGroupName('');
-    setSelectedOU('CN=Users,DC=domain,DC=local');
-    setCustomOU('');
-    setError(null);
-  };
+    setInternalGroupName('')
+    setSelectedOU('CN=Users,DC=domain,DC=local')
+    setCustomOU('')
+    setError(null)
+  }
 
   const handleOUChange = (value: string) => {
-    setSelectedOU(value);
+    setSelectedOU(value)
     if (error) {
-      setError(null);
+      setError(null)
     }
-  };
+  }
 
   const handleCustomOUChange = (value: string) => {
-    setCustomOU(value);
+    setCustomOU(value)
     if (error) {
-      setError(null);
+      setError(null)
     }
-  };
+  }
 
   const handleGroupNameChange = (value: string) => {
-    setInternalGroupName(value);
+    setInternalGroupName(value)
     if (error) {
-      setError(null);
+      setError(null)
     }
-  };
+  }
 
   const handleClose = () => {
-    resetForm();
-    onClose?.();
-  };
+    resetForm()
+    onClose?.()
+  }
 
   const getTargetOU = () => {
-    return selectedOU === 'OU=Custom' ? customOU : selectedOU;
-  };
+    return selectedOU === 'OU=Custom' ? customOU : selectedOU
+  }
 
   const isFormValid = () => {
-    const targetOU = getTargetOU();
-    return groupName.trim() && targetOU.trim();
-  };
+    const targetOU = getTargetOU()
+    return groupName.trim() && targetOU.trim()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -152,7 +152,7 @@ export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
             Move Group to Different OU
           </DialogTitle>
           <DialogDescription>
-            Move this group to a different Organizational Unit (OU). This will change the group's 
+            Move this group to a different Organizational Unit (OU). This will change the group's
             location in the Active Directory hierarchy.
           </DialogDescription>
         </DialogHeader>
@@ -238,7 +238,7 @@ export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default MoveGroupDialog;
+export default MoveGroupDialog

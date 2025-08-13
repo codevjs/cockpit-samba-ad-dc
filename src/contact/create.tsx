@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, UserPlus } from 'lucide-react';
-import { useContactMutations } from './hooks/useContactMutations';
-import { toast } from 'sonner';
-import type { CreateContactInput } from '@/types/samba';
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Loader2, UserPlus } from 'lucide-react'
+import { useContactMutations } from './hooks/useContactMutations'
+import { toast } from 'sonner'
+import type { CreateContactInput } from '@/types/samba'
 
 interface CreateContactDialogProps {
   isOpen: boolean;
@@ -51,25 +51,25 @@ const createContactSchema = z.object({
     .optional(),
   organizationalUnit: z.string()
     .max(200, 'Organizational Unit must be less than 200 characters')
-    .optional(),
-});
+    .optional()
+})
 
 type CreateContactFormData = z.infer<typeof createContactSchema>;
 
-export function CreateContactDialog({
+export function CreateContactDialog ({
   isOpen,
   onClose,
-  onContactCreated,
+  onContactCreated
 }: CreateContactDialogProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-    watch,
+    watch
   } = useForm<CreateContactFormData>({
     resolver: zodResolver(createContactSchema),
     defaultValues: {
@@ -80,38 +80,38 @@ export function CreateContactDialog({
       description: '',
       mail: '',
       telephoneNumber: '',
-      organizationalUnit: '',
-    },
-  });
+      organizationalUnit: ''
+    }
+  })
 
   const { createContact } = useContactMutations(
     () => {
       // Success callback
-      toast.success('Contact created successfully');
-      resetForm();
-      onContactCreated?.();
-      onClose();
+      toast.success('Contact created successfully')
+      resetForm()
+      onContactCreated?.()
+      onClose()
     },
     (errorMessage: string) => {
       // Error callback
-      setError(errorMessage);
+      setError(errorMessage)
     }
-  );
+  )
 
   const resetForm = () => {
-    reset();
-    setError(null);
-  };
+    reset()
+    setError(null)
+  }
 
   const handleClose = () => {
-    resetForm();
-    onClose();
-  };
+    resetForm()
+    onClose()
+  }
 
   const onSubmit = async (data: CreateContactFormData) => {
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
       // Generate display name if not provided
       const contactData: CreateContactInput = {
@@ -122,21 +122,21 @@ export function CreateContactDialog({
         telephoneNumber: data.telephoneNumber === '' ? undefined : data.telephoneNumber,
         description: data.description === '' ? undefined : data.description,
         organizationalUnit: data.organizationalUnit === '' ? undefined : data.organizationalUnit,
-        initials: data.initials === '' ? undefined : data.initials,
-      };
+        initials: data.initials === '' ? undefined : data.initials
+      }
 
-      await createContact(contactData);
+      await createContact(contactData)
     } catch (err) {
       // Error is already handled by the mutation hook
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // Watch given name and surname to auto-generate display name
-  const givenName = watch('givenName');
-  const surname = watch('surname');
-  const displayName = watch('displayName');
+  const givenName = watch('givenName')
+  const surname = watch('surname')
+  const displayName = watch('displayName')
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -284,5 +284,5 @@ export function CreateContactDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

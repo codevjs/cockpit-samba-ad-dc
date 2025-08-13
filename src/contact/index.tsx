@@ -1,76 +1,76 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { 
-  Search, 
-  UserPlus, 
-  Users, 
+import React, { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import {
+  Search,
+  UserPlus,
+  Users,
   Mail,
   Phone,
   Building,
   Contact as ContactIcon,
   ArrowLeft
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { ContactList } from './list';
-import { CreateContactDialog } from './create';
-import { DeleteContactDialog } from './delete';
-import { MoveContactDialog } from './move';
-import { ShowContactDialog } from './show';
-import { useContacts } from './hooks/useContacts';
-import type { FilterOptions } from '@/types/samba';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { ContactList } from './list'
+import { CreateContactDialog } from './create'
+import { DeleteContactDialog } from './delete'
+import { MoveContactDialog } from './move'
+import { ShowContactDialog } from './show'
+import { useContacts } from './hooks/useContacts'
+import type { FilterOptions } from '@/types/samba'
 
 interface ContactManagementPageProps {
   initialView?: 'list' | 'create';
 }
 
-export default function ContactManagementPage({ initialView = 'list' }: ContactManagementPageProps) {
-  const [activeTab, setActiveTab] = useState(initialView);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<FilterOptions>({});
+export default function ContactManagementPage ({ initialView = 'list' }: ContactManagementPageProps) {
+  const [activeTab, setActiveTab] = useState(initialView)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState<FilterOptions>({})
 
   // Contact management dialogs
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [moveDialogOpen, setMoveDialogOpen] = useState(false);
-  const [showDialogOpen, setShowDialogOpen] = useState(false);
-  const [selectedContact, setSelectedContact] = useState<string>('');
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [moveDialogOpen, setMoveDialogOpen] = useState(false)
+  const [showDialogOpen, setShowDialogOpen] = useState(false)
+  const [selectedContact, setSelectedContact] = useState<string>('')
 
   const { contacts, loading, error, refresh: refreshContacts } = useContacts({
     filters: { ...filters, search: searchQuery },
-    autoFetch: true,
-  });
+    autoFetch: true
+  })
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setFilters(prev => ({ ...prev, search: query }));
-  };
+    setSearchQuery(query)
+    setFilters(prev => ({ ...prev, search: query }))
+  }
 
   const handleCreateSuccess = () => {
-    refreshContacts();
-    setCreateDialogOpen(false);
-  };
+    refreshContacts()
+    setCreateDialogOpen(false)
+  }
 
   const handleDeleteSuccess = () => {
-    refreshContacts();
-    setDeleteDialogOpen(false);
-    setSelectedContact('');
-  };
+    refreshContacts()
+    setDeleteDialogOpen(false)
+    setSelectedContact('')
+  }
 
   const handleMoveSuccess = () => {
-    refreshContacts();
-    setMoveDialogOpen(false);
-    setSelectedContact('');
-  };
+    refreshContacts()
+    setMoveDialogOpen(false)
+    setSelectedContact('')
+  }
 
   const contactStats = {
     total: contacts.length,
     withEmail: contacts.filter(c => c.mail).length,
-    withPhone: contacts.filter(c => c.telephoneNumber).length,
-  };
+    withPhone: contacts.filter(c => c.telephoneNumber).length
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -98,7 +98,7 @@ export default function ContactManagementPage({ initialView = 'list' }: ContactM
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">With Email</CardTitle>
@@ -160,16 +160,16 @@ export default function ContactManagementPage({ initialView = 'list' }: ContactM
             error={error}
             onRefresh={refreshContacts}
             onShowContact={(contactName) => {
-              setSelectedContact(contactName);
-              setShowDialogOpen(true);
+              setSelectedContact(contactName)
+              setShowDialogOpen(true)
             }}
             onDeleteContact={(contactName) => {
-              setSelectedContact(contactName);
-              setDeleteDialogOpen(true);
+              setSelectedContact(contactName)
+              setDeleteDialogOpen(true)
             }}
             onMoveContact={(contactName) => {
-              setSelectedContact(contactName);
-              setMoveDialogOpen(true);
+              setSelectedContact(contactName)
+              setMoveDialogOpen(true)
             }}
           />
         </TabsContent>
@@ -202,5 +202,5 @@ export default function ContactManagementPage({ initialView = 'list' }: ContactM
         contactName={selectedContact}
       />
     </div>
-  );
+  )
 }

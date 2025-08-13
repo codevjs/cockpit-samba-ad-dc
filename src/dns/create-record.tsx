@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useDNSMutations } from './hooks/useDNS';
-import { toast } from 'sonner';
-import type { CreateDNSRecordInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useDNSMutations } from './hooks/useDNS'
+import { toast } from 'sonner'
+import type { CreateDNSRecordInput } from '@/types/samba'
 
 const createRecordSchema = z.object({
   server: z.string().min(1, 'Server is required'),
   zone: z.string().min(1, 'Zone is required'),
   name: z.string().min(1, 'Name is required'),
   type: z.enum(['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT'], {
-    required_error: 'Record type is required',
+    required_error: 'Record type is required'
   }),
   data: z.string().min(1, 'Data is required'),
   password: z.string().optional(),
-  ttl: z.number().optional(),
-});
+  ttl: z.number().optional()
+})
 
 type CreateRecordFormData = z.infer<typeof createRecordSchema>;
 
@@ -33,14 +33,14 @@ interface CreateRecordDialogProps {
   defaultPassword?: string;
 }
 
-export function CreateRecordDialog({
+export function CreateRecordDialog ({
   isOpen,
   onClose,
   onRecordCreated,
   defaultServer,
-  defaultPassword,
+  defaultPassword
 }: CreateRecordDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
@@ -48,29 +48,29 @@ export function CreateRecordDialog({
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors }
   } = useForm<CreateRecordFormData>({
     resolver: zodResolver(createRecordSchema),
     defaultValues: {
       server: defaultServer || '',
-      password: defaultPassword || '',
-    },
-  });
+      password: defaultPassword || ''
+    }
+  })
 
   const { createRecord } = useDNSMutations(
     () => {
-      toast.success('DNS record created successfully');
-      onRecordCreated();
+      toast.success('DNS record created successfully')
+      onRecordCreated()
     },
     (error) => {
-      toast.error(`Failed to create DNS record: ${error}`);
+      toast.error(`Failed to create DNS record: ${error}`)
     }
-  );
+  )
 
-  const recordType = watch('type');
+  const recordType = watch('type')
 
   const onSubmit = async (data: CreateRecordFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: CreateDNSRecordInput = {
         server: data.server,
@@ -79,67 +79,67 @@ export function CreateRecordDialog({
         type: data.type,
         data: data.data,
         password: data.password,
-        ttl: data.ttl,
-      };
-      await createRecord(input);
-      handleClose();
+        ttl: data.ttl
+      }
+      await createRecord(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   const getDataPlaceholder = () => {
     switch (recordType) {
       case 'A':
-        return '192.168.1.100';
+        return '192.168.1.100'
       case 'AAAA':
-        return '2001:db8::1';
+        return '2001:db8::1'
       case 'CNAME':
-        return 'alias.example.com';
+        return 'alias.example.com'
       case 'MX':
-        return '10 mail.example.com';
+        return '10 mail.example.com'
       case 'NS':
-        return 'ns1.example.com';
+        return 'ns1.example.com'
       case 'PTR':
-        return 'host.example.com';
+        return 'host.example.com'
       case 'SRV':
-        return '10 5 443 target.example.com';
+        return '10 5 443 target.example.com'
       case 'TXT':
-        return 'v=spf1 include:_spf.example.com ~all';
+        return 'v=spf1 include:_spf.example.com ~all'
       default:
-        return 'Enter record data';
+        return 'Enter record data'
     }
-  };
+  }
 
   const getDataDescription = () => {
     switch (recordType) {
       case 'A':
-        return 'IPv4 address (e.g., 192.168.1.100)';
+        return 'IPv4 address (e.g., 192.168.1.100)'
       case 'AAAA':
-        return 'IPv6 address (e.g., 2001:db8::1)';
+        return 'IPv6 address (e.g., 2001:db8::1)'
       case 'CNAME':
-        return 'Canonical name (e.g., alias.example.com)';
+        return 'Canonical name (e.g., alias.example.com)'
       case 'MX':
-        return 'Priority and mail server (e.g., 10 mail.example.com)';
+        return 'Priority and mail server (e.g., 10 mail.example.com)'
       case 'NS':
-        return 'Name server (e.g., ns1.example.com)';
+        return 'Name server (e.g., ns1.example.com)'
       case 'PTR':
-        return 'Pointer to hostname (e.g., host.example.com)';
+        return 'Pointer to hostname (e.g., host.example.com)'
       case 'SRV':
-        return 'Priority, weight, port, target (e.g., 10 5 443 target.example.com)';
+        return 'Priority, weight, port, target (e.g., 10 5 443 target.example.com)'
       case 'TXT':
-        return 'Text record (e.g., SPF, DKIM records)';
+        return 'Text record (e.g., SPF, DKIM records)'
       default:
-        return 'Enter the appropriate data for the record type';
+        return 'Enter the appropriate data for the record type'
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -274,5 +274,5 @@ export function CreateRecordDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

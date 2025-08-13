@@ -1,21 +1,21 @@
-import React from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Server, 
-  Database, 
-  Globe, 
-  Settings, 
-  CheckCircle, 
-  XCircle, 
+import React from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Server,
+  Database,
+  Globe,
+  Settings,
+  CheckCircle,
+  XCircle,
   AlertCircle,
   Info
-} from 'lucide-react';
-import { useDNSServerInfo } from './hooks/useDNS';
+} from 'lucide-react'
+import { useDNSServerInfo } from './hooks/useDNS'
 
 interface ServerInfoDialogProps {
   isOpen: boolean;
@@ -24,35 +24,35 @@ interface ServerInfoDialogProps {
   password?: string;
 }
 
-export function ServerInfoDialog({
+export function ServerInfoDialog ({
   isOpen,
   onClose,
   server,
-  password,
+  password
 }: ServerInfoDialogProps) {
-  const { serverInfo, loading, error } = useDNSServerInfo(server || '', password, isOpen && !!server);
+  const { serverInfo, loading, error } = useDNSServerInfo(server || '', password, isOpen && !!server)
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'Running':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
+        return <CheckCircle className="h-4 w-4 text-green-600" />
       case 'Stopped':
-        return <XCircle className="h-4 w-4 text-red-600" />;
+        return <XCircle className="h-4 w-4 text-red-600" />
       default:
-        return <AlertCircle className="h-4 w-4 text-yellow-600" />;
+        return <AlertCircle className="h-4 w-4 text-yellow-600" />
     }
-  };
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Running':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-100 text-green-800 border-green-200'
       case 'Stopped':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-100 text-red-800 border-red-200'
       default:
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -124,9 +124,9 @@ export function ServerInfoDialog({
                     </div>
                   </div>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Version</p>
@@ -155,8 +155,8 @@ export function ServerInfoDialog({
                 <CardContent>
                   <div className="space-y-2">
                     {serverInfo.zones.map((zone, index) => (
-                      <div 
-                        key={index} 
+                      <div
+                        key={index}
                         className="flex items-center justify-between p-3 border rounded-lg"
                       >
                         <div className="flex items-center gap-3">
@@ -197,14 +197,14 @@ export function ServerInfoDialog({
                         </span>
                       </div>
                     </div>
-                    
+
                     <div className="p-3 bg-muted/50 rounded-lg">
                       <p className="text-sm font-medium mb-2">Version Information</p>
                       <p className="text-sm">
                         DNS server version: {serverInfo.version}
                       </p>
                     </div>
-                    
+
                     {serverInfo.zones.length === 0 && (
                       <div className="p-3 bg-muted/50 rounded-lg">
                         <p className="text-sm font-medium mb-2">Zone Configuration</p>
@@ -244,5 +244,5 @@ export function ServerInfoDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

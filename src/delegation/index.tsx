@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Shield, 
-  Plus, 
+import React, { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Shield,
+  Plus,
   Trash2,
   Search,
   Settings,
@@ -15,47 +15,47 @@ import {
   Unlock,
   ArrowLeft,
   Info
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { useDelegation } from './hooks/useDelegation';
-import { ShowDelegationDialog } from './show-delegation';
-import { AddServiceDialog } from './add-service';
-import { DeleteServiceDialog } from './delete-service';
-import { SetAnyServiceDialog } from './set-any-service';
-import { SetAnyProtocolDialog } from './set-any-protocol';
-import { toast } from 'sonner';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { useDelegation } from './hooks/useDelegation'
+import { ShowDelegationDialog } from './show-delegation'
+import { AddServiceDialog } from './add-service'
+import { DeleteServiceDialog } from './delete-service'
+import { SetAnyServiceDialog } from './set-any-service'
+import { SetAnyProtocolDialog } from './set-any-protocol'
+import { toast } from 'sonner'
 
-export default function DelegationManagement() {
-  const [searchAccountName, setSearchAccountName] = useState('');
-  const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
-  
+export default function DelegationManagement () {
+  const [searchAccountName, setSearchAccountName] = useState('')
+  const [selectedAccount, setSelectedAccount] = useState<string | null>(null)
+
   // Dialog states
-  const [showDelegationDialogOpen, setShowDelegationDialogOpen] = useState(false);
-  const [addServiceDialogOpen, setAddServiceDialogOpen] = useState(false);
-  const [deleteServiceDialogOpen, setDeleteServiceDialogOpen] = useState(false);
-  const [setAnyServiceDialogOpen, setSetAnyServiceDialogOpen] = useState(false);
-  const [setAnyProtocolDialogOpen, setSetAnyProtocolDialogOpen] = useState(false);
+  const [showDelegationDialogOpen, setShowDelegationDialogOpen] = useState(false)
+  const [addServiceDialogOpen, setAddServiceDialogOpen] = useState(false)
+  const [deleteServiceDialogOpen, setDeleteServiceDialogOpen] = useState(false)
+  const [setAnyServiceDialogOpen, setSetAnyServiceDialogOpen] = useState(false)
+  const [setAnyProtocolDialogOpen, setSetAnyProtocolDialogOpen] = useState(false)
 
-  const { delegation, loading: delegationLoading, refresh: refreshDelegation } = useDelegation(selectedAccount);
+  const { delegation, loading: delegationLoading, refresh: refreshDelegation } = useDelegation(selectedAccount)
 
   const handleOperationSuccess = () => {
-    refreshDelegation();
-  };
+    refreshDelegation()
+  }
 
   const handleSearchAccount = () => {
     if (searchAccountName.trim()) {
-      setSelectedAccount(searchAccountName.trim());
+      setSelectedAccount(searchAccountName.trim())
     }
-  };
+  }
 
   const handleShowDelegation = () => {
     if (searchAccountName.trim()) {
-      setSelectedAccount(searchAccountName.trim());
-      setShowDelegationDialogOpen(true);
+      setSelectedAccount(searchAccountName.trim())
+      setShowDelegationDialogOpen(true)
     } else {
-      toast.error('Please enter an account name first');
+      toast.error('Please enter an account name first')
     }
-  };
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -114,7 +114,7 @@ export default function DelegationManagement() {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Delegation Type</CardTitle>
@@ -144,11 +144,13 @@ export default function DelegationManagement() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Any Service</CardTitle>
-              {delegation.anyService ? (
+              {delegation.anyService
+                ? (
                 <Unlock className="h-4 w-4 text-orange-600" />
-              ) : (
+                  )
+                : (
                 <Lock className="h-4 w-4 text-green-600" />
-              )}
+                  )}
             </CardHeader>
             <CardContent>
               <div className={`text-2xl font-bold ${delegation.anyService ? 'text-orange-600' : 'text-green-600'}`}>
@@ -191,7 +193,7 @@ export default function DelegationManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setAddServiceDialogOpen(true)}
                   className="w-full"
                 >
@@ -211,7 +213,7 @@ export default function DelegationManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setDeleteServiceDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -232,7 +234,7 @@ export default function DelegationManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setSetAnyServiceDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -253,7 +255,7 @@ export default function DelegationManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setSetAnyProtocolDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -274,7 +276,7 @@ export default function DelegationManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setShowDelegationDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -316,13 +318,13 @@ export default function DelegationManagement() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <h4 className="font-medium mb-2">Any Service</h4>
-                        <Badge variant={delegation.anyService ? "destructive" : "default"}>
+                        <Badge variant={delegation.anyService ? 'destructive' : 'default'}>
                           {delegation.anyService ? 'Enabled' : 'Disabled'}
                         </Badge>
                       </div>
                       <div>
                         <h4 className="font-medium mb-2">Any Protocol</h4>
-                        <Badge variant={delegation.anyProtocol ? "destructive" : "default"}>
+                        <Badge variant={delegation.anyProtocol ? 'destructive' : 'default'}>
                           {delegation.anyProtocol ? 'Enabled' : 'Disabled'}
                         </Badge>
                       </div>
@@ -330,9 +332,11 @@ export default function DelegationManagement() {
 
                     <div>
                       <h4 className="font-medium mb-2">Allowed Services</h4>
-                      {delegation.allowedServices.length === 0 ? (
+                      {delegation.allowedServices.length === 0
+                        ? (
                         <p className="text-sm text-muted-foreground">No specific services configured</p>
-                      ) : (
+                          )
+                        : (
                         <div className="space-y-2">
                           {delegation.allowedServices.map((service, index) => (
                             <div key={index} className="bg-muted p-2 rounded">
@@ -340,7 +344,7 @@ export default function DelegationManagement() {
                             </div>
                           ))}
                         </div>
-                      )}
+                          )}
                     </div>
 
                     {delegation.protocols.length > 0 && (
@@ -379,8 +383,8 @@ export default function DelegationManagement() {
           <div className="space-y-2">
             <p className="font-medium">Kerberos Delegation</p>
             <p className="text-sm">
-              Delegation allows a service to impersonate users when accessing other services. 
-              Use constrained delegation for security, and avoid "any service" delegation 
+              Delegation allows a service to impersonate users when accessing other services.
+              Use constrained delegation for security, and avoid "any service" delegation
               unless absolutely necessary as it poses security risks.
             </p>
           </div>
@@ -417,5 +421,5 @@ export default function DelegationManagement() {
         onAnyProtocolSet={handleOperationSuccess}
       />
     </div>
-  );
+  )
 }

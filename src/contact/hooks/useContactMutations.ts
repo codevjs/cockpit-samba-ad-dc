@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
-import { ContactAPI } from '../../services/contact-api';
-import { CreateContactInput, UpdateContactInput } from '../../types/samba';
-import { APIError } from '../../lib/errors';
+import { useCallback } from 'react'
+import { ContactAPI } from '../../services/contact-api'
+import { CreateContactInput, UpdateContactInput } from '../../types/samba'
+import { APIError } from '../../lib/errors'
 
 export interface UseContactMutationsReturn {
   createContact: (contactData: CreateContactInput) => Promise<void>;
@@ -17,36 +17,36 @@ export interface UseContactMutationsReturn {
 export const useContactMutations = (onSuccess?: () => void, onError?: (error: string) => void): UseContactMutationsReturn => {
   const createContact = useCallback(async (contactData: CreateContactInput) => {
     try {
-      await ContactAPI.create(contactData);
-      onSuccess?.();
+      await ContactAPI.create(contactData)
+      onSuccess?.()
     } catch (err) {
-      const errorMessage = err instanceof APIError ? err.message : 'Failed to create contact';
-      onError?.(errorMessage);
-      throw err;
+      const errorMessage = err instanceof APIError ? err.message : 'Failed to create contact'
+      onError?.(errorMessage)
+      throw err
     }
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError])
 
   const deleteContact = useCallback(async (contactName: string) => {
     try {
-      await ContactAPI.delete(contactName);
-      onSuccess?.();
+      await ContactAPI.delete(contactName)
+      onSuccess?.()
     } catch (err) {
-      const errorMessage = err instanceof APIError ? err.message : 'Failed to delete contact';
-      onError?.(errorMessage);
-      throw err;
+      const errorMessage = err instanceof APIError ? err.message : 'Failed to delete contact'
+      onError?.(errorMessage)
+      throw err
     }
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError])
 
   const moveContact = useCallback(async (contactName: string, targetOU: string) => {
     try {
-      await ContactAPI.move(contactName, targetOU);
-      onSuccess?.();
+      await ContactAPI.move(contactName, targetOU)
+      onSuccess?.()
     } catch (err) {
-      const errorMessage = err instanceof APIError ? err.message : 'Failed to move contact';
-      onError?.(errorMessage);
-      throw err;
+      const errorMessage = err instanceof APIError ? err.message : 'Failed to move contact'
+      onError?.(errorMessage)
+      throw err
     }
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError])
 
   return {
     createContact,
@@ -54,5 +54,5 @@ export const useContactMutations = (onSuccess?: () => void, onError?: (error: st
     moveContact,
     isLoading: false, // We handle loading states at the component level
     error: null // We handle errors via the callbacks
-  };
-};
+  }
+}

@@ -1,35 +1,35 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Key, Loader2, Eye, EyeOff, Shield } from 'lucide-react';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Key, Loader2, Eye, EyeOff, Shield } from 'lucide-react'
+import { z } from 'zod'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form'
 
-import { useUserMutations } from './hooks/useUserMutations';
-import { ErrorToast, SuccessToast } from '@/common';
-import { ValidationHelper } from '@/lib/validation';
-import type { SambaUser } from '@/types/samba';
+import { useUserMutations } from './hooks/useUserMutations'
+import { ErrorToast, SuccessToast } from '@/common'
+import { ValidationHelper } from '@/lib/validation'
+import type { SambaUser } from '@/types/samba'
 
 // Password change schema
 const changePasswordSchema = z.object({
@@ -42,11 +42,11 @@ const changePasswordSchema = z.object({
       'Password must contain uppercase, lowercase, number, and special character'
     ),
   confirmPassword: z.string().min(1, 'Please confirm your password'),
-  mustChangeAtNextLogin: z.boolean().default(false),
+  mustChangeAtNextLogin: z.boolean().default(false)
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+  path: ['confirmPassword']
+})
 
 type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 
@@ -58,113 +58,113 @@ interface ChangePasswordDialogProps {
     trigger?: React.ReactNode;
 }
 
-export default function ChangePasswordDialog({ 
-    user, 
-    username: propUsername, 
-    mode = 'admin',
-    onPasswordChanged, 
-    trigger 
+export default function ChangePasswordDialog ({
+  user,
+  username: propUsername,
+  mode = 'admin',
+  onPasswordChanged,
+  trigger
 }: ChangePasswordDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [showPasswords, setShowPasswords] = useState({
-        current: false,
-        new: false,
-        confirm: false
-    });
-    const [showToasts, setShowToasts] = useState({ success: false, error: false });
-    const [passwordStrength, setPasswordStrength] = useState<{ score: number; feedback: string[]; isStrong: boolean }>({ score: 0, feedback: [], isStrong: false });
+  const [isOpen, setIsOpen] = useState(false)
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  })
+  const [showToasts, setShowToasts] = useState({ success: false, error: false })
+  const [passwordStrength, setPasswordStrength] = useState<{ score: number; feedback: string[]; isStrong: boolean }>({ score: 0, feedback: [], isStrong: false })
 
-    const username = user?.username || propUsername || '';
-    const displayName = user?.displayName || user?.username || username;
+  const username = user?.username || propUsername || ''
+  const displayName = user?.displayName || user?.username || username
 
-    const form = useForm<ChangePasswordFormData>({
-        resolver: zodResolver(changePasswordSchema),
-        defaultValues: {
-            username: username,
-            currentPassword: '',
-            newPassword: '',
-            confirmPassword: '',
-            mustChangeAtNextLogin: false,
-        },
-    });
+  const form = useForm<ChangePasswordFormData>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: {
+      username,
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+      mustChangeAtNextLogin: false
+    }
+  })
 
-    const { setPassword, changingPassword, error, clearError } = useUserMutations({
-        onSuccess: (action) => {
-            if (action === 'setPassword') {
-                setShowToasts({ success: true, error: false });
-                setIsOpen(false);
-                form.reset();
-                onPasswordChanged?.(username);
-            }
-        },
-        onError: () => {
-            setShowToasts({ success: false, error: true });
-        },
-    });
+  const { setPassword, changingPassword, error, clearError } = useUserMutations({
+    onSuccess: (action) => {
+      if (action === 'setPassword') {
+        setShowToasts({ success: true, error: false })
+        setIsOpen(false)
+        form.reset()
+        onPasswordChanged?.(username)
+      }
+    },
+    onError: () => {
+      setShowToasts({ success: false, error: true })
+    }
+  })
 
-    const watchedNewPassword = form.watch('newPassword');
+  const watchedNewPassword = form.watch('newPassword')
 
-    // Update password strength when new password changes
-    React.useEffect(() => {
-        if (watchedNewPassword) {
-            const strength = ValidationHelper.checkPasswordStrength(watchedNewPassword);
-            setPasswordStrength(strength);
-        } else {
-            setPasswordStrength({ score: 0, feedback: [], isStrong: false });
-        }
-    }, [watchedNewPassword]);
+  // Update password strength when new password changes
+  React.useEffect(() => {
+    if (watchedNewPassword) {
+      const strength = ValidationHelper.checkPasswordStrength(watchedNewPassword)
+      setPasswordStrength(strength)
+    } else {
+      setPasswordStrength({ score: 0, feedback: [], isStrong: false })
+    }
+  }, [watchedNewPassword])
 
-    const onSubmit = async (data: ChangePasswordFormData) => {
-        clearError();
-        
-        // For admin mode, we can set password directly
-        // For self mode, we would need to validate current password first
-        const success = await setPassword(data.username, data.newPassword);
-        if (success && !data.mustChangeAtNextLogin) {
-            // If admin doesn't want user to change at next login, we might need additional API call
-            // This depends on samba-tool capabilities
-        }
-    };
+  const onSubmit = async (data: ChangePasswordFormData) => {
+    clearError()
 
-    const handleOpenChange = (open: boolean) => {
-        setIsOpen(open);
-        if (!open) {
-            form.reset();
-            clearError();
-            setShowPasswords({ current: false, new: false, confirm: false });
-        }
-    };
+    // For admin mode, we can set password directly
+    // For self mode, we would need to validate current password first
+    const success = await setPassword(data.username, data.newPassword)
+    if (success && !data.mustChangeAtNextLogin) {
+      // If admin doesn't want user to change at next login, we might need additional API call
+      // This depends on samba-tool capabilities
+    }
+  }
 
-    const togglePasswordVisibility = (field: keyof typeof showPasswords) => {
-        setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
-    };
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) {
+      form.reset()
+      clearError()
+      setShowPasswords({ current: false, new: false, confirm: false })
+    }
+  }
 
-    const getPasswordStrengthColor = (score: number) => {
-        if (score <= 2) return 'bg-red-500';
-        if (score <= 4) return 'bg-yellow-500';
-        if (score <= 5) return 'bg-blue-500';
-        return 'bg-green-500';
-    };
+  const togglePasswordVisibility = (field: keyof typeof showPasswords) => {
+    setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }))
+  }
 
-    const getPasswordStrengthLabel = (score: number) => {
-        if (score <= 2) return 'Weak';
-        if (score <= 4) return 'Fair';
-        if (score <= 5) return 'Good';
-        return 'Strong';
-    };
+  const getPasswordStrengthColor = (score: number) => {
+    if (score <= 2) return 'bg-red-500'
+    if (score <= 4) return 'bg-yellow-500'
+    if (score <= 5) return 'bg-blue-500'
+    return 'bg-green-500'
+  }
 
-    return (
+  const getPasswordStrengthLabel = (score: number) => {
+    if (score <= 2) return 'Weak'
+    if (score <= 4) return 'Fair'
+    if (score <= 5) return 'Good'
+    return 'Strong'
+  }
+
+  return (
         <>
             {showToasts.error && error && (
-                <ErrorToast 
-                    errorMessage={error} 
-                    closeModal={() => setShowToasts({ ...showToasts, error: false })} 
+                <ErrorToast
+                    errorMessage={error}
+                    closeModal={() => setShowToasts({ ...showToasts, error: false })}
                 />
             )}
             {showToasts.success && (
-                <SuccessToast 
-                    successMessage={`Password changed successfully for "${username}".`} 
-                    closeModal={() => setShowToasts({ ...showToasts, success: false })} 
+                <SuccessToast
+                    successMessage={`Password changed successfully for "${username}".`}
+                    closeModal={() => setShowToasts({ ...showToasts, success: false })}
                 />
             )}
 
@@ -184,9 +184,9 @@ export default function ChangePasswordDialog({
                             <DialogTitle>Change Password</DialogTitle>
                         </div>
                         <DialogDescription>
-                            {mode === 'self' 
-                                ? 'Change your account password. Your new password must be strong and secure.'
-                                : `Change the password for user "${displayName}". The new password must meet security requirements.`
+                            {mode === 'self'
+                              ? 'Change your account password. Your new password must be strong and secure.'
+                              : `Change the password for user "${displayName}". The new password must meet security requirements.`
                             }
                         </DialogDescription>
                     </DialogHeader>
@@ -201,8 +201,8 @@ export default function ChangePasswordDialog({
                                         <FormItem>
                                             <FormLabel>Username</FormLabel>
                                             <FormControl>
-                                                <Input 
-                                                    {...field} 
+                                                <Input
+                                                    {...field}
                                                     placeholder="Enter username"
                                                     disabled={!!user}
                                                 />
@@ -222,9 +222,9 @@ export default function ChangePasswordDialog({
                                             <FormLabel>Current Password</FormLabel>
                                             <FormControl>
                                                 <div className="relative">
-                                                    <Input 
+                                                    <Input
                                                         {...field}
-                                                        type={showPasswords.current ? "text" : "password"}
+                                                        type={showPasswords.current ? 'text' : 'password'}
                                                         placeholder="Enter current password"
                                                     />
                                                     <Button
@@ -234,11 +234,13 @@ export default function ChangePasswordDialog({
                                                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                                                         onClick={() => togglePasswordVisibility('current')}
                                                     >
-                                                        {showPasswords.current ? (
+                                                        {showPasswords.current
+                                                          ? (
                                                             <EyeOff className="h-4 w-4" />
-                                                        ) : (
+                                                            )
+                                                          : (
                                                             <Eye className="h-4 w-4" />
-                                                        )}
+                                                            )}
                                                     </Button>
                                                 </div>
                                             </FormControl>
@@ -256,9 +258,9 @@ export default function ChangePasswordDialog({
                                         <FormLabel>New Password</FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                                <Input 
+                                                <Input
                                                     {...field}
-                                                    type={showPasswords.new ? "text" : "password"}
+                                                    type={showPasswords.new ? 'text' : 'password'}
                                                     placeholder="Enter new password"
                                                 />
                                                 <Button
@@ -268,21 +270,23 @@ export default function ChangePasswordDialog({
                                                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                                                     onClick={() => togglePasswordVisibility('new')}
                                                 >
-                                                    {showPasswords.new ? (
+                                                    {showPasswords.new
+                                                      ? (
                                                         <EyeOff className="h-4 w-4" />
-                                                    ) : (
+                                                        )
+                                                      : (
                                                         <Eye className="h-4 w-4" />
-                                                    )}
+                                                        )}
                                                 </Button>
                                             </div>
                                         </FormControl>
-                                        
+
                                         {/* Password Strength Indicator */}
                                         {watchedNewPassword && (
                                             <div className="space-y-2">
                                                 <div className="flex items-center gap-2">
                                                     <div className="flex-1 bg-gray-200 rounded-full h-2">
-                                                        <div 
+                                                        <div
                                                             className={`h-2 rounded-full transition-all ${getPasswordStrengthColor(passwordStrength.score)}`}
                                                             style={{ width: `${(passwordStrength.score / 7) * 100}%` }}
                                                         />
@@ -312,9 +316,9 @@ export default function ChangePasswordDialog({
                                         <FormLabel>Confirm New Password</FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                                <Input 
+                                                <Input
                                                     {...field}
-                                                    type={showPasswords.confirm ? "text" : "password"}
+                                                    type={showPasswords.confirm ? 'text' : 'password'}
                                                     placeholder="Confirm new password"
                                                 />
                                                 <Button
@@ -324,11 +328,13 @@ export default function ChangePasswordDialog({
                                                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                                                     onClick={() => togglePasswordVisibility('confirm')}
                                                 >
-                                                    {showPasswords.confirm ? (
+                                                    {showPasswords.confirm
+                                                      ? (
                                                         <EyeOff className="h-4 w-4" />
-                                                    ) : (
+                                                        )
+                                                      : (
                                                         <Eye className="h-4 w-4" />
-                                                    )}
+                                                        )}
                                                 </Button>
                                             </div>
                                         </FormControl>
@@ -361,15 +367,15 @@ export default function ChangePasswordDialog({
                             )}
 
                             <DialogFooter>
-                                <Button 
-                                    type="button" 
-                                    variant="outline" 
+                                <Button
+                                    type="button"
+                                    variant="outline"
                                     onClick={() => handleOpenChange(false)}
                                 >
                                     Cancel
                                 </Button>
-                                <Button 
-                                    type="submit" 
+                                <Button
+                                    type="submit"
                                     disabled={changingPassword || !passwordStrength.isStrong}
                                 >
                                     {changingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -381,5 +387,5 @@ export default function ChangePasswordDialog({
                 </DialogContent>
             </Dialog>
         </>
-    );
+  )
 }

@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Plus, Key } from 'lucide-react';
-import { useSPNMutations } from './hooks/useSPNMutations';
-import { toast } from 'sonner';
-import type { CreateSPNInput } from '@/types/samba';
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Loader2, Plus, Key } from 'lucide-react'
+import { useSPNMutations } from './hooks/useSPNMutations'
+import { toast } from 'sonner'
+import type { CreateSPNInput } from '@/types/samba'
 
 interface AddSPNDialogProps {
   isOpen: boolean;
@@ -36,73 +36,73 @@ const addSPNSchema = z.object({
   user: z.string()
     .min(1, 'Username is required')
     .max(100, 'Username must be less than 100 characters')
-    .regex(/^[a-zA-Z0-9._-]+$/, 'Username can only contain letters, numbers, dots, underscores, and hyphens'),
-});
+    .regex(/^[a-zA-Z0-9._-]+$/, 'Username can only contain letters, numbers, dots, underscores, and hyphens')
+})
 
 type AddSPNFormData = z.infer<typeof addSPNSchema>;
 
-export function AddSPNDialog({
+export function AddSPNDialog ({
   isOpen,
   onClose,
-  onSPNAdded,
+  onSPNAdded
 }: AddSPNDialogProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm<AddSPNFormData>({
     resolver: zodResolver(addSPNSchema),
     defaultValues: {
       name: '',
-      user: '',
-    },
-  });
+      user: ''
+    }
+  })
 
   const { addSPN } = useSPNMutations(
     () => {
       // Success callback
-      toast.success('SPN added successfully');
-      resetForm();
-      onSPNAdded?.();
-      onClose();
+      toast.success('SPN added successfully')
+      resetForm()
+      onSPNAdded?.()
+      onClose()
     },
     (errorMessage: string) => {
       // Error callback
-      setError(errorMessage);
+      setError(errorMessage)
     }
-  );
+  )
 
   const resetForm = () => {
-    reset();
-    setError(null);
-  };
+    reset()
+    setError(null)
+  }
 
   const handleClose = () => {
-    resetForm();
-    onClose();
-  };
+    resetForm()
+    onClose()
+  }
 
   const onSubmit = async (data: AddSPNFormData) => {
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
       const spnData: CreateSPNInput = {
         name: data.name.trim(),
-        user: data.user.trim(),
-      };
+        user: data.user.trim()
+      }
 
-      await addSPN(spnData);
+      await addSPN(spnData)
     } catch (err) {
       // Error is already handled by the mutation hook
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -182,5 +182,5 @@ export function AddSPNDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

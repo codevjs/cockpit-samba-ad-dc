@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -6,15 +6,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Users, Info } from 'lucide-react';
-import { useGroupDetails, useGroupMembers } from './hooks/useGroups';
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Users, Info } from 'lucide-react'
+import { useGroupDetails, useGroupMembers } from './hooks/useGroups'
 
 interface GroupDetailsDialogProps {
   isOpen?: boolean;
@@ -28,24 +28,24 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
   onClose: externalOnClose,
   groupName: externalGroupName
 }) => {
-  const [internalIsOpen, setInternalIsOpen] = useState(false);
-  const [internalGroupName, setInternalGroupName] = useState('');
+  const [internalIsOpen, setInternalIsOpen] = useState(false)
+  const [internalGroupName, setInternalGroupName] = useState('')
 
   // Use external props if provided, otherwise use internal state
-  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const onClose = externalOnClose || (() => setInternalIsOpen(false));
-  const groupName = externalGroupName || internalGroupName;
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen
+  const onClose = externalOnClose || (() => setInternalIsOpen(false))
+  const groupName = externalGroupName || internalGroupName
 
-  const { group, loading: groupLoading, error: groupError } = useGroupDetails(groupName);
-  const { members, loading: membersLoading, error: membersError } = useGroupMembers(groupName);
+  const { group, loading: groupLoading, error: groupError } = useGroupDetails(groupName)
+  const { members, loading: membersLoading, error: membersError } = useGroupMembers(groupName)
 
   const handleShowGroup = () => {
-    setInternalIsOpen(true);
-  };
+    setInternalIsOpen(true)
+  }
 
   const handleInputChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setInternalGroupName(value);
-  };
+    setInternalGroupName(value)
+  }
 
   if (!isOpen && !externalIsOpen) {
     return (
@@ -56,7 +56,7 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
             value={internalGroupName}
             onChange={(e) => handleInputChange(e, e.target.value)}
           />
-          <Button 
+          <Button
             onClick={handleShowGroup}
             disabled={!internalGroupName.trim()}
           >
@@ -64,7 +64,7 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -101,11 +101,14 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
                 <CardTitle>Group Information</CardTitle>
               </CardHeader>
               <CardContent>
-                {groupLoading ? (
+                {groupLoading
+                  ? (
                   <div className="flex justify-center py-8">
                     <LoadingSpinner />
                   </div>
-                ) : group ? (
+                    )
+                  : group
+                    ? (
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
@@ -138,7 +141,8 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
                       </div>
                     </div>
                   </div>
-                ) : (
+                      )
+                    : (
                   <div className="text-center py-8">
                     <Users className="mx-auto h-12 w-12 text-muted-foreground" />
                     <h3 className="mt-2 text-sm font-medium">Group not found</h3>
@@ -146,7 +150,7 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
                       The specified group could not be located.
                     </p>
                   </div>
-                )}
+                      )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -166,11 +170,14 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
                   </Alert>
                 )}
 
-                {membersLoading ? (
+                {membersLoading
+                  ? (
                   <div className="flex justify-center py-8">
                     <LoadingSpinner />
                   </div>
-                ) : members && members.length > 0 ? (
+                    )
+                  : members && members.length > 0
+                    ? (
                   <div className="space-y-2">
                     {members.map((member, index) => (
                       <div key={index} className="flex items-center p-2 bg-muted/50 rounded">
@@ -179,7 +186,8 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
                       </div>
                     ))}
                   </div>
-                ) : (
+                      )
+                    : (
                   <div className="text-center py-8">
                     <Users className="mx-auto h-12 w-12 text-muted-foreground" />
                     <h3 className="mt-2 text-sm font-medium">No members</h3>
@@ -187,7 +195,7 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
                       This group currently has no members.
                     </p>
                   </div>
-                )}
+                      )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -200,7 +208,7 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default GroupDetailsDialog;
+export default GroupDetailsDialog

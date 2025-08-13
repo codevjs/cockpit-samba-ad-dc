@@ -1,26 +1,26 @@
-import React, { useMemo } from 'react';
-import { format } from 'date-fns';
-import { MoreHorizontal, Users, Shield, Globe, Building, Trash2, Info, FolderOpen, UserPlus, UserMinus } from 'lucide-react';
+import React, { useMemo } from 'react'
+import { format } from 'date-fns'
+import { MoreHorizontal, Users, Shield, Globe, Building, Trash2, Info, FolderOpen, UserPlus, UserMinus } from 'lucide-react'
 
-import { DataTable, DataTableColumn } from '@/components/ui/data-table';
-import { ErrorAlert } from '@/components/ui/error-alert';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { DataTable, DataTableColumn } from '@/components/ui/data-table'
+import { ErrorAlert } from '@/components/ui/error-alert'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 
-import type { SambaGroup } from '@/types/samba';
-import DeleteGroupDialog from './delete';
-import GroupDetailsDialog from './show';
-import MoveGroupDialog from './move';
-import ListMembersDialog from './listmembers';
-import RemoveMembersDialog from './removemembers';
+import type { SambaGroup } from '@/types/samba'
+import DeleteGroupDialog from './delete'
+import GroupDetailsDialog from './show'
+import MoveGroupDialog from './move'
+import ListMembersDialog from './listmembers'
+import RemoveMembersDialog from './removemembers'
 
 interface GroupListProps {
   groups?: SambaGroup[];
@@ -46,8 +46,8 @@ const GroupActions: React.FC<GroupActionsProps> = ({ group, onRefresh }) => {
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
-        <GroupDetailsDialog 
+
+        <GroupDetailsDialog
           groupName={group.name}
           trigger={
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -56,8 +56,8 @@ const GroupActions: React.FC<GroupActionsProps> = ({ group, onRefresh }) => {
             </DropdownMenuItem>
           }
         />
-        
-        <ListMembersDialog 
+
+        <ListMembersDialog
           groupName={group.name}
           trigger={
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -66,8 +66,8 @@ const GroupActions: React.FC<GroupActionsProps> = ({ group, onRefresh }) => {
             </DropdownMenuItem>
           }
         />
-        
-        <RemoveMembersDialog 
+
+        <RemoveMembersDialog
           groupName={group.name}
           onMembersRemoved={onRefresh}
           trigger={
@@ -77,8 +77,8 @@ const GroupActions: React.FC<GroupActionsProps> = ({ group, onRefresh }) => {
             </DropdownMenuItem>
           }
         />
-        
-        <MoveGroupDialog 
+
+        <MoveGroupDialog
           groupName={group.name}
           onGroupMoved={onRefresh}
           trigger={
@@ -88,14 +88,14 @@ const GroupActions: React.FC<GroupActionsProps> = ({ group, onRefresh }) => {
             </DropdownMenuItem>
           }
         />
-        
+
         <DropdownMenuSeparator />
-        
-        <DeleteGroupDialog 
+
+        <DeleteGroupDialog
           groupName={group.name}
           onGroupDeleted={onRefresh}
           trigger={
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onSelect={(e) => e.preventDefault()}
               className="text-destructive focus:text-destructive"
             >
@@ -106,8 +106,8 @@ const GroupActions: React.FC<GroupActionsProps> = ({ group, onRefresh }) => {
         />
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-};
+  )
+}
 
 const GroupList: React.FC<GroupListProps> = ({ groups = [], loading = false, error = null, onRefresh = () => {} }) => {
   const columns = useMemo<DataTableColumn<SambaGroup>[]>(() => [
@@ -121,7 +121,7 @@ const GroupList: React.FC<GroupListProps> = ({ groups = [], loading = false, err
           <Users className="mr-2 h-4 w-4 text-muted-foreground" />
           {group.name}
         </div>
-      ),
+      )
     },
     {
       key: 'groupType',
@@ -129,19 +129,21 @@ const GroupList: React.FC<GroupListProps> = ({ groups = [], loading = false, err
       sortable: true,
       render: (group) => (
         <Badge variant={group.groupType === 'Security' ? 'default' : 'secondary'}>
-          {group.groupType === 'Security' ? (
+          {group.groupType === 'Security'
+            ? (
             <>
               <Shield className="mr-1 h-3 w-3" />
               Security
             </>
-          ) : (
+              )
+            : (
             <>
               <Globe className="mr-1 h-3 w-3" />
               Distribution
             </>
-          )}
+              )}
         </Badge>
-      ),
+      )
     },
     {
       key: 'groupScope',
@@ -151,18 +153,18 @@ const GroupList: React.FC<GroupListProps> = ({ groups = [], loading = false, err
         const scopeIcon = {
           DomainLocal: Building,
           Global: Globe,
-          Universal: Shield,
-        }[group.groupScope];
-        
-        const IconComponent = scopeIcon || Building;
-        
+          Universal: Shield
+        }[group.groupScope]
+
+        const IconComponent = scopeIcon || Building
+
         return (
           <div className="flex items-center text-sm">
             <IconComponent className="mr-1 h-3 w-3 text-muted-foreground" />
             {group.groupScope}
           </div>
-        );
-      },
+        )
+      }
     },
     {
       key: 'description',
@@ -172,14 +174,14 @@ const GroupList: React.FC<GroupListProps> = ({ groups = [], loading = false, err
         <div className="text-sm max-w-[300px] truncate">
           {group.description || <span className="text-muted-foreground">-</span>}
         </div>
-      ),
+      )
     },
     {
       key: 'members',
       header: 'Members',
       sortable: true,
       render: (group) => {
-        const memberCount = group.members?.length || 0;
+        const memberCount = group.members?.length || 0
         return (
           <div className="text-sm">
             <div className="font-medium">{memberCount}</div>
@@ -189,8 +191,8 @@ const GroupList: React.FC<GroupListProps> = ({ groups = [], loading = false, err
               </div>
             )}
           </div>
-        );
-      },
+        )
+      }
     },
     {
       key: 'createdAt',
@@ -200,14 +202,14 @@ const GroupList: React.FC<GroupListProps> = ({ groups = [], loading = false, err
         <div className="text-sm">
           {format(group.createdAt, 'MMM dd, yyyy')}
         </div>
-      ),
+      )
     },
     {
       key: 'actions',
       header: 'Actions',
-      render: (group) => <GroupActions group={group} onRefresh={onRefresh} />,
-    },
-  ], [onRefresh]);
+      render: (group) => <GroupActions group={group} onRefresh={onRefresh} />
+    }
+  ], [onRefresh])
 
   if (error) {
     return (
@@ -217,7 +219,7 @@ const GroupList: React.FC<GroupListProps> = ({ groups = [], loading = false, err
         onRetry={onRefresh}
         retryLabel="Retry Loading"
       />
-    );
+    )
   }
 
   return (
@@ -229,7 +231,7 @@ const GroupList: React.FC<GroupListProps> = ({ groups = [], loading = false, err
       searchPlaceholder="Search groups by name or description..."
       emptyMessage="No groups found"
     />
-  );
-};
+  )
+}
 
-export default GroupList;
+export default GroupList

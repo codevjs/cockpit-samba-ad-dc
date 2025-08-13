@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,15 +17,15 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { useNTACLMutations } from './hooks/useNTACL';
-import { toast } from 'sonner';
-import type { ChangeDomSIDInput } from '@/types/samba';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle } from 'lucide-react'
+import { useNTACLMutations } from './hooks/useNTACL'
+import { toast } from 'sonner'
+import type { ChangeDomSIDInput } from '@/types/samba'
 
 const changeDomSIDSchema = z.object({
   oldSid: z.string().min(1, 'Old SID is required').regex(
@@ -40,8 +40,8 @@ const changeDomSIDSchema = z.object({
   eadbFile: z.string().optional(),
   useNtvfs: z.string().optional(),
   useS3fs: z.string().optional(),
-  service: z.string().optional(),
-});
+  service: z.string().optional()
+})
 
 type ChangeDomSIDFormData = z.infer<typeof changeDomSIDSchema>;
 
@@ -51,9 +51,9 @@ interface ChangeDomSIDDialogProps {
   onDomSIDChanged: () => void;
 }
 
-export function ChangeDomSIDDialog({ isOpen, onClose, onDomSIDChanged }: ChangeDomSIDDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function ChangeDomSIDDialog ({ isOpen, onClose, onDomSIDChanged }: ChangeDomSIDDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<ChangeDomSIDFormData>({
     resolver: zodResolver(changeDomSIDSchema),
     defaultValues: {
@@ -63,25 +63,25 @@ export function ChangeDomSIDDialog({ isOpen, onClose, onDomSIDChanged }: ChangeD
       eadbFile: '',
       useNtvfs: '',
       useS3fs: '',
-      service: '',
-    },
-  });
+      service: ''
+    }
+  })
 
   const { changeDomainSID } = useNTACLMutations(
     () => {
-      onDomSIDChanged();
-      handleClose();
+      onDomSIDChanged()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: ChangeDomSIDFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: ChangeDomSIDInput = {
         oldSid: data.oldSid,
@@ -90,17 +90,17 @@ export function ChangeDomSIDDialog({ isOpen, onClose, onDomSIDChanged }: ChangeD
         eadbFile: data.eadbFile || undefined,
         useNtvfs: data.useNtvfs || undefined,
         useS3fs: data.useS3fs || undefined,
-        service: data.service || undefined,
-      };
-      
-      await changeDomainSID(input);
-      toast.success('Domain SID changed successfully in NT ACLs');
+        service: data.service || undefined
+      }
+
+      await changeDomainSID(input)
+      toast.success('Domain SID changed successfully in NT ACLs')
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -111,7 +111,7 @@ export function ChangeDomSIDDialog({ isOpen, onClose, onDomSIDChanged }: ChangeD
             Update domain SID references in NT ACLs after domain migration or restoration.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <Alert>
@@ -120,9 +120,9 @@ export function ChangeDomSIDDialog({ isOpen, onClose, onDomSIDChanged }: ChangeD
                 <div className="space-y-2">
                   <p className="font-medium">Critical Operation</p>
                   <p className="text-sm">
-                    This operation will change all references to the old domain SID 
-                    with the new domain SID in NT ACLs. This is typically done after 
-                    domain migration or backup restoration. Ensure you have the correct 
+                    This operation will change all references to the old domain SID
+                    with the new domain SID in NT ACLs. This is typically done after
+                    domain migration or backup restoration. Ensure you have the correct
                     SIDs before proceeding.
                   </p>
                 </div>
@@ -236,5 +236,5 @@ export function ChangeDomSIDDialog({ isOpen, onClose, onDomSIDChanged }: ChangeD
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

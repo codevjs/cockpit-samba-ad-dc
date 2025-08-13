@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,16 +17,16 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ExternalLink, AlertTriangle } from 'lucide-react';
-import { useDSACLMutations } from './hooks/useDSACL';
-import { toast } from 'sonner';
-import type { SetDSACLInput } from '@/types/samba';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ExternalLink, AlertTriangle } from 'lucide-react'
+import { useDSACLMutations } from './hooks/useDSACL'
+import { toast } from 'sonner'
+import type { SetDSACLInput } from '@/types/samba'
 
 const setDSACLSchema = z.object({
   url: z.string().optional(),
@@ -34,13 +34,13 @@ const setDSACLSchema = z.object({
   action: z.string().optional(),
   objectDN: z.string().optional(),
   trusteeDN: z.string().optional(),
-  sddl: z.string().optional(),
+  sddl: z.string().optional()
 }).refine(
   (data) => Object.values(data).some(value => value && value.length > 0),
   {
-    message: "At least one field must be provided",
+    message: 'At least one field must be provided'
   }
-);
+)
 
 type SetDSACLFormData = z.infer<typeof setDSACLSchema>;
 
@@ -50,9 +50,9 @@ interface SetDSACLDialogProps {
   onDSACLSet: () => void;
 }
 
-export function SetDSACLDialog({ isOpen, onClose, onDSACLSet }: SetDSACLDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function SetDSACLDialog ({ isOpen, onClose, onDSACLSet }: SetDSACLDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<SetDSACLFormData>({
     resolver: zodResolver(setDSACLSchema),
     defaultValues: {
@@ -61,25 +61,25 @@ export function SetDSACLDialog({ isOpen, onClose, onDSACLSet }: SetDSACLDialogPr
       action: '',
       objectDN: '',
       trusteeDN: '',
-      sddl: '',
-    },
-  });
+      sddl: ''
+    }
+  })
 
   const { setDSACL } = useDSACLMutations(
     () => {
-      onDSACLSet();
-      handleClose();
+      onDSACLSet()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: SetDSACLFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const dsaclData: SetDSACLInput = {
         url: data.url || undefined,
@@ -87,17 +87,17 @@ export function SetDSACLDialog({ isOpen, onClose, onDSACLSet }: SetDSACLDialogPr
         action: data.action || undefined,
         objectDN: data.objectDN || undefined,
         trusteeDN: data.trusteeDN || undefined,
-        sddl: data.sddl || undefined,
-      };
-      
-      await setDSACL(dsaclData);
-      toast.success('DSACL modified successfully');
+        sddl: data.sddl || undefined
+      }
+
+      await setDSACL(dsaclData)
+      toast.success('DSACL modified successfully')
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -108,7 +108,7 @@ export function SetDSACLDialog({ isOpen, onClose, onDSACLSet }: SetDSACLDialogPr
             Modify Directory Service Access Control List entries using samba-tool dsacl set.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <Alert>
@@ -117,7 +117,7 @@ export function SetDSACLDialog({ isOpen, onClose, onDSACLSet }: SetDSACLDialogPr
                 <div className="space-y-2">
                   <p className="font-medium">Advanced Feature</p>
                   <p className="text-sm">
-                    Modifying ACLs requires careful consideration and understanding of 
+                    Modifying ACLs requires careful consideration and understanding of
                     Active Directory security. Incorrect modifications can impact system security.
                   </p>
                 </div>
@@ -274,9 +274,9 @@ export function SetDSACLDialog({ isOpen, onClose, onDSACLSet }: SetDSACLDialogPr
                     For detailed information about SDDL format and ACL management, refer to:
                   </p>
                   <div className="flex items-center gap-2 text-sm">
-                    <a 
-                      href="https://docs.microsoft.com/en-us/windows/win32/secauthz/security-descriptor-definition-language" 
-                      target="_blank" 
+                    <a
+                      href="https://docs.microsoft.com/en-us/windows/win32/secauthz/security-descriptor-definition-language"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
                     >
@@ -300,5 +300,5 @@ export function SetDSACLDialog({ isOpen, onClose, onDSACLSet }: SetDSACLDialogPr
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

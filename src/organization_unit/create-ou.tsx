@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,21 +17,21 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { useOUMutations } from './hooks/useOU';
-import { toast } from 'sonner';
-import type { CreateOUInput, SambaOU } from '@/types/samba';
+  SelectValue
+} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { useOUMutations } from './hooks/useOU'
+import { toast } from 'sonner'
+import type { CreateOUInput, SambaOU } from '@/types/samba'
 
 const createOUSchema = z.object({
   name: z.string().min(1, 'Organization Unit name is required').regex(
@@ -39,8 +39,8 @@ const createOUSchema = z.object({
     'OU name must start with "OU=" (e.g., OU=Marketing)'
   ),
   description: z.string().optional(),
-  parentOU: z.string().optional(),
-});
+  parentOU: z.string().optional()
+})
 
 type CreateOUFormData = z.infer<typeof createOUSchema>;
 
@@ -51,48 +51,48 @@ interface CreateOUDialogProps {
   parentOUs: SambaOU[];
 }
 
-export function CreateOUDialog({ isOpen, onClose, onOUCreated, parentOUs }: CreateOUDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function CreateOUDialog ({ isOpen, onClose, onOUCreated, parentOUs }: CreateOUDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<CreateOUFormData>({
     resolver: zodResolver(createOUSchema),
     defaultValues: {
       name: '',
       description: '',
-      parentOU: '',
-    },
-  });
+      parentOU: ''
+    }
+  })
 
   const { createOU } = useOUMutations(
     () => {
-      onOUCreated();
-      handleClose();
+      onOUCreated()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: CreateOUFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const ouData: CreateOUInput = {
         name: data.name,
         description: data.description || undefined,
-        parentOU: data.parentOU || undefined,
-      };
-      
-      await createOU(ouData);
-      toast.success(`Organization Unit "${data.name}" created successfully`);
+        parentOU: data.parentOU || undefined
+      }
+
+      await createOU(ouData)
+      toast.success(`Organization Unit "${data.name}" created successfully`)
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -103,7 +103,7 @@ export function CreateOUDialog({ isOpen, onClose, onOUCreated, parentOUs }: Crea
             Create a new organizational unit to organize your Active Directory objects.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -200,5 +200,5 @@ export function CreateOUDialog({ isOpen, onClose, onOUCreated, parentOUs }: Crea
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

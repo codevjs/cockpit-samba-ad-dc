@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,23 +17,23 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { useNTACLMutations } from './hooks/useNTACL';
-import { toast } from 'sonner';
-import type { SysvolOperationInput } from '@/types/samba';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle } from 'lucide-react'
+import { useNTACLMutations } from './hooks/useNTACL'
+import { toast } from 'sonner'
+import type { SysvolOperationInput } from '@/types/samba'
 
 const sysvolResetSchema = z.object({
   xattrBackend: z.string().optional(),
   eadbFile: z.string().optional(),
   useNtvfs: z.string().optional(),
   useS3fs: z.string().optional(),
-  service: z.string().optional(),
-});
+  service: z.string().optional()
+})
 
 type SysvolResetFormData = z.infer<typeof sysvolResetSchema>;
 
@@ -43,10 +43,10 @@ interface SysvolResetDialogProps {
   onSysvolReset: () => void;
 }
 
-export function SysvolResetDialog({ isOpen, onClose, onSysvolReset }: SysvolResetDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [confirmed, setConfirmed] = useState(false);
-  
+export function SysvolResetDialog ({ isOpen, onClose, onSysvolReset }: SysvolResetDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [confirmed, setConfirmed] = useState(false)
+
   const form = useForm<SysvolResetFormData>({
     resolver: zodResolver(sysvolResetSchema),
     defaultValues: {
@@ -54,48 +54,48 @@ export function SysvolResetDialog({ isOpen, onClose, onSysvolReset }: SysvolRese
       eadbFile: '',
       useNtvfs: '',
       useS3fs: '',
-      service: '',
-    },
-  });
+      service: ''
+    }
+  })
 
   const { sysvolReset } = useNTACLMutations(
     () => {
-      onSysvolReset();
-      handleClose();
+      onSysvolReset()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    setConfirmed(false);
-    onClose();
-  };
+    form.reset()
+    setConfirmed(false)
+    onClose()
+  }
 
   const onSubmit = async (data: SysvolResetFormData) => {
     if (!confirmed) {
-      toast.error('Please confirm that you understand the risks');
-      return;
+      toast.error('Please confirm that you understand the risks')
+      return
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: SysvolOperationInput = {
         xattrBackend: data.xattrBackend || undefined,
         eadbFile: data.eadbFile || undefined,
         useNtvfs: data.useNtvfs || undefined,
         useS3fs: data.useS3fs || undefined,
-        service: data.service || undefined,
-      };
-      
-      await sysvolReset(input);
-      toast.success('SYSVOL ACLs reset successfully');
+        service: data.service || undefined
+      }
+
+      await sysvolReset(input)
+      toast.success('SYSVOL ACLs reset successfully')
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -106,7 +106,7 @@ export function SysvolResetDialog({ isOpen, onClose, onSysvolReset }: SysvolRese
             Reset SYSVOL ACLs to their default Windows-compatible settings.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <Alert>
@@ -115,9 +115,9 @@ export function SysvolResetDialog({ isOpen, onClose, onSysvolReset }: SysvolRese
                 <div className="space-y-2">
                   <p className="font-medium text-destructive">Destructive Operation</p>
                   <p className="text-sm">
-                    This operation will reset all SYSVOL ACLs to their default settings. 
-                    This will affect Group Policy access and may impact domain functionality. 
-                    Only proceed if you are experiencing SYSVOL permission issues and 
+                    This operation will reset all SYSVOL ACLs to their default settings.
+                    This will affect Group Policy access and may impact domain functionality.
+                    Only proceed if you are experiencing SYSVOL permission issues and
                     understand the consequences.
                   </p>
                   <ul className="text-sm list-disc list-inside space-y-1">
@@ -202,9 +202,9 @@ export function SysvolResetDialog({ isOpen, onClose, onSysvolReset }: SysvolRese
               <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
-                disabled={isSubmitting || !confirmed} 
+              <Button
+                type="submit"
+                disabled={isSubmitting || !confirmed}
                 variant="destructive"
               >
                 {isSubmitting ? 'Resetting SYSVOL...' : 'Reset SYSVOL ACLs'}
@@ -214,5 +214,5 @@ export function SysvolResetDialog({ isOpen, onClose, onSysvolReset }: SysvolRese
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useDNSMutations } from './hooks/useDNS';
-import { toast } from 'sonner';
-import type { DeleteDNSRecordInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useDNSMutations } from './hooks/useDNS'
+import { toast } from 'sonner'
+import type { DeleteDNSRecordInput } from '@/types/samba'
 
 const deleteRecordSchema = z.object({
   server: z.string().min(1, 'Server is required'),
   zone: z.string().min(1, 'Zone is required'),
   name: z.string().min(1, 'Name is required'),
   type: z.enum(['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT'], {
-    required_error: 'Record type is required',
+    required_error: 'Record type is required'
   }),
   data: z.string().min(1, 'Data is required'),
-  password: z.string().optional(),
-});
+  password: z.string().optional()
+})
 
 type DeleteRecordFormData = z.infer<typeof deleteRecordSchema>;
 
@@ -34,14 +34,14 @@ interface DeleteRecordDialogProps {
   defaultPassword?: string;
 }
 
-export function DeleteRecordDialog({
+export function DeleteRecordDialog ({
   isOpen,
   onClose,
   onRecordDeleted,
   defaultServer,
-  defaultPassword,
+  defaultPassword
 }: DeleteRecordDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
@@ -49,29 +49,29 @@ export function DeleteRecordDialog({
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors }
   } = useForm<DeleteRecordFormData>({
     resolver: zodResolver(deleteRecordSchema),
     defaultValues: {
       server: defaultServer || '',
-      password: defaultPassword || '',
-    },
-  });
+      password: defaultPassword || ''
+    }
+  })
 
   const { deleteRecord } = useDNSMutations(
     () => {
-      toast.success('DNS record deleted successfully');
-      onRecordDeleted();
+      toast.success('DNS record deleted successfully')
+      onRecordDeleted()
     },
     (error) => {
-      toast.error(`Failed to delete DNS record: ${error}`);
+      toast.error(`Failed to delete DNS record: ${error}`)
     }
-  );
+  )
 
-  const recordType = watch('type');
+  const recordType = watch('type')
 
   const onSubmit = async (data: DeleteRecordFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: DeleteDNSRecordInput = {
         server: data.server,
@@ -79,67 +79,67 @@ export function DeleteRecordDialog({
         name: data.name,
         type: data.type,
         data: data.data,
-        password: data.password,
-      };
-      await deleteRecord(input);
-      handleClose();
+        password: data.password
+      }
+      await deleteRecord(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   const getDataPlaceholder = () => {
     switch (recordType) {
       case 'A':
-        return '192.168.1.100';
+        return '192.168.1.100'
       case 'AAAA':
-        return '2001:db8::1';
+        return '2001:db8::1'
       case 'CNAME':
-        return 'alias.example.com';
+        return 'alias.example.com'
       case 'MX':
-        return '10 mail.example.com';
+        return '10 mail.example.com'
       case 'NS':
-        return 'ns1.example.com';
+        return 'ns1.example.com'
       case 'PTR':
-        return 'host.example.com';
+        return 'host.example.com'
       case 'SRV':
-        return '10 5 443 target.example.com';
+        return '10 5 443 target.example.com'
       case 'TXT':
-        return 'v=spf1 include:_spf.example.com ~all';
+        return 'v=spf1 include:_spf.example.com ~all'
       default:
-        return 'Enter record data';
+        return 'Enter record data'
     }
-  };
+  }
 
   const getDataDescription = () => {
     switch (recordType) {
       case 'A':
-        return 'IPv4 address to delete (e.g., 192.168.1.100)';
+        return 'IPv4 address to delete (e.g., 192.168.1.100)'
       case 'AAAA':
-        return 'IPv6 address to delete (e.g., 2001:db8::1)';
+        return 'IPv6 address to delete (e.g., 2001:db8::1)'
       case 'CNAME':
-        return 'Canonical name to delete (e.g., alias.example.com)';
+        return 'Canonical name to delete (e.g., alias.example.com)'
       case 'MX':
-        return 'Mail server entry to delete (e.g., 10 mail.example.com)';
+        return 'Mail server entry to delete (e.g., 10 mail.example.com)'
       case 'NS':
-        return 'Name server to delete (e.g., ns1.example.com)';
+        return 'Name server to delete (e.g., ns1.example.com)'
       case 'PTR':
-        return 'Pointer record to delete (e.g., host.example.com)';
+        return 'Pointer record to delete (e.g., host.example.com)'
       case 'SRV':
-        return 'Service record to delete (e.g., 10 5 443 target.example.com)';
+        return 'Service record to delete (e.g., 10 5 443 target.example.com)'
       case 'TXT':
-        return 'Text record to delete (exact match required)';
+        return 'Text record to delete (exact match required)'
       default:
-        return 'Enter the exact data of the record to delete';
+        return 'Enter the exact data of the record to delete'
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -267,5 +267,5 @@ export function DeleteRecordDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

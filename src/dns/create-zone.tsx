@@ -1,25 +1,25 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useDNSMutations } from './hooks/useDNS';
-import { toast } from 'sonner';
-import type { CreateDNSZoneInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Info } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useDNSMutations } from './hooks/useDNS'
+import { toast } from 'sonner'
+import type { CreateDNSZoneInput } from '@/types/samba'
 
 const createZoneSchema = z.object({
   server: z.string().min(1, 'Server is required'),
   zoneName: z.string()
     .min(1, 'Zone name is required')
-    .regex(/^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$/, 
+    .regex(/^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$/,
       'Invalid zone name format'),
-  password: z.string().optional(),
-});
+  password: z.string().optional()
+})
 
 type CreateZoneFormData = z.infer<typeof createZoneSchema>;
 
@@ -31,59 +31,59 @@ interface CreateZoneDialogProps {
   defaultPassword?: string;
 }
 
-export function CreateZoneDialog({
+export function CreateZoneDialog ({
   isOpen,
   onClose,
   onZoneCreated,
   defaultServer,
-  defaultPassword,
+  defaultPassword
 }: CreateZoneDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm<CreateZoneFormData>({
     resolver: zodResolver(createZoneSchema),
     defaultValues: {
       server: defaultServer || '',
-      password: defaultPassword || '',
-    },
-  });
+      password: defaultPassword || ''
+    }
+  })
 
   const { createZone } = useDNSMutations(
     () => {
-      toast.success('DNS zone created successfully');
-      onZoneCreated();
+      toast.success('DNS zone created successfully')
+      onZoneCreated()
     },
     (error) => {
-      toast.error(`Failed to create DNS zone: ${error}`);
+      toast.error(`Failed to create DNS zone: ${error}`)
     }
-  );
+  )
 
   const onSubmit = async (data: CreateZoneFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: CreateDNSZoneInput = {
         server: data.server,
         zoneName: data.zoneName,
-        password: data.password,
-      };
-      await createZone(input);
-      handleClose();
+        password: data.password
+      }
+      await createZone(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -98,7 +98,7 @@ export function CreateZoneDialog({
         <Alert className="border-blue-200 bg-blue-50">
           <Info className="h-4 w-4 text-blue-600" />
           <AlertDescription className="text-blue-800">
-            <strong>Note:</strong> DNS zones manage domain names and their associated records. 
+            <strong>Note:</strong> DNS zones manage domain names and their associated records.
             Creating a zone allows you to add DNS records for that domain.
           </AlertDescription>
         </Alert>
@@ -170,5 +170,5 @@ export function CreateZoneDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

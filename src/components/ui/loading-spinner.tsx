@@ -1,6 +1,6 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
-import { Loader2 } from 'lucide-react';
+import React from 'react'
+import { cn } from '@/lib/utils'
+import { Loader2 } from 'lucide-react'
 
 export interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -11,16 +11,16 @@ export interface LoadingSpinnerProps {
 
 const sizeConfig = {
   sm: 'h-4 w-4',
-  md: 'h-6 w-6', 
+  md: 'h-6 w-6',
   lg: 'h-8 w-8',
-  xl: 'h-12 w-12',
-};
+  xl: 'h-12 w-12'
+}
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'md',
   className,
   text,
-  variant = 'default',
+  variant = 'default'
 }) => {
   const spinnerContent = (
     <div className={cn('flex items-center justify-center', className)}>
@@ -31,18 +31,18 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
         </span>
       )}
     </div>
-  );
+  )
 
   if (variant === 'overlay') {
     return (
       <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-50">
         {spinnerContent}
       </div>
-    );
+    )
   }
 
-  return spinnerContent;
-};
+  return spinnerContent
+}
 
 // Full page loading component
 export interface PageLoadingProps {
@@ -52,7 +52,7 @@ export interface PageLoadingProps {
 
 export const PageLoading: React.FC<PageLoadingProps> = ({
   text = 'Loading...',
-  description,
+  description
 }) => {
   return (
     <div className="flex min-h-[400px] flex-col items-center justify-center space-y-4">
@@ -64,13 +64,13 @@ export const PageLoading: React.FC<PageLoadingProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
 // Loading state for tables/lists
 export const LoadingTable: React.FC<{ rows?: number; columns?: number }> = ({
   rows = 5,
-  columns = 3,
+  columns = 3
 }) => {
   return (
     <div className="space-y-2">
@@ -86,8 +86,8 @@ export const LoadingTable: React.FC<{ rows?: number; columns?: number }> = ({
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
 // Loading state for cards
 export const LoadingCard: React.FC<{ className?: string }> = ({ className }) => {
@@ -99,14 +99,14 @@ export const LoadingCard: React.FC<{ className?: string }> = ({ className }) => 
         <div className="h-3 bg-muted rounded animate-pulse w-5/6" />
       </div>
     </div>
-  );
-};
+  )
+}
 
 // Inline loading for buttons
 export const ButtonSpinner: React.FC<{ className?: string }> = ({ className }) => {
   return (
     <Loader2 className={cn('h-4 w-4 animate-spin', className)} />
-  );
-};
+  )
+}
 
-export default LoadingSpinner;
+export default LoadingSpinner

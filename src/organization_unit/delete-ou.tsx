@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { useOUMutations } from './hooks/useOU';
-import { toast } from 'sonner';
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle } from 'lucide-react'
+import { useOUMutations } from './hooks/useOU'
+import { toast } from 'sonner'
 
 interface DeleteOUDialogProps {
   isOpen: boolean;
@@ -20,32 +20,32 @@ interface DeleteOUDialogProps {
   ouDN: string | null;
 }
 
-export function DeleteOUDialog({ isOpen, onClose, onOUDeleted, ouDN }: DeleteOUDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export function DeleteOUDialog ({ isOpen, onClose, onOUDeleted, ouDN }: DeleteOUDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const { deleteOU } = useOUMutations(
     () => {
-      onOUDeleted();
-      onClose();
+      onOUDeleted()
+      onClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleDelete = async () => {
-    if (!ouDN) return;
-    
-    setIsSubmitting(true);
+    if (!ouDN) return
+
+    setIsSubmitting(true)
     try {
-      await deleteOU(ouDN);
-      toast.success('Organization Unit deleted successfully');
+      await deleteOU(ouDN)
+      toast.success('Organization Unit deleted successfully')
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
-  if (!ouDN) return null;
+  if (!ouDN) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -70,8 +70,8 @@ export function DeleteOUDialog({ isOpen, onClose, onOUDeleted, ouDN }: DeleteOUD
                   {ouDN}
                 </code>
                 <p className="text-sm text-destructive">
-                  Warning: This will permanently delete the OU and may affect any objects 
-                  or child OUs contained within it. Make sure the OU is empty or move 
+                  Warning: This will permanently delete the OU and may affect any objects
+                  or child OUs contained within it. Make sure the OU is empty or move
                   its contents first.
                 </p>
               </div>
@@ -83,9 +83,9 @@ export function DeleteOUDialog({ isOpen, onClose, onOUDeleted, ouDN }: DeleteOUD
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button 
-            variant="destructive" 
-            onClick={handleDelete} 
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Deleting...' : 'Delete OU'}
@@ -93,5 +93,5 @@ export function DeleteOUDialog({ isOpen, onClose, onOUDeleted, ouDN }: DeleteOUD
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

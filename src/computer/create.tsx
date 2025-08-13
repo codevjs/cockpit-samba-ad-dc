@@ -1,54 +1,54 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, Loader2, Monitor } from 'lucide-react';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Plus, Loader2, Monitor } from 'lucide-react'
+import { z } from 'zod'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form'
 
-import { useComputerMutations } from './hooks/useComputerMutations';
-import { ErrorToast, SuccessToast } from '@/common';
-import type { CreateComputerInput, SambaOrganizationalUnit } from '@/types/samba';
+import { useComputerMutations } from './hooks/useComputerMutations'
+import { ErrorToast, SuccessToast } from '@/common'
+import type { CreateComputerInput, SambaOrganizationalUnit } from '@/types/samba'
 
 // Computer creation schema
 const createComputerSchema = z.object({
-    name: z.string()
-        .min(1, 'Computer name is required')
-        .max(15, 'Computer name cannot exceed 15 characters')
-        .regex(
-            /^[A-Za-z0-9\-]+$/,
-            'Computer name can only contain letters, numbers, and hyphens'
-        ),
-    description: z.string().optional(),
-    organizationalUnit: z.string().optional(),
-});
+  name: z.string()
+    .min(1, 'Computer name is required')
+    .max(15, 'Computer name cannot exceed 15 characters')
+    .regex(
+      /^[A-Za-z0-9\-]+$/,
+      'Computer name can only contain letters, numbers, and hyphens'
+    ),
+  description: z.string().optional(),
+  organizationalUnit: z.string().optional()
+})
 
 type CreateComputerFormData = z.infer<typeof createComputerSchema>;
 
@@ -59,75 +59,75 @@ interface CreateComputerDialogProps {
 
 // Common organizational units for computers
 const COMPUTER_ORG_UNITS: SambaOrganizationalUnit[] = [
-    { name: 'Computers', distinguishedName: 'CN=Computers,DC=domain,DC=local', description: 'Default Computers container', createdAt: new Date(), children: [] },
-    { name: 'Domain Controllers', distinguishedName: 'OU=Domain Controllers,DC=domain,DC=local', description: 'Domain Controllers OU', createdAt: new Date(), children: [] },
-    { name: 'Workstations', distinguishedName: 'OU=Workstations,DC=domain,DC=local', description: 'Client Workstations OU', createdAt: new Date(), children: [] },
-    { name: 'Servers', distinguishedName: 'OU=Servers,DC=domain,DC=local', description: 'Server Computers OU', createdAt: new Date(), children: [] },
-    { name: 'Laptops', distinguishedName: 'OU=Laptops,DC=domain,DC=local', description: 'Laptop Computers OU', createdAt: new Date(), children: [] },
-];
+  { name: 'Computers', distinguishedName: 'CN=Computers,DC=domain,DC=local', description: 'Default Computers container', createdAt: new Date(), children: [] },
+  { name: 'Domain Controllers', distinguishedName: 'OU=Domain Controllers,DC=domain,DC=local', description: 'Domain Controllers OU', createdAt: new Date(), children: [] },
+  { name: 'Workstations', distinguishedName: 'OU=Workstations,DC=domain,DC=local', description: 'Client Workstations OU', createdAt: new Date(), children: [] },
+  { name: 'Servers', distinguishedName: 'OU=Servers,DC=domain,DC=local', description: 'Server Computers OU', createdAt: new Date(), children: [] },
+  { name: 'Laptops', distinguishedName: 'OU=Laptops,DC=domain,DC=local', description: 'Laptop Computers OU', createdAt: new Date(), children: [] }
+]
 
-export default function CreateComputerDialog({ 
-    onComputerCreated, 
-    trigger 
+export default function CreateComputerDialog ({
+  onComputerCreated,
+  trigger
 }: CreateComputerDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [showToasts, setShowToasts] = useState({ success: false, error: false });
+  const [isOpen, setIsOpen] = useState(false)
+  const [showToasts, setShowToasts] = useState({ success: false, error: false })
 
-    const form = useForm<CreateComputerFormData>({
-        resolver: zodResolver(createComputerSchema),
-        defaultValues: {
-            name: '',
-            description: '',
-            organizationalUnit: '',
-        },
-    });
+  const form = useForm<CreateComputerFormData>({
+    resolver: zodResolver(createComputerSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      organizationalUnit: ''
+    }
+  })
 
-    const { create, creating, error, clearError } = useComputerMutations({
-        onSuccess: (action, newComputer) => {
-            if (action === 'create') {
-                setShowToasts({ success: true, error: false });
-                setIsOpen(false);
-                form.reset();
-                onComputerCreated?.(newComputer);
-            }
-        },
-        onError: () => {
-            setShowToasts({ success: false, error: true });
-        },
-    });
+  const { create, creating, error, clearError } = useComputerMutations({
+    onSuccess: (action, newComputer) => {
+      if (action === 'create') {
+        setShowToasts({ success: true, error: false })
+        setIsOpen(false)
+        form.reset()
+        onComputerCreated?.(newComputer)
+      }
+    },
+    onError: () => {
+      setShowToasts({ success: false, error: true })
+    }
+  })
 
-    const onSubmit = async (data: CreateComputerFormData) => {
-        clearError();
-        
-        const computerData: CreateComputerInput = {
-            name: data.name,
-            description: data.description || undefined,
-            organizationalUnit: data.organizationalUnit || undefined,
-        };
-        
-        await create(computerData);
-    };
+  const onSubmit = async (data: CreateComputerFormData) => {
+    clearError()
 
-    const handleOpenChange = (open: boolean) => {
-        setIsOpen(open);
-        if (!open) {
-            form.reset();
-            clearError();
-        }
-    };
+    const computerData: CreateComputerInput = {
+      name: data.name,
+      description: data.description || undefined,
+      organizationalUnit: data.organizationalUnit || undefined
+    }
 
-    return (
+    await create(computerData)
+  }
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) {
+      form.reset()
+      clearError()
+    }
+  }
+
+  return (
         <>
             {showToasts.error && error && (
-                <ErrorToast 
-                    errorMessage={error} 
-                    closeModal={() => setShowToasts({ ...showToasts, error: false })} 
+                <ErrorToast
+                    errorMessage={error}
+                    closeModal={() => setShowToasts({ ...showToasts, error: false })}
                 />
             )}
             {showToasts.success && (
-                <SuccessToast 
-                    successMessage="Computer account created successfully!" 
-                    closeModal={() => setShowToasts({ ...showToasts, success: false })} 
+                <SuccessToast
+                    successMessage="Computer account created successfully!"
+                    closeModal={() => setShowToasts({ ...showToasts, success: false })}
                 />
             )}
 
@@ -160,8 +160,8 @@ export default function CreateComputerDialog({
                                     <FormItem>
                                         <FormLabel>Computer Name</FormLabel>
                                         <FormControl>
-                                            <Input 
-                                                {...field} 
+                                            <Input
+                                                {...field}
                                                 placeholder="COMPUTER01"
                                                 onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                                             />
@@ -181,8 +181,8 @@ export default function CreateComputerDialog({
                                     <FormItem>
                                         <FormLabel>Description</FormLabel>
                                         <FormControl>
-                                            <Textarea 
-                                                {...field} 
+                                            <Textarea
+                                                {...field}
                                                 placeholder="Optional description for this computer..."
                                                 rows={3}
                                             />
@@ -229,9 +229,9 @@ export default function CreateComputerDialog({
                             />
 
                             <DialogFooter>
-                                <Button 
-                                    type="button" 
-                                    variant="outline" 
+                                <Button
+                                    type="button"
+                                    variant="outline"
                                     onClick={() => handleOpenChange(false)}
                                 >
                                     Cancel
@@ -246,5 +246,5 @@ export default function CreateComputerDialog({
                 </DialogContent>
             </Dialog>
         </>
-    );
+  )
 }

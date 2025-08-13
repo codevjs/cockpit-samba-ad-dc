@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, ArrowRight, Info } from 'lucide-react';
-import { useFSMOMutations } from './hooks/useFSMO';
-import { toast } from 'sonner';
-import type { TransferFSMORoleInput } from '@/types/samba';
+  SelectValue
+} from '@/components/ui/select'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Loader2, ArrowRight, Info } from 'lucide-react'
+import { useFSMOMutations } from './hooks/useFSMO'
+import { toast } from 'sonner'
+import type { TransferFSMORoleInput } from '@/types/samba'
 
 interface TransferRoleDialogProps {
   isOpen: boolean;
@@ -35,12 +35,12 @@ interface TransferRoleDialogProps {
 
 const transferRoleSchema = z.object({
   role: z.enum(['SchemaMaster', 'DomainNamingMaster', 'PDCEmulator', 'RIDMaster', 'InfrastructureMaster'], {
-    required_error: 'FSMO role is required',
+    required_error: 'FSMO role is required'
   }),
   targetServer: z.string()
     .min(1, 'Target server is required')
-    .max(100, 'Server name must be less than 100 characters'),
-});
+    .max(100, 'Server name must be less than 100 characters')
+})
 
 type TransferRoleFormData = z.infer<typeof transferRoleSchema>;
 
@@ -49,17 +49,17 @@ const fsmoRoleOptions = [
   { value: 'DomainNamingMaster', label: 'Domain Naming Master', scope: 'Forest-wide' },
   { value: 'PDCEmulator', label: 'PDC Emulator', scope: 'Domain-wide' },
   { value: 'RIDMaster', label: 'RID Master', scope: 'Domain-wide' },
-  { value: 'InfrastructureMaster', label: 'Infrastructure Master', scope: 'Domain-wide' },
-] as const;
+  { value: 'InfrastructureMaster', label: 'Infrastructure Master', scope: 'Domain-wide' }
+] as const
 
-export function TransferRoleDialog({
+export function TransferRoleDialog ({
   isOpen,
   onClose,
   onRoleTransferred,
-  preselectedRole,
+  preselectedRole
 }: TransferRoleDialogProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const {
     register,
@@ -67,68 +67,68 @@ export function TransferRoleDialog({
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors }
   } = useForm<TransferRoleFormData>({
     resolver: zodResolver(transferRoleSchema),
     defaultValues: {
       role: 'PDCEmulator',
-      targetServer: '',
-    },
-  });
+      targetServer: ''
+    }
+  })
 
-  const selectedRole = watch('role');
+  const selectedRole = watch('role')
 
   // Set preselected role when dialog opens
   useEffect(() => {
     if (preselectedRole && isOpen) {
-      setValue('role', preselectedRole as TransferRoleFormData['role']);
+      setValue('role', preselectedRole as TransferRoleFormData['role'])
     }
-  }, [preselectedRole, isOpen, setValue]);
+  }, [preselectedRole, isOpen, setValue])
 
   const { transferRole } = useFSMOMutations(
     () => {
       // Success callback
-      const roleOption = fsmoRoleOptions.find(r => r.value === selectedRole);
-      toast.success(`${roleOption?.label} role transferred successfully`);
-      resetForm();
-      onRoleTransferred?.();
-      onClose();
+      const roleOption = fsmoRoleOptions.find(r => r.value === selectedRole)
+      toast.success(`${roleOption?.label} role transferred successfully`)
+      resetForm()
+      onRoleTransferred?.()
+      onClose()
     },
     (errorMessage: string) => {
       // Error callback
-      setError(errorMessage);
+      setError(errorMessage)
     }
-  );
+  )
 
   const resetForm = () => {
-    reset();
-    setError(null);
-  };
+    reset()
+    setError(null)
+  }
 
   const handleClose = () => {
-    resetForm();
-    onClose();
-  };
+    resetForm()
+    onClose()
+  }
 
   const onSubmit = async (data: TransferRoleFormData) => {
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
       const transferData: TransferFSMORoleInput = {
         role: data.role,
-        targetServer: data.targetServer.trim(),
-      };
+        targetServer: data.targetServer.trim()
+      }
 
-      await transferRole(transferData);
+      await transferRole(transferData)
     } catch (err) {
       // Error is already handled by the mutation hook
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const selectedRoleInfo = fsmoRoleOptions.find(r => r.value === selectedRole);
+  const selectedRoleInfo = fsmoRoleOptions.find(r => r.value === selectedRole)
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -139,7 +139,7 @@ export function TransferRoleDialog({
             Transfer FSMO Role
           </DialogTitle>
           <DialogDescription>
-            Transfer an FSMO role to another domain controller. This is a graceful operation that 
+            Transfer an FSMO role to another domain controller. This is a graceful operation that
             coordinates with the target server.
           </DialogDescription>
         </DialogHeader>
@@ -200,7 +200,7 @@ export function TransferRoleDialog({
                   <div><strong>Role:</strong> {selectedRoleInfo.label}</div>
                   <div><strong>Scope:</strong> {selectedRoleInfo.scope}</div>
                   <div className="text-sm">
-                    This operation will gracefully transfer the role to the target server. 
+                    This operation will gracefully transfer the role to the target server.
                     Both servers must be online and reachable.
                   </div>
                 </div>
@@ -232,5 +232,5 @@ export function TransferRoleDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

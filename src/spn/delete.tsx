@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, Loader2, Trash2 } from 'lucide-react';
-import { useSPNMutations } from './hooks/useSPNMutations';
-import { toast } from 'sonner';
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle, Loader2, Trash2 } from 'lucide-react'
+import { useSPNMutations } from './hooks/useSPNMutations'
+import { toast } from 'sonner'
 
 interface DeleteSPNDialogProps {
   isOpen: boolean;
@@ -21,63 +21,63 @@ interface DeleteSPNDialogProps {
   userName: string;
 }
 
-export function DeleteSPNDialog({
+export function DeleteSPNDialog ({
   isOpen,
   onClose,
   onSPNDeleted,
   spnName,
   userName
 }: DeleteSPNDialogProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const { deleteSPN } = useSPNMutations(
     () => {
       // Success callback
-      toast.success(`SPN "${spnName}" deleted successfully`);
-      onSPNDeleted?.();
-      onClose();
+      toast.success(`SPN "${spnName}" deleted successfully`)
+      onSPNDeleted?.()
+      onClose()
     },
     (errorMessage: string) => {
       // Error callback
-      setError(errorMessage);
+      setError(errorMessage)
     }
-  );
+  )
 
   const handleClose = () => {
-    setError(null);
-    onClose();
-  };
+    setError(null)
+    onClose()
+  }
 
   const handleSubmit = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      
-      await deleteSPN({ name: spnName, user: userName });
+      setLoading(true)
+      setError(null)
+
+      await deleteSPN({ name: spnName, user: userName })
     } catch (err) {
       // Error is already handled by the mutation hook
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const parseSPNInfo = (spn: string) => {
-    const parts = spn.split('/');
-    const service = parts[0] || 'Unknown';
-    const hostPart = parts[1] || '';
-    
-    let hostname = hostPart;
-    let port = '';
-    
-    if (hostPart.includes(':')) {
-      [hostname, port] = hostPart.split(':');
-    }
-    
-    return { service, hostname, port };
-  };
+    const parts = spn.split('/')
+    const service = parts[0] || 'Unknown'
+    const hostPart = parts[1] || ''
 
-  const { service, hostname, port } = parseSPNInfo(spnName);
+    let hostname = hostPart
+    let port = ''
+
+    if (hostPart.includes(':')) {
+      [hostname, port] = hostPart.split(':')
+    }
+
+    return { service, hostname, port }
+  }
+
+  const { service, hostname, port } = parseSPNInfo(spnName)
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -137,15 +137,17 @@ export function DeleteSPNDialog({
             disabled={loading}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? 'Deleting...' : (
+            {loading
+              ? 'Deleting...'
+              : (
               <>
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete SPN
               </>
-            )}
+                )}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

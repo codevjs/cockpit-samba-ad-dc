@@ -1,51 +1,51 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Shield, 
-  Plus, 
+import React, { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Shield,
+  Plus,
   Edit2,
   Search,
   Lock,
   Unlock,
   Info,
   ArrowLeft
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { useDSACL } from './hooks/useDSACL';
-import { SetDSACLDialog } from './set-dsacl';
-import { toast } from 'sonner';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { useDSACL } from './hooks/useDSACL'
+import { SetDSACLDialog } from './set-dsacl'
+import { toast } from 'sonner'
 
-export default function DSACLManagement() {
-  const { dsacl, loading: dsaclLoading, refresh: refreshDSACL } = useDSACL();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [objectDN, setObjectDN] = useState('');
-  
+export default function DSACLManagement () {
+  const { dsacl, loading: dsaclLoading, refresh: refreshDSACL } = useDSACL()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [objectDN, setObjectDN] = useState('')
+
   // Dialog states
-  const [setDSACLDialogOpen, setSetDSACLDialogOpen] = useState(false);
+  const [setDSACLDialogOpen, setSetDSACLDialogOpen] = useState(false)
 
   const handleSetDSACLSuccess = () => {
-    refreshDSACL();
-    setSetDSACLDialogOpen(false);
-  };
+    refreshDSACL()
+    setSetDSACLDialogOpen(false)
+  }
 
   // Filter ACL entries based on search query
-  const filteredEntries = dsacl?.entries.filter(entry => 
+  const filteredEntries = dsacl?.entries.filter(entry =>
     entry.trusteeDN.toLowerCase().includes(searchQuery.toLowerCase()) ||
     entry.objectDN.toLowerCase().includes(searchQuery.toLowerCase()) ||
     entry.permissions.some(perm => perm.toLowerCase().includes(searchQuery.toLowerCase()))
-  ) || [];
+  ) || []
 
   const handleSearchObject = () => {
     if (objectDN.trim()) {
       // Refresh with the specific object DN
-      refreshDSACL();
+      refreshDSACL()
     }
-  };
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -73,7 +73,7 @@ export default function DSACLManagement() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Allow Entries</CardTitle>
@@ -175,7 +175,8 @@ export default function DSACLManagement() {
               </div>
             </CardHeader>
             <CardContent>
-              {dsaclLoading ? (
+              {dsaclLoading
+                ? (
                 <div className="space-y-3">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="animate-pulse">
@@ -183,31 +184,36 @@ export default function DSACLManagement() {
                     </div>
                   ))}
                 </div>
-              ) : filteredEntries.length === 0 ? (
+                  )
+                : filteredEntries.length === 0
+                  ? (
                 <div className="text-center py-8">
                   <Shield className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-2 text-sm font-semibold">
                     {searchQuery ? 'No Matching Entries' : 'No ACL Entries Found'}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {searchQuery 
+                    {searchQuery
                       ? 'Try adjusting your search terms'
                       : 'No access control entries are currently available'
                     }
                   </p>
                 </div>
-              ) : (
+                    )
+                  : (
                 <div className="space-y-3">
                   {filteredEntries.map((entry) => (
                     <Card key={entry.id} className="border border-border">
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-3">
-                            {entry.accessType === 'Allow' ? (
+                            {entry.accessType === 'Allow'
+                              ? (
                               <Unlock className="h-5 w-5 text-green-600 mt-0.5" />
-                            ) : (
+                                )
+                              : (
                               <Lock className="h-5 w-5 text-red-600 mt-0.5" />
-                            )}
+                                )}
                             <div className="space-y-2">
                               <div>
                                 <h4 className="font-medium">Trustee</h4>
@@ -215,7 +221,7 @@ export default function DSACLManagement() {
                                   {entry.trusteeDN}
                                 </p>
                               </div>
-                              
+
                               <div>
                                 <h4 className="font-medium text-sm">Permissions</h4>
                                 <div className="flex flex-wrap gap-1 mt-1">
@@ -248,9 +254,9 @@ export default function DSACLManagement() {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center gap-2">
-                            <Badge 
+                            <Badge
                               variant={entry.accessType === 'Allow' ? 'default' : 'destructive'}
                               className="text-xs"
                             >
@@ -262,7 +268,7 @@ export default function DSACLManagement() {
                     </Card>
                   ))}
                 </div>
-              )}
+                    )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -276,11 +282,14 @@ export default function DSACLManagement() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {dsaclLoading ? (
+              {dsaclLoading
+                ? (
                 <div className="animate-pulse">
                   <div className="h-64 bg-muted rounded w-full"></div>
                 </div>
-              ) : dsacl?.rawOutput.length === 0 ? (
+                  )
+                : dsacl?.rawOutput.length === 0
+                  ? (
                 <div className="text-center py-8">
                   <Info className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-2 text-sm font-semibold">No Raw Output</h3>
@@ -288,12 +297,13 @@ export default function DSACLManagement() {
                     No raw DSACL output is available
                   </p>
                 </div>
-              ) : (
+                    )
+                  : (
                 <div className="space-y-2">
                   <Alert>
                     <Info className="h-4 w-4" />
                     <AlertDescription>
-                      This is the raw output from the samba-tool dsacl get command. 
+                      This is the raw output from the samba-tool dsacl get command.
                       Each line represents an access control entry in SDDL format.
                     </AlertDescription>
                   </Alert>
@@ -303,7 +313,7 @@ export default function DSACLManagement() {
                     </pre>
                   </div>
                 </div>
-              )}
+                    )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -316,5 +326,5 @@ export default function DSACLManagement() {
         onDSACLSet={handleSetDSACLSuccess}
       />
     </div>
-  );
+  )
 }

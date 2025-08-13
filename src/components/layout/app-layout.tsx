@@ -1,25 +1,25 @@
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Menu, 
-  X, 
-  Users, 
-  Monitor, 
-  UserCheck, 
-  Building, 
-  Globe, 
-  Shield, 
+import React, { useState } from 'react'
+import { Outlet } from 'react-router-dom'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
+import {
+  Menu,
+  X,
+  Users,
+  Monitor,
+  UserCheck,
+  Building,
+  Globe,
+  Shield,
   FolderTree,
   Settings,
   ChevronRight,
   ChevronDown,
   Server
-} from 'lucide-react';
-import { SambaLogo } from './samba-logo';
+} from 'lucide-react'
+import { SambaLogo } from './samba-logo'
 
 export interface NavigationItem {
   key: string;
@@ -111,7 +111,7 @@ const navigationItems: NavigationItem[] = [
     icon: Settings,
     description: 'Group Policy Objects'
   }
-];
+]
 
 interface SidebarProps {
   isOpen: boolean;
@@ -121,20 +121,20 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, activeItem, onItemClick, onClose }) => {
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
 
   const toggleExpanded = (key: string) => {
-    setExpandedItems(prev => 
-      prev.includes(key) 
+    setExpandedItems(prev =>
+      prev.includes(key)
         ? prev.filter(item => item !== key)
         : [...prev, key]
-    );
-  };
+    )
+  }
 
   const renderNavigationItem = (item: NavigationItem, level = 0) => {
-    const isActive = activeItem === item.key;
-    const isExpanded = expandedItems.includes(item.key);
-    const hasChildren = item.children && item.children.length > 0;
+    const isActive = activeItem === item.key
+    const isExpanded = expandedItems.includes(item.key)
+    const hasChildren = item.children && item.children.length > 0
 
     return (
       <div key={item.key}>
@@ -142,16 +142,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, activeItem, onItemClick, onCl
           className={cn(
             'flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-colors cursor-pointer',
             level > 0 && 'ml-4',
-            isActive 
-              ? 'bg-primary text-primary-foreground' 
+            isActive
+              ? 'bg-primary text-primary-foreground'
               : 'text-muted-foreground hover:bg-muted hover:text-foreground'
           )}
           onClick={() => {
             if (hasChildren) {
-              toggleExpanded(item.key);
+              toggleExpanded(item.key)
             } else {
-              onItemClick(item);
-              onClose();
+              onItemClick(item)
+              onClose()
             }
           }}
         >
@@ -175,11 +175,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, activeItem, onItemClick, onCl
           </div>
           {hasChildren && (
             <div className="ml-2">
-              {isExpanded ? (
+              {isExpanded
+                ? (
                 <ChevronDown className="h-4 w-4" />
-              ) : (
+                  )
+                : (
                 <ChevronRight className="h-4 w-4" />
-              )}
+                  )}
             </div>
           )}
         </div>
@@ -190,15 +192,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, activeItem, onItemClick, onCl
           </div>
         )}
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <>
       {/* Mobile overlay */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 z-40 lg:hidden bg-black/50" 
+        <div
+          className="fixed inset-0 z-40 lg:hidden bg-black/50"
           onClick={onClose}
         />
       )}
@@ -243,8 +245,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, activeItem, onItemClick, onCl
         </div>
       </aside>
     </>
-  );
-};
+  )
+}
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -283,8 +285,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
         </div>
       </div>
     </header>
-  );
-};
+  )
+}
 
 export interface AppLayoutProps {
   children?: React.ReactNode;
@@ -292,29 +294,29 @@ export interface AppLayoutProps {
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children, title }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [activeItem, setActiveItem] = useState('dashboard')
 
   const handleItemClick = (item: NavigationItem) => {
-    setActiveItem(item.key);
+    setActiveItem(item.key)
     // Navigation will be handled by React Router
-  };
+  }
 
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar 
+      <Sidebar
         isOpen={sidebarOpen}
         activeItem={activeItem}
         onItemClick={handleItemClick}
         onClose={() => setSidebarOpen(false)}
       />
-      
+
       <div className="flex-1 flex flex-col min-w-0 lg:ml-0">
-        <Header 
+        <Header
           onMenuClick={() => setSidebarOpen(true)}
           title={title}
         />
-        
+
         <main className="flex-1 overflow-auto">
           <div className="p-6">
             {children || <Outlet />}
@@ -322,7 +324,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title }) => {
         </main>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AppLayout;
+export default AppLayout

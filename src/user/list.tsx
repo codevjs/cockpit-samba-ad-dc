@@ -1,27 +1,27 @@
-import React, { useMemo } from 'react';
-import { format } from 'date-fns';
-import { MoreHorizontal, Edit, Trash2, User, UserCheck, UserX, Key, Calendar, FolderOpen } from 'lucide-react';
+import React, { useMemo } from 'react'
+import { format } from 'date-fns'
+import { MoreHorizontal, Edit, Trash2, User, UserCheck, UserX, Key, Calendar, FolderOpen } from 'lucide-react'
 
-import { DataTable, DataTableColumn } from '@/components/ui/data-table';
-import { ErrorAlert } from '@/components/ui/error-alert';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { DataTable, DataTableColumn } from '@/components/ui/data-table'
+import { ErrorAlert } from '@/components/ui/error-alert'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 
-import type { SambaUser } from '@/types/samba';
-import DeleteUserDialog from './delete';
-import ShowUserDialog from './show';
-import ChangePasswordDialog from './password';
-import SetExpiryDialog from './setexpiry';
-import MoveUserDialog from './move';
-import UserStatusToggle from './status-toggle';
+import type { SambaUser } from '@/types/samba'
+import DeleteUserDialog from './delete'
+import ShowUserDialog from './show'
+import ChangePasswordDialog from './password'
+import SetExpiryDialog from './setexpiry'
+import MoveUserDialog from './move'
+import UserStatusToggle from './status-toggle'
 
 interface UserListProps {
   users: SambaUser[];
@@ -47,8 +47,8 @@ const UserActions: React.FC<UserActionsProps> = ({ user, onRefresh }) => {
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
-        <ShowUserDialog 
+
+        <ShowUserDialog
           username={user.username}
           trigger={
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -57,28 +57,30 @@ const UserActions: React.FC<UserActionsProps> = ({ user, onRefresh }) => {
             </DropdownMenuItem>
           }
         />
-        
-        <UserStatusToggle 
+
+        <UserStatusToggle
           user={user}
           onStatusChanged={onRefresh}
           trigger={
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              {user.enabled ? (
+              {user.enabled
+                ? (
                 <>
                   <UserX className="mr-2 h-4 w-4" />
                   Disable User
                 </>
-              ) : (
+                  )
+                : (
                 <>
                   <UserCheck className="mr-2 h-4 w-4" />
                   Enable User
                 </>
-              )}
+                  )}
             </DropdownMenuItem>
           }
         />
-        
-        <ChangePasswordDialog 
+
+        <ChangePasswordDialog
           username={user.username}
           mode="admin"
           trigger={
@@ -88,8 +90,8 @@ const UserActions: React.FC<UserActionsProps> = ({ user, onRefresh }) => {
             </DropdownMenuItem>
           }
         />
-        
-        <SetExpiryDialog 
+
+        <SetExpiryDialog
           username={user.username}
           trigger={
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -98,8 +100,8 @@ const UserActions: React.FC<UserActionsProps> = ({ user, onRefresh }) => {
             </DropdownMenuItem>
           }
         />
-        
-        <MoveUserDialog 
+
+        <MoveUserDialog
           username={user.username}
           onUserMoved={onRefresh}
           trigger={
@@ -109,14 +111,14 @@ const UserActions: React.FC<UserActionsProps> = ({ user, onRefresh }) => {
             </DropdownMenuItem>
           }
         />
-        
+
         <DropdownMenuSeparator />
-        
-        <DeleteUserDialog 
+
+        <DeleteUserDialog
           username={user.username}
           onUserDeleted={onRefresh}
           trigger={
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onSelect={(e) => e.preventDefault()}
               className="text-destructive focus:text-destructive"
             >
@@ -127,8 +129,8 @@ const UserActions: React.FC<UserActionsProps> = ({ user, onRefresh }) => {
         />
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-};
+  )
+}
 
 const UserList: React.FC<UserListProps> = ({ users, loading, error, onRefresh }) => {
   const columns = useMemo<DataTableColumn<SambaUser>[]>(() => [
@@ -139,7 +141,7 @@ const UserList: React.FC<UserListProps> = ({ users, loading, error, onRefresh })
       searchable: true,
       render: (user) => (
         <div className="font-medium">{user.username}</div>
-      ),
+      )
     },
     {
       key: 'displayName',
@@ -147,10 +149,10 @@ const UserList: React.FC<UserListProps> = ({ users, loading, error, onRefresh })
       sortable: true,
       searchable: true,
       render: (user) => {
-        const displayName = user.displayName || 
-          (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : '');
-        return <div>{displayName || '-'}</div>;
-      },
+        const displayName = user.displayName ||
+          (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : '')
+        return <div>{displayName || '-'}</div>
+      }
     },
     {
       key: 'email',
@@ -158,17 +160,19 @@ const UserList: React.FC<UserListProps> = ({ users, loading, error, onRefresh })
       sortable: true,
       searchable: true,
       render: (user) => {
-        return user.email ? (
-          <a 
-            href={`mailto:${user.email}`} 
+        return user.email
+          ? (
+          <a
+            href={`mailto:${user.email}`}
             className="text-blue-600 hover:text-blue-800 hover:underline"
           >
             {user.email}
           </a>
-        ) : (
+            )
+          : (
           <span className="text-muted-foreground">-</span>
-        );
-      },
+            )
+      }
     },
     {
       key: 'enabled',
@@ -178,20 +182,20 @@ const UserList: React.FC<UserListProps> = ({ users, loading, error, onRefresh })
         <Badge variant={user.enabled ? 'default' : 'secondary'}>
           {user.enabled ? 'Enabled' : 'Disabled'}
         </Badge>
-      ),
+      )
     },
     {
       key: 'groups',
       header: 'Groups',
       render: (user) => {
         if (!user.groups || user.groups.length === 0) {
-          return <span className="text-muted-foreground">None</span>;
+          return <span className="text-muted-foreground">None</span>
         }
-        
+
         if (user.groups.length === 1) {
-          return <Badge variant="outline">{user.groups[0]}</Badge>;
+          return <Badge variant="outline">{user.groups[0]}</Badge>
         }
-        
+
         return (
           <div className="flex items-center gap-1">
             <Badge variant="outline">{user.groups[0]}</Badge>
@@ -201,22 +205,24 @@ const UserList: React.FC<UserListProps> = ({ users, loading, error, onRefresh })
               </Badge>
             )}
           </div>
-        );
-      },
+        )
+      }
     },
     {
       key: 'lastLogin',
       header: 'Last Login',
       sortable: true,
       render: (user) => {
-        return user.lastLogin ? (
+        return user.lastLogin
+          ? (
           <span className="text-sm">
             {format(user.lastLogin, 'MMM dd, yyyy HH:mm')}
           </span>
-        ) : (
+            )
+          : (
           <span className="text-muted-foreground">Never</span>
-        );
-      },
+            )
+      }
     },
     {
       key: 'accountExpires',
@@ -224,18 +230,20 @@ const UserList: React.FC<UserListProps> = ({ users, loading, error, onRefresh })
       sortable: true,
       render: (user) => {
         if (!user.accountExpires) {
-          return <span className="text-muted-foreground">Never</span>;
+          return <span className="text-muted-foreground">Never</span>
         }
-        
-        const isExpired = user.accountExpires.getTime() < Date.now();
-        const isExpiringSoon = user.accountExpires.getTime() - Date.now() < 30 * 24 * 60 * 60 * 1000; // 30 days
-        
+
+        const isExpired = user.accountExpires.getTime() < Date.now()
+        const isExpiringSoon = user.accountExpires.getTime() - Date.now() < 30 * 24 * 60 * 60 * 1000 // 30 days
+
         return (
           <div className="text-sm">
             <span className={
-              isExpired ? 'text-red-600 font-medium' :
-              isExpiringSoon ? 'text-yellow-600 font-medium' :
-              'text-muted-foreground'
+              isExpired
+                ? 'text-red-600 font-medium'
+                : isExpiringSoon
+                  ? 'text-yellow-600 font-medium'
+                  : 'text-muted-foreground'
             }>
               {format(user.accountExpires, 'MMM dd, yyyy')}
             </span>
@@ -250,15 +258,15 @@ const UserList: React.FC<UserListProps> = ({ users, loading, error, onRefresh })
               </Badge>
             )}
           </div>
-        );
-      },
+        )
+      }
     },
     {
       key: 'actions',
       header: 'Actions',
-      render: (user) => <UserActions user={user} onRefresh={onRefresh} />,
-    },
-  ], [onRefresh]);
+      render: (user) => <UserActions user={user} onRefresh={onRefresh} />
+    }
+  ], [onRefresh])
 
   if (error) {
     return (
@@ -268,7 +276,7 @@ const UserList: React.FC<UserListProps> = ({ users, loading, error, onRefresh })
         onRetry={onRefresh}
         retryLabel="Retry Loading"
       />
-    );
+    )
   }
 
   return (
@@ -280,7 +288,7 @@ const UserList: React.FC<UserListProps> = ({ users, loading, error, onRefresh })
       searchPlaceholder="Search users by username, name, or email..."
       emptyMessage="No users found"
     />
-  );
-};
+  )
+}
 
-export default UserList;
+export default UserList

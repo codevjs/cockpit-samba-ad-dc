@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { Eye, User, Mail, Calendar, Shield, Users, MapPin, FileText, Clock } from 'lucide-react';
+import React, { useState } from 'react'
+import { Eye, User, Mail, Calendar, Shield, Users, MapPin, FileText, Clock } from 'lucide-react'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 
-import { useUser } from './hooks/useUsers';
-import { RenderError } from '@/common';
-import type { SambaUser } from '@/types/samba';
+import { useUser } from './hooks/useUsers'
+import { RenderError } from '@/common'
+import type { SambaUser } from '@/types/samba'
 
 interface UserDetailsDialogProps {
     user?: SambaUser;
@@ -30,18 +30,18 @@ interface UserDetailsViewProps {
 }
 
 const UserDetailsView: React.FC<UserDetailsViewProps> = ({ user }) => {
-    const formatDate = (date?: Date) => {
-        if (!date) return 'Never';
-        return new Intl.DateTimeFormat('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        }).format(date);
-    };
+  const formatDate = (date?: Date) => {
+    if (!date) return 'Never'
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date)
+  }
 
-    return (
+  return (
         <div className="space-y-6">
             {/* Header Card */}
             <Card>
@@ -119,11 +119,13 @@ const UserDetailsView: React.FC<UserDetailsViewProps> = ({ user }) => {
                         <div>
                             <Label className="text-xs font-medium text-muted-foreground">STATUS</Label>
                             <p className="text-sm font-medium">
-                                {user.enabled ? (
+                                {user.enabled
+                                  ? (
                                     <span className="text-green-600">Active</span>
-                                ) : (
+                                    )
+                                  : (
                                     <span className="text-red-600">Disabled</span>
-                                )}
+                                    )}
                             </p>
                         </div>
                         <div>
@@ -163,7 +165,8 @@ const UserDetailsView: React.FC<UserDetailsViewProps> = ({ user }) => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {user.groups.length > 0 ? (
+                        {user.groups.length > 0
+                          ? (
                             <div className="flex flex-wrap gap-1">
                                 {user.groups.map((group) => (
                                     <Badge key={group} variant="secondary" className="text-xs">
@@ -171,9 +174,10 @@ const UserDetailsView: React.FC<UserDetailsViewProps> = ({ user }) => {
                                     </Badge>
                                 ))}
                             </div>
-                        ) : (
+                            )
+                          : (
                             <p className="text-sm text-muted-foreground">No group memberships</p>
-                        )}
+                            )}
                     </CardContent>
                 </Card>
 
@@ -198,49 +202,49 @@ const UserDetailsView: React.FC<UserDetailsViewProps> = ({ user }) => {
                 )}
             </div>
         </div>
-    );
-};
+  )
+}
 
-export default function UserDetailsDialog({ user, username: propUsername, trigger }: UserDetailsDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [searchUsername, setSearchUsername] = useState(propUsername || '');
-    const [selectedUsername, setSelectedUsername] = useState<string | null>(
-        user?.username || propUsername || null
-    );
+export default function UserDetailsDialog ({ user, username: propUsername, trigger }: UserDetailsDialogProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [searchUsername, setSearchUsername] = useState(propUsername || '')
+  const [selectedUsername, setSelectedUsername] = useState<string | null>(
+    user?.username || propUsername || null
+  )
 
-    // Use the user hook when we have a selected username
-    const { 
-        user: fetchedUser, 
-        loading, 
-        error, 
-        refresh,
-        clearError 
-    } = useUser({ 
-        username: selectedUsername || '', 
-        autoFetch: !!selectedUsername 
-    });
+  // Use the user hook when we have a selected username
+  const {
+    user: fetchedUser,
+    loading,
+    error,
+    refresh,
+    clearError
+  } = useUser({
+    username: selectedUsername || '',
+    autoFetch: !!selectedUsername
+  })
 
-    const displayUser = user || fetchedUser;
+  const displayUser = user || fetchedUser
 
-    const handleSearch = () => {
-        if (searchUsername.trim()) {
-            setSelectedUsername(searchUsername.trim());
-            clearError();
-        }
-    };
+  const handleSearch = () => {
+    if (searchUsername.trim()) {
+      setSelectedUsername(searchUsername.trim())
+      clearError()
+    }
+  }
 
-    const handleOpenChange = (open: boolean) => {
-        setIsOpen(open);
-        if (!open) {
-            setSearchUsername(propUsername || '');
-            setSelectedUsername(user?.username || propUsername || null);
-            clearError();
-        }
-    };
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) {
+      setSearchUsername(propUsername || '')
+      setSelectedUsername(user?.username || propUsername || null)
+      clearError()
+    }
+  }
 
-    const renderContent = () => {
-        if (loading) {
-            return (
+  const renderContent = () => {
+    if (loading) {
+      return (
                 <div className="space-y-6">
                     <div className="flex items-center space-x-4">
                         <Skeleton className="h-12 w-12 rounded-full" />
@@ -256,22 +260,22 @@ export default function UserDetailsDialog({ user, username: propUsername, trigge
                         <Skeleton className="h-[150px]" />
                     </div>
                 </div>
-            );
-        }
+      )
+    }
 
-        if (error) {
-            return (
-                <RenderError 
-                    error={error} 
-                    hideAlert={clearError} 
+    if (error) {
+      return (
+                <RenderError
+                    error={error}
+                    hideAlert={clearError}
                     alertVisible={!!error}
                     title="Failed to Load User"
                 />
-            );
-        }
+      )
+    }
 
-        if (!displayUser && selectedUsername) {
-            return (
+    if (!displayUser && selectedUsername) {
+      return (
                 <div className="text-center py-8">
                     <User className="mx-auto h-12 w-12 text-muted-foreground" />
                     <h3 className="mt-2 text-sm font-medium text-muted-foreground">User not found</h3>
@@ -279,11 +283,11 @@ export default function UserDetailsDialog({ user, username: propUsername, trigge
                         No user found with username "{selectedUsername}"
                     </p>
                 </div>
-            );
-        }
+      )
+    }
 
-        if (!displayUser) {
-            return (
+    if (!displayUser) {
+      return (
                 <div className="text-center py-8">
                     <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
                     <h3 className="mt-2 text-sm font-medium text-muted-foreground">No user selected</h3>
@@ -291,13 +295,13 @@ export default function UserDetailsDialog({ user, username: propUsername, trigge
                         Enter a username above to view user details
                     </p>
                 </div>
-            );
-        }
+      )
+    }
 
-        return <UserDetailsView user={displayUser} />;
-    };
+    return <UserDetailsView user={displayUser} />
+  }
 
-    return (
+  return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 {trigger || (
@@ -341,5 +345,5 @@ export default function UserDetailsDialog({ user, username: propUsername, trigge
                 {renderContent()}
             </DialogContent>
         </Dialog>
-    );
+  )
 }

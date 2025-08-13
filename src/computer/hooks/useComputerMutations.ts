@@ -1,12 +1,12 @@
 // Computer Mutation Hooks for CRUD Operations
 
-import { useState, useCallback } from 'react';
-import { ComputerAPI } from '@/services/computer-api';
-import { ErrorHandler } from '@/lib/errors';
-import type { 
-  SambaComputer, 
-  CreateComputerInput 
-} from '@/types/samba';
+import { useState, useCallback } from 'react'
+import { ComputerAPI } from '@/services/computer-api'
+import { ErrorHandler } from '@/lib/errors'
+import type {
+  SambaComputer,
+  CreateComputerInput
+} from '@/types/samba'
 
 export interface MutationState {
   loading: boolean;
@@ -33,128 +33,128 @@ export interface UseComputerMutationsReturn {
   enable: (computerName: string) => Promise<SambaComputer | null>;
   disable: (computerName: string) => Promise<SambaComputer | null>;
   move: (computerName: string, targetOU: string) => Promise<SambaComputer | null>;
-  
+
   // Utilities
   clearError: () => void;
   isLoading: boolean;
 }
 
 export const useComputerMutations = (options: UseComputerMutationsOptions = {}): UseComputerMutationsReturn => {
-  const { onSuccess, onError, autoRefresh } = options;
+  const { onSuccess, onError, autoRefresh } = options
 
   // Individual loading states
-  const [creating, setCreating] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [enablingDisabling, setEnablingDisabling] = useState(false);
-  const [moving, setMoving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [enablingDisabling, setEnablingDisabling] = useState(false)
+  const [moving, setMoving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+    setError(null)
+  }, [])
 
   const handleError = useCallback((action: string, err: unknown) => {
     const apiError = ErrorHandler.handle(err, `useComputerMutations.${action}`, {
       showToast: false,
-      rethrow: false,
-    });
-    setError(apiError.message);
-    onError?.(action, apiError.message);
-    return null;
-  }, [onError]);
+      rethrow: false
+    })
+    setError(apiError.message)
+    onError?.(action, apiError.message)
+    return null
+  }, [onError])
 
   const create = useCallback(async (computerData: CreateComputerInput): Promise<SambaComputer | null> => {
     try {
-      setCreating(true);
-      clearError();
-      
-      const newComputer = await ComputerAPI.create(computerData);
-      
-      onSuccess?.('create', newComputer);
-      if (autoRefresh) await autoRefresh();
-      
-      return newComputer;
+      setCreating(true)
+      clearError()
+
+      const newComputer = await ComputerAPI.create(computerData)
+
+      onSuccess?.('create', newComputer)
+      if (autoRefresh) await autoRefresh()
+
+      return newComputer
     } catch (err) {
-      return handleError('create', err);
+      return handleError('create', err)
     } finally {
-      setCreating(false);
+      setCreating(false)
     }
-  }, [onSuccess, autoRefresh, handleError, clearError]);
+  }, [onSuccess, autoRefresh, handleError, clearError])
 
   const deleteComputer = useCallback(async (computerName: string): Promise<boolean> => {
     try {
-      setDeleting(true);
-      clearError();
-      
-      await ComputerAPI.delete(computerName);
-      
-      onSuccess?.('delete', { computerName });
-      if (autoRefresh) await autoRefresh();
-      
-      return true;
+      setDeleting(true)
+      clearError()
+
+      await ComputerAPI.delete(computerName)
+
+      onSuccess?.('delete', { computerName })
+      if (autoRefresh) await autoRefresh()
+
+      return true
     } catch (err) {
-      handleError('delete', err);
-      return false;
+      handleError('delete', err)
+      return false
     } finally {
-      setDeleting(false);
+      setDeleting(false)
     }
-  }, [onSuccess, autoRefresh, handleError, clearError]);
+  }, [onSuccess, autoRefresh, handleError, clearError])
 
   const enable = useCallback(async (computerName: string): Promise<SambaComputer | null> => {
     try {
-      setEnablingDisabling(true);
-      clearError();
-      
-      const computer = await ComputerAPI.enable(computerName);
-      
-      onSuccess?.('enable', computer);
-      if (autoRefresh) await autoRefresh();
-      
-      return computer;
+      setEnablingDisabling(true)
+      clearError()
+
+      const computer = await ComputerAPI.enable(computerName)
+
+      onSuccess?.('enable', computer)
+      if (autoRefresh) await autoRefresh()
+
+      return computer
     } catch (err) {
-      return handleError('enable', err);
+      return handleError('enable', err)
     } finally {
-      setEnablingDisabling(false);
+      setEnablingDisabling(false)
     }
-  }, [onSuccess, autoRefresh, handleError, clearError]);
+  }, [onSuccess, autoRefresh, handleError, clearError])
 
   const disable = useCallback(async (computerName: string): Promise<SambaComputer | null> => {
     try {
-      setEnablingDisabling(true);
-      clearError();
-      
-      const computer = await ComputerAPI.disable(computerName);
-      
-      onSuccess?.('disable', computer);
-      if (autoRefresh) await autoRefresh();
-      
-      return computer;
+      setEnablingDisabling(true)
+      clearError()
+
+      const computer = await ComputerAPI.disable(computerName)
+
+      onSuccess?.('disable', computer)
+      if (autoRefresh) await autoRefresh()
+
+      return computer
     } catch (err) {
-      return handleError('disable', err);
+      return handleError('disable', err)
     } finally {
-      setEnablingDisabling(false);
+      setEnablingDisabling(false)
     }
-  }, [onSuccess, autoRefresh, handleError, clearError]);
+  }, [onSuccess, autoRefresh, handleError, clearError])
 
   const move = useCallback(async (computerName: string, targetOU: string): Promise<SambaComputer | null> => {
     try {
-      setMoving(true);
-      clearError();
-      
-      const computer = await ComputerAPI.move(computerName, targetOU);
-      
-      onSuccess?.('move', computer);
-      if (autoRefresh) await autoRefresh();
-      
-      return computer;
-    } catch (err) {
-      return handleError('move', err);
-    } finally {
-      setMoving(false);
-    }
-  }, [onSuccess, autoRefresh, handleError, clearError]);
+      setMoving(true)
+      clearError()
 
-  const isLoading = creating || deleting || enablingDisabling || moving;
+      const computer = await ComputerAPI.move(computerName, targetOU)
+
+      onSuccess?.('move', computer)
+      if (autoRefresh) await autoRefresh()
+
+      return computer
+    } catch (err) {
+      return handleError('move', err)
+    } finally {
+      setMoving(false)
+    }
+  }, [onSuccess, autoRefresh, handleError, clearError])
+
+  const isLoading = creating || deleting || enablingDisabling || moving
 
   return {
     // States
@@ -171,8 +171,8 @@ export const useComputerMutations = (options: UseComputerMutationsOptions = {}):
     enable,
     disable,
     move,
-    
+
     // Utilities
-    clearError,
-  };
-};
+    clearError
+  }
+}

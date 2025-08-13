@@ -1,48 +1,48 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Shield, 
-  FileText, 
-  Settings, 
+import React, { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Shield,
+  FileText,
+  Settings,
   CheckCircle,
   AlertTriangle,
   HardDrive,
   ArrowLeft,
   Info
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { useSysvolCheck } from './hooks/useNTACL';
-import { GetNTACLDialog } from './get-ntacl';
-import { SetNTACLDialog } from './set-ntacl';
-import { ChangeDomSIDDialog } from './change-domsid';
-import { GetDOSInfoDialog } from './get-dosinfo';
-import { SysvolResetDialog } from './sysvol-reset';
-import { toast } from 'sonner';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { useSysvolCheck } from './hooks/useNTACL'
+import { GetNTACLDialog } from './get-ntacl'
+import { SetNTACLDialog } from './set-ntacl'
+import { ChangeDomSIDDialog } from './change-domsid'
+import { GetDOSInfoDialog } from './get-dosinfo'
+import { SysvolResetDialog } from './sysvol-reset'
+import { toast } from 'sonner'
 
-export default function NTACLManagement() {
-  const { sysvolStatus, loading: sysvolLoading, refresh: refreshSysvol } = useSysvolCheck();
-  
+export default function NTACLManagement () {
+  const { sysvolStatus, loading: sysvolLoading, refresh: refreshSysvol } = useSysvolCheck()
+
   // Dialog states
-  const [getNTACLDialogOpen, setGetNTACLDialogOpen] = useState(false);
-  const [setNTACLDialogOpen, setSetNTACLDialogOpen] = useState(false);
-  const [changeDomSIDDialogOpen, setChangeDomSIDDialogOpen] = useState(false);
-  const [getDOSInfoDialogOpen, setGetDOSInfoDialogOpen] = useState(false);
-  const [sysvolResetDialogOpen, setSysvolResetDialogOpen] = useState(false);
+  const [getNTACLDialogOpen, setGetNTACLDialogOpen] = useState(false)
+  const [setNTACLDialogOpen, setSetNTACLDialogOpen] = useState(false)
+  const [changeDomSIDDialogOpen, setChangeDomSIDDialogOpen] = useState(false)
+  const [getDOSInfoDialogOpen, setGetDOSInfoDialogOpen] = useState(false)
+  const [sysvolResetDialogOpen, setSysvolResetDialogOpen] = useState(false)
 
   const handleOperationSuccess = () => {
-    refreshSysvol();
-  };
+    refreshSysvol()
+  }
 
   // Check if SYSVOL has issues
-  const hasSysvolIssues = sysvolStatus.some(line => 
-    line.toLowerCase().includes('error') || 
+  const hasSysvolIssues = sysvolStatus.some(line =>
+    line.toLowerCase().includes('error') ||
     line.toLowerCase().includes('failed') ||
     line.toLowerCase().includes('mismatch')
-  );
+  )
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -61,11 +61,13 @@ export default function NTACLManagement() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">SYSVOL Status</CardTitle>
-            {hasSysvolIssues ? (
+            {hasSysvolIssues
+              ? (
               <AlertTriangle className="h-4 w-4 text-red-600" />
-            ) : (
+                )
+              : (
               <CheckCircle className="h-4 w-4 text-green-600" />
-            )}
+                )}
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${hasSysvolIssues ? 'text-red-600' : 'text-green-600'}`}>
@@ -76,7 +78,7 @@ export default function NTACLManagement() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">File ACLs</CardTitle>
@@ -150,7 +152,7 @@ export default function NTACLManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setGetNTACLDialogOpen(true)}
                   className="w-full"
                 >
@@ -170,7 +172,7 @@ export default function NTACLManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setSetNTACLDialogOpen(true)}
                   className="w-full"
                 >
@@ -190,7 +192,7 @@ export default function NTACLManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setChangeDomSIDDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -211,7 +213,7 @@ export default function NTACLManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setGetDOSInfoDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -232,7 +234,7 @@ export default function NTACLManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setSysvolResetDialogOpen(true)}
                   className="w-full"
                   variant="destructive"
@@ -253,7 +255,7 @@ export default function NTACLManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={refreshSysvol}
                   className="w-full"
                   variant="outline"
@@ -277,7 +279,8 @@ export default function NTACLManagement() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {sysvolLoading ? (
+              {sysvolLoading
+                ? (
                 <div className="space-y-3">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="animate-pulse">
@@ -285,7 +288,9 @@ export default function NTACLManagement() {
                     </div>
                   ))}
                 </div>
-              ) : sysvolStatus.length === 0 ? (
+                  )
+                : sysvolStatus.length === 0
+                  ? (
                 <div className="text-center py-8">
                   <CheckCircle className="mx-auto h-12 w-12 text-green-600" />
                   <h3 className="mt-2 text-sm font-semibold">SYSVOL Healthy</h3>
@@ -293,7 +298,8 @@ export default function NTACLManagement() {
                     No SYSVOL ACL issues detected
                   </p>
                 </div>
-              ) : (
+                    )
+                  : (
                 <div className="space-y-4">
                   {hasSysvolIssues && (
                     <Alert>
@@ -303,7 +309,7 @@ export default function NTACLManagement() {
                       </AlertDescription>
                     </Alert>
                   )}
-                  
+
                   <div className="space-y-2">
                     <h4 className="font-medium">SYSVOL Check Results:</h4>
                     <div className="bg-muted/50 p-4 rounded-lg">
@@ -312,17 +318,17 @@ export default function NTACLManagement() {
                       </pre>
                     </div>
                   </div>
-                  
+
                   {hasSysvolIssues && (
                     <div className="flex gap-2">
-                      <Button 
+                      <Button
                         onClick={() => setSysvolResetDialogOpen(true)}
                         variant="destructive"
                         size="sm"
                       >
                         Reset SYSVOL ACLs
                       </Button>
-                      <Button 
+                      <Button
                         onClick={refreshSysvol}
                         variant="outline"
                         size="sm"
@@ -332,7 +338,7 @@ export default function NTACLManagement() {
                     </div>
                   )}
                 </div>
-              )}
+                    )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -345,8 +351,8 @@ export default function NTACLManagement() {
           <div className="space-y-2">
             <p className="font-medium">NT ACL Management</p>
             <p className="text-sm">
-              This module provides tools for managing Windows NT Access Control Lists (ACLs) 
-              on files and directories. NT ACLs control file system permissions and are critical 
+              This module provides tools for managing Windows NT Access Control Lists (ACLs)
+              on files and directories. NT ACLs control file system permissions and are critical
               for proper Samba integration with Windows clients.
             </p>
           </div>
@@ -382,5 +388,5 @@ export default function NTACLManagement() {
         onSysvolReset={handleOperationSuccess}
       />
     </div>
-  );
+  )
 }

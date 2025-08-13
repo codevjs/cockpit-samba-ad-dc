@@ -1,49 +1,49 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { 
-  Search, 
-  Plus, 
-  List, 
+import React, { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import {
+  Search,
+  Plus,
+  List,
   Key,
   User,
   Server,
   Shield,
   ArrowLeft
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { SPNList } from './list';
-import { AddSPNDialog } from './add';
-import { DeleteSPNDialog } from './delete';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { SPNList } from './list'
+import { AddSPNDialog } from './add'
+import { DeleteSPNDialog } from './delete'
 
 interface SPNManagementPageProps {
   initialView?: 'list';
 }
 
-export default function SPNManagementPage({ initialView = 'list' }: SPNManagementPageProps) {
-  const [activeTab, setActiveTab] = useState(initialView);
-  const [searchQuery, setSearchQuery] = useState('');
+export default function SPNManagementPage ({ initialView = 'list' }: SPNManagementPageProps) {
+  const [activeTab, setActiveTab] = useState(initialView)
+  const [searchQuery, setSearchQuery] = useState('')
 
   // SPN management dialogs
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedSPN, setSelectedSPN] = useState<{name: string, user: string} | null>(null);
+  const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [selectedSPN, setSelectedSPN] = useState<{name: string, user: string} | null>(null)
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
+    setSearchQuery(query)
+  }
 
   const handleAddSuccess = () => {
-    setAddDialogOpen(false);
-  };
+    setAddDialogOpen(false)
+  }
 
   const handleDeleteSuccess = () => {
-    setDeleteDialogOpen(false);
-    setSelectedSPN(null);
-  };
+    setDeleteDialogOpen(false)
+    setSelectedSPN(null)
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -71,7 +71,7 @@ export default function SPNManagementPage({ initialView = 'list' }: SPNManagemen
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Kerberos Authentication</CardTitle>
@@ -120,8 +120,8 @@ export default function SPNManagementPage({ initialView = 'list' }: SPNManagemen
         <TabsContent value="list">
           <SPNList
             onDeleteSPN={(name, user) => {
-              setSelectedSPN({ name, user });
-              setDeleteDialogOpen(true);
+              setSelectedSPN({ name, user })
+              setDeleteDialogOpen(true)
             }}
           />
         </TabsContent>
@@ -143,7 +143,7 @@ export default function SPNManagementPage({ initialView = 'list' }: SPNManagemen
                 What are SPNs?
               </h4>
               <p className="text-sm text-muted-foreground mb-2">
-                Service Principal Names (SPNs) are unique identifiers for service instances in Active Directory. 
+                Service Principal Names (SPNs) are unique identifiers for service instances in Active Directory.
                 They enable Kerberos authentication by mapping services to user accounts.
               </p>
               <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
@@ -153,7 +153,7 @@ export default function SPNManagementPage({ initialView = 'list' }: SPNManagemen
                 <li>Must be unique across the domain</li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-medium mb-2 flex items-center gap-2">
                 <Server className="h-4 w-4" />
@@ -192,5 +192,5 @@ export default function SPNManagementPage({ initialView = 'list' }: SPNManagemen
         />
       )}
     </div>
-  );
+  )
 }

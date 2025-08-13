@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,22 +17,22 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info, AlertTriangle } from 'lucide-react';
-import { useOUMutations } from './hooks/useOU';
-import { toast } from 'sonner';
-import type { RenameOUInput } from '@/types/samba';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Info, AlertTriangle } from 'lucide-react'
+import { useOUMutations } from './hooks/useOU'
+import { toast } from 'sonner'
+import type { RenameOUInput } from '@/types/samba'
 
 const renameOUSchema = z.object({
   newName: z.string().min(1, 'New name is required').regex(
     /^OU=.+/,
     'OU name must start with "OU=" (e.g., OU=NewName)'
-  ),
-});
+  )
+})
 
 type RenameOUFormData = z.infer<typeof renameOUSchema>;
 
@@ -43,52 +43,52 @@ interface RenameOUDialogProps {
   ouDN: string | null;
 }
 
-export function RenameOUDialog({ isOpen, onClose, onOURenamed, ouDN }: RenameOUDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function RenameOUDialog ({ isOpen, onClose, onOURenamed, ouDN }: RenameOUDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<RenameOUFormData>({
     resolver: zodResolver(renameOUSchema),
     defaultValues: {
-      newName: '',
-    },
-  });
+      newName: ''
+    }
+  })
 
   const { renameOU } = useOUMutations(
     () => {
-      onOURenamed();
-      handleClose();
+      onOURenamed()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: RenameOUFormData) => {
-    if (!ouDN) return;
-    
-    setIsSubmitting(true);
+    if (!ouDN) return
+
+    setIsSubmitting(true)
     try {
       const renameData: RenameOUInput = {
         ouDN,
-        newName: data.newName,
-      };
-      
-      await renameOU(renameData);
-      toast.success('Organization Unit renamed successfully');
+        newName: data.newName
+      }
+
+      await renameOU(renameData)
+      toast.success('Organization Unit renamed successfully')
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   // Extract current OU name from DN
-  const currentOUName = ouDN ? ouDN.match(/^OU=([^,]+)/)?.[1] || '' : '';
+  const currentOUName = ouDN ? ouDN.match(/^OU=([^,]+)/)?.[1] || '' : ''
 
-  if (!ouDN) return null;
+  if (!ouDN) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -99,7 +99,7 @@ export function RenameOUDialog({ isOpen, onClose, onOURenamed, ouDN }: RenameOUD
             Change the name of this organizational unit.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <Alert>
@@ -176,5 +176,5 @@ export function RenameOUDialog({ isOpen, onClose, onOURenamed, ouDN }: RenameOUD
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

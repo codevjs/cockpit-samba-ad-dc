@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,22 +17,22 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ExternalLink, AlertTriangle } from 'lucide-react';
-import { useForestMutations } from './hooks/useForest';
-import { toast } from 'sonner';
-import type { SetDSHeuristicsInput } from '@/types/samba';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ExternalLink, AlertTriangle } from 'lucide-react'
+import { useForestMutations } from './hooks/useForest'
+import { toast } from 'sonner'
+import type { SetDSHeuristicsInput } from '@/types/samba'
 
 const dsHeuristicsSchema = z.object({
   value: z.string().min(1, 'DSHeuristics value is required').regex(
     /^[0-9]+$/,
     'DSHeuristics value must contain only digits'
-  ),
-});
+  )
+})
 
 type DSHeuristicsFormData = z.infer<typeof dsHeuristicsSchema>;
 
@@ -42,44 +42,44 @@ interface DSHeuristicsDialogProps {
   onHeuristicsSet: () => void;
 }
 
-export function DSHeuristicsDialog({ isOpen, onClose, onHeuristicsSet }: DSHeuristicsDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function DSHeuristicsDialog ({ isOpen, onClose, onHeuristicsSet }: DSHeuristicsDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<DSHeuristicsFormData>({
     resolver: zodResolver(dsHeuristicsSchema),
     defaultValues: {
-      value: '',
-    },
-  });
+      value: ''
+    }
+  })
 
   const { setDSHeuristics } = useForestMutations(
     () => {
-      onHeuristicsSet();
-      handleClose();
+      onHeuristicsSet()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: DSHeuristicsFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const heuristicsData: SetDSHeuristicsInput = {
-        value: data.value,
-      };
-      
-      await setDSHeuristics(heuristicsData);
-      toast.success(`DSHeuristics set to "${data.value}" successfully`);
+        value: data.value
+      }
+
+      await setDSHeuristics(heuristicsData)
+      toast.success(`DSHeuristics set to "${data.value}" successfully`)
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -87,11 +87,11 @@ export function DSHeuristicsDialog({ isOpen, onClose, onHeuristicsSet }: DSHeuri
         <DialogHeader>
           <DialogTitle>Set DSHeuristics Value</DialogTitle>
           <DialogDescription>
-            Set the value of dsheuristics on the Directory Service. This value alters the behavior 
+            Set the value of dsheuristics on the Directory Service. This value alters the behavior
             of the Directory Service on all domain controllers in the forest.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -121,14 +121,14 @@ export function DSHeuristicsDialog({ isOpen, onClose, onHeuristicsSet }: DSHeuri
                 <div className="space-y-2">
                   <p className="font-medium">Important Notice</p>
                   <p className="text-sm">
-                    This setting affects the behavior of the Directory Service across the entire forest. 
+                    This setting affects the behavior of the Directory Service across the entire forest.
                     Make sure you understand the implications before proceeding.
                   </p>
                   <div className="flex items-center gap-2 text-sm">
                     <span>Documentation available at:</span>
-                    <a 
-                      href="https://msdn.microsoft.com/en-us/library/cc223560.aspx" 
-                      target="_blank" 
+                    <a
+                      href="https://msdn.microsoft.com/en-us/library/cc223560.aspx"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
                     >
@@ -162,5 +162,5 @@ export function DSHeuristicsDialog({ isOpen, onClose, onHeuristicsSet }: DSHeuri
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

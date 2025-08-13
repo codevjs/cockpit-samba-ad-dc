@@ -1,44 +1,44 @@
-import React from 'react';
-import { Alert, AlertDescription, AlertTitle } from './alert';
-import { Button } from './button';
-import { cn } from '@/lib/utils';
-import { 
-  AlertCircle, 
-  X, 
-  RefreshCw, 
-  Info, 
+import React from 'react'
+import { Alert, AlertDescription, AlertTitle } from './alert'
+import { Button } from './button'
+import { cn } from '@/lib/utils'
+import {
+  AlertCircle,
+  X,
+  RefreshCw,
+  Info,
   AlertTriangle,
   XCircle
-} from 'lucide-react';
+} from 'lucide-react'
 
 // Custom error classes
 export class APIError extends Error {
-  constructor(
+  constructor (
     message: string,
     public code?: string,
     public details?: unknown,
     public statusCode?: number
   ) {
-    super(message);
-    this.name = 'APIError';
+    super(message)
+    this.name = 'APIError'
   }
 }
 
 export class ValidationError extends Error {
-  constructor(
+  constructor (
     message: string,
     public field?: string,
     public value?: unknown
   ) {
-    super(message);
-    this.name = 'ValidationError';
+    super(message)
+    this.name = 'ValidationError'
   }
 }
 
 export class NetworkError extends Error {
-  constructor(message: string = 'Network connection failed') {
-    super(message);
-    this.name = 'NetworkError';
+  constructor (message: string = 'Network connection failed') {
+    super(message)
+    this.name = 'NetworkError'
   }
 }
 
@@ -57,31 +57,31 @@ export interface ErrorAlertProps {
 
 const getErrorIcon = (error: Error | string | null, variant: string) => {
   if (typeof error === 'string') {
-    return variant === 'warning' ? AlertTriangle : AlertCircle;
+    return variant === 'warning' ? AlertTriangle : AlertCircle
   }
 
   if (error instanceof ValidationError) {
-    return Info;
-  }
-  
-  if (error instanceof NetworkError) {
-    return RefreshCw;
-  }
-  
-  if (error instanceof APIError) {
-    return XCircle;
+    return Info
   }
 
-  return variant === 'warning' ? AlertTriangle : AlertCircle;
-};
+  if (error instanceof NetworkError) {
+    return RefreshCw
+  }
+
+  if (error instanceof APIError) {
+    return XCircle
+  }
+
+  return variant === 'warning' ? AlertTriangle : AlertCircle
+}
 
 const getErrorDetails = (error: Error | string | null) => {
   if (typeof error === 'string') {
-    return { message: error, code: undefined, details: undefined };
+    return { message: error, code: undefined, details: undefined }
   }
 
   if (!error) {
-    return { message: '', code: undefined, details: undefined };
+    return { message: '', code: undefined, details: undefined }
   }
 
   if (error instanceof APIError) {
@@ -89,23 +89,23 @@ const getErrorDetails = (error: Error | string | null) => {
       message: error.message,
       code: error.code,
       details: error.details,
-      statusCode: error.statusCode,
-    };
+      statusCode: error.statusCode
+    }
   }
 
   if (error instanceof ValidationError) {
     return {
       message: error.message,
       field: error.field,
-      value: error.value,
-    };
+      value: error.value
+    }
   }
 
   return {
     message: error.message,
-    name: error.name,
-  };
-};
+    name: error.name
+  }
+}
 
 export const ErrorAlert: React.FC<ErrorAlertProps> = ({
   error,
@@ -117,20 +117,23 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
   className,
   showIcon = true,
   collapsible = false,
-  children,
+  children
 }) => {
-  const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [isCollapsed, setIsCollapsed] = React.useState(false)
 
-  if (!error) return null;
+  if (!error) return null
 
-  const errorDetails = getErrorDetails(error);
-  const IconComponent = getErrorIcon(error, variant);
+  const errorDetails = getErrorDetails(error)
+  const IconComponent = getErrorIcon(error, variant)
   const defaultTitle = title || (
-    error instanceof ValidationError ? 'Validation Error' :
-    error instanceof NetworkError ? 'Connection Error' :
-    error instanceof APIError ? 'Server Error' :
-    'Error'
-  );
+    error instanceof ValidationError
+      ? 'Validation Error'
+      : error instanceof NetworkError
+        ? 'Connection Error'
+        : error instanceof APIError
+          ? 'Server Error'
+          : 'Error'
+  )
 
   return (
     <Alert variant={variant} className={cn('relative', className)}>
@@ -156,7 +159,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
                 </Button>
               )}
             </div>
-            
+
             {!isCollapsed && (
               <>
                 <AlertDescription className="mt-1 text-sm">
@@ -229,8 +232,8 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
         )}
       </div>
     </Alert>
-  );
-};
+  )
+}
 
 // Specialized error components
 export interface NetworkErrorAlertProps {
@@ -242,7 +245,7 @@ export interface NetworkErrorAlertProps {
 export const NetworkErrorAlert: React.FC<NetworkErrorAlertProps> = ({
   onRetry,
   onDismiss,
-  message = 'Unable to connect to the server. Please check your connection and try again.',
+  message = 'Unable to connect to the server. Please check your connection and try again.'
 }) => {
   return (
     <ErrorAlert
@@ -253,8 +256,8 @@ export const NetworkErrorAlert: React.FC<NetworkErrorAlertProps> = ({
       onDismiss={onDismiss}
       retryLabel="Retry Connection"
     />
-  );
-};
+  )
+}
 
 export interface ValidationErrorAlertProps {
   errors: ValidationError[];
@@ -263,11 +266,11 @@ export interface ValidationErrorAlertProps {
 
 export const ValidationErrorAlert: React.FC<ValidationErrorAlertProps> = ({
   errors,
-  onDismiss,
+  onDismiss
 }) => {
-  const message = errors.length === 1 
+  const message = errors.length === 1
     ? errors[0].message
-    : `${errors.length} validation errors occurred`;
+    : `${errors.length} validation errors occurred`
 
   return (
     <ErrorAlert
@@ -286,42 +289,42 @@ export const ValidationErrorAlert: React.FC<ValidationErrorAlertProps> = ({
         </ul>
       )}
     </ErrorAlert>
-  );
-};
+  )
+}
 
 // Hook for managing error state
 export const useErrorHandler = () => {
-  const [error, setError] = React.useState<Error | null>(null);
+  const [error, setError] = React.useState<Error | null>(null)
 
   const handleError = React.useCallback((error: unknown) => {
     if (error instanceof Error) {
-      setError(error);
+      setError(error)
     } else if (typeof error === 'string') {
-      setError(new Error(error));
+      setError(new Error(error))
     } else {
-      setError(new Error('An unexpected error occurred'));
+      setError(new Error('An unexpected error occurred'))
     }
-  }, []);
+  }, [])
 
   const clearError = React.useCallback(() => {
-    setError(null);
-  }, []);
+    setError(null)
+  }, [])
 
   const retryWithClear = React.useCallback(async (retryFn: () => Promise<void>) => {
     try {
-      clearError();
-      await retryFn();
+      clearError()
+      await retryFn()
     } catch (err) {
-      handleError(err);
+      handleError(err)
     }
-  }, [handleError, clearError]);
+  }, [handleError, clearError])
 
   return {
     error,
     handleError,
     clearError,
-    retryWithClear,
-  };
-};
+    retryWithClear
+  }
+}
 
-export default ErrorAlert;
+export default ErrorAlert

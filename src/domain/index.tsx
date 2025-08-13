@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Globe, 
-  Plus, 
+import React, { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Globe,
+  Plus,
   Trash2,
   Search,
   Settings,
@@ -24,26 +24,26 @@ import {
   Key,
   CheckCircle,
   Clock
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { DataTable } from '@/components/ui/data-table';
-import { DomainInfoCard } from './info';
-import { DomainJoinDialog } from './join';
-import { BackupOfflineDialog } from './backup/offline';
-import { TrustListCard } from './trust/list';
-import { toast } from 'sonner';
-import type { ColumnDef } from '@tanstack/react-table';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { DataTable } from '@/components/ui/data-table'
+import { DomainInfoCard } from './info'
+import { DomainJoinDialog } from './join'
+import { BackupOfflineDialog } from './backup/offline'
+import { TrustListCard } from './trust/list'
+import { toast } from 'sonner'
+import type { ColumnDef } from '@tanstack/react-table'
 
-export default function DomainManagement() {
-  const [searchTerm, setSearchTerm] = useState('');
-  
+export default function DomainManagement () {
+  const [searchTerm, setSearchTerm] = useState('')
+
   // Dialog states
-  const [joinDialogOpen, setJoinDialogOpen] = useState(false);
-  const [backupOfflineDialogOpen, setBackupOfflineDialogOpen] = useState(false);
+  const [joinDialogOpen, setJoinDialogOpen] = useState(false)
+  const [backupOfflineDialogOpen, setBackupOfflineDialogOpen] = useState(false)
 
   const handleOperationSuccess = () => {
-    toast.success('Operation completed successfully');
-  };
+    toast.success('Operation completed successfully')
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -74,7 +74,7 @@ export default function DomainManagement() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Trusts</CardTitle>
@@ -149,7 +149,7 @@ export default function DomainManagement() {
         <TabsContent value="overview">
           <div className="space-y-6">
             <DomainInfoCard />
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -225,7 +225,7 @@ export default function DomainManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setJoinDialogOpen(true)}
                   className="w-full"
                 >
@@ -245,7 +245,7 @@ export default function DomainManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
                   variant="outline"
                   disabled
@@ -266,7 +266,7 @@ export default function DomainManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
                   variant="outline"
                   disabled
@@ -287,7 +287,7 @@ export default function DomainManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
                   variant="outline"
                   disabled
@@ -308,7 +308,7 @@ export default function DomainManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
                   variant="outline"
                   disabled
@@ -329,7 +329,7 @@ export default function DomainManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
                   variant="outline"
                   disabled
@@ -358,7 +358,7 @@ export default function DomainManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setBackupOfflineDialogOpen(true)}
                   className="w-full"
                 >
@@ -378,7 +378,7 @@ export default function DomainManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
                   variant="outline"
                   disabled
@@ -399,7 +399,7 @@ export default function DomainManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
                   variant="outline"
                   disabled
@@ -420,7 +420,7 @@ export default function DomainManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
                   variant="outline"
                   disabled
@@ -440,8 +440,8 @@ export default function DomainManagement() {
           <div className="space-y-2">
             <p className="font-medium">Domain Management</p>
             <p className="text-sm">
-              This module provides tools for managing Active Directory domain operations 
-              including domain joining, trust relationships, and backup operations. Use 
+              This module provides tools for managing Active Directory domain operations
+              including domain joining, trust relationships, and backup operations. Use
               these tools carefully as they can significantly impact domain functionality.
             </p>
           </div>
@@ -461,5 +461,5 @@ export default function DomainManagement() {
         onBackupCompleted={handleOperationSuccess}
       />
     </div>
-  );
+  )
 }

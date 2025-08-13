@@ -1,24 +1,24 @@
-import React from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'sonner';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import React from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Toaster } from 'sonner'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
-    Users,
-    Building,
-    Mail,
-    Clock,
-    MapPin,
-    Folder,
-    Shield,
-    Network,
-    Server,
-    Key,
-    FileText,
-    Settings,
-    Database
-} from 'lucide-react';
+  Users,
+  Building,
+  Mail,
+  Clock,
+  MapPin,
+  Folder,
+  Shield,
+  Network,
+  Server,
+  Key,
+  FileText,
+  Settings,
+  Database
+} from 'lucide-react'
 
 interface ManagementModule {
     id: string;
@@ -31,165 +31,165 @@ interface ManagementModule {
 }
 
 const managementModules: ManagementModule[] = [
-    {
-        id: 'users',
-        title: 'User Management',
-        description: 'Create, modify, and manage user accounts and permissions',
-        icon: Users,
-        href: 'user/user.html',
-        status: 'active',
-        badge: 'Core'
-    },
-    {
-        id: 'computers',
-        title: 'Computer Management',
-        description: 'Manage domain-joined computers and their policies',
-        icon: Building,
-        href: 'computer/computer.html',
-        status: 'active'
-    },
-    {
-        id: 'groups',
-        title: 'Group Management',
-        description: 'Create and manage security and distribution groups',
-        icon: Shield,
-        href: 'group/group.html',
-        status: 'active',
-        badge: 'Core'
-    },
-    {
-        id: 'domain',
-        title: 'Domain Management',
-        description: 'Configure domain settings, trust relationships, and policies',
-        icon: Network,
-        href: 'domain/domain.html',
-        status: 'active',
-        badge: 'Critical'
-    },
-    {
-        id: 'dns',
-        title: 'DNS Management',
-        description: 'Manage DNS zones, records, and domain name resolution',
-        icon: Database,
-        href: 'dns/dns.html',
-        status: 'active',
-        badge: 'Core'
-    },
-    {
-        id: 'sites',
-        title: 'Sites Management',
-        description: 'Configure Active Directory sites and subnets',
-        icon: MapPin,
-        href: 'sites/sites.html',
-        status: 'active'
-    },
-    {
-        id: 'ou',
-        title: 'Organization Units',
-        description: 'Create and manage organizational unit structure',
-        icon: Folder,
-        href: 'organization_unit/orgunit.html',
-        status: 'active'
-    },
-    {
-        id: 'gpo',
-        title: 'Group Policy Objects',
-        description: 'Manage and deploy group policies across the domain',
-        icon: FileText,
-        href: 'gpo/gpo.html',
-        status: 'active',
-        badge: 'Advanced'
-    },
-    {
-        id: 'fsmo',
-        title: 'FSMO Management',
-        description: 'Manage Flexible Single Master Operations roles',
-        icon: Server,
-        href: 'fsmo/fsmo.html',
-        status: 'active',
-        badge: 'Advanced'
-    },
-    {
-        id: 'spn',
-        title: 'SPN Management',
-        description: 'Manage Service Principal Names for authentication',
-        icon: Key,
-        href: 'spn/spn.html',
-        status: 'active',
-        badge: 'Advanced'
-    },
-    {
-        id: 'delegation',
-        title: 'Delegation Management',
-        description: 'Configure delegation of authentication and permissions',
-        icon: Settings,
-        href: 'delegation/delegation.html',
-        status: 'active',
-        badge: 'Advanced'
-    },
-    {
-        id: 'time',
-        title: 'Time Configuration',
-        description: 'Configure time synchronization and NTP settings',
-        icon: Clock,
-        href: 'time/time.html',
-        status: 'active'
-    },
-    {
-        id: 'contacts',
-        title: 'Contact Management',
-        description: 'Manage contact objects and address book entries',
-        icon: Mail,
-        href: 'contact/contact.html',
-        status: 'active'
-    },
-    {
-        id: 'forest',
-        title: 'Forest Management',
-        description: 'Manage forest-wide settings and configuration',
-        icon: Database,
-        href: 'forest/forest.html',
-        status: 'active',
-        badge: 'Advanced'
-    },
-    {
-        id: 'dsacl',
-        title: 'DS ACL Management',
-        description: 'Manage Directory Service Access Control Lists',
-        icon: Shield,
-        href: 'dsacl/dsacl.html',
-        status: 'active',
-        badge: 'Expert'
-    },
-    {
-        id: 'ntacl',
-        title: 'NT ACL Management',
-        description: 'Manage NTFS Access Control Lists on SYSVOL',
-        icon: Shield,
-        href: 'ntacl/ntacl.html',
-        status: 'active',
-        badge: 'Expert'
-    }
-];
+  {
+    id: 'users',
+    title: 'User Management',
+    description: 'Create, modify, and manage user accounts and permissions',
+    icon: Users,
+    href: 'user/user.html',
+    status: 'active',
+    badge: 'Core'
+  },
+  {
+    id: 'computers',
+    title: 'Computer Management',
+    description: 'Manage domain-joined computers and their policies',
+    icon: Building,
+    href: 'computer/computer.html',
+    status: 'active'
+  },
+  {
+    id: 'groups',
+    title: 'Group Management',
+    description: 'Create and manage security and distribution groups',
+    icon: Shield,
+    href: 'group/group.html',
+    status: 'active',
+    badge: 'Core'
+  },
+  {
+    id: 'domain',
+    title: 'Domain Management',
+    description: 'Configure domain settings, trust relationships, and policies',
+    icon: Network,
+    href: 'domain/domain.html',
+    status: 'active',
+    badge: 'Critical'
+  },
+  {
+    id: 'dns',
+    title: 'DNS Management',
+    description: 'Manage DNS zones, records, and domain name resolution',
+    icon: Database,
+    href: 'dns/dns.html',
+    status: 'active',
+    badge: 'Core'
+  },
+  {
+    id: 'sites',
+    title: 'Sites Management',
+    description: 'Configure Active Directory sites and subnets',
+    icon: MapPin,
+    href: 'sites/sites.html',
+    status: 'active'
+  },
+  {
+    id: 'ou',
+    title: 'Organization Units',
+    description: 'Create and manage organizational unit structure',
+    icon: Folder,
+    href: 'organization_unit/orgunit.html',
+    status: 'active'
+  },
+  {
+    id: 'gpo',
+    title: 'Group Policy Objects',
+    description: 'Manage and deploy group policies across the domain',
+    icon: FileText,
+    href: 'gpo/gpo.html',
+    status: 'active',
+    badge: 'Advanced'
+  },
+  {
+    id: 'fsmo',
+    title: 'FSMO Management',
+    description: 'Manage Flexible Single Master Operations roles',
+    icon: Server,
+    href: 'fsmo/fsmo.html',
+    status: 'active',
+    badge: 'Advanced'
+  },
+  {
+    id: 'spn',
+    title: 'SPN Management',
+    description: 'Manage Service Principal Names for authentication',
+    icon: Key,
+    href: 'spn/spn.html',
+    status: 'active',
+    badge: 'Advanced'
+  },
+  {
+    id: 'delegation',
+    title: 'Delegation Management',
+    description: 'Configure delegation of authentication and permissions',
+    icon: Settings,
+    href: 'delegation/delegation.html',
+    status: 'active',
+    badge: 'Advanced'
+  },
+  {
+    id: 'time',
+    title: 'Time Configuration',
+    description: 'Configure time synchronization and NTP settings',
+    icon: Clock,
+    href: 'time/time.html',
+    status: 'active'
+  },
+  {
+    id: 'contacts',
+    title: 'Contact Management',
+    description: 'Manage contact objects and address book entries',
+    icon: Mail,
+    href: 'contact/contact.html',
+    status: 'active'
+  },
+  {
+    id: 'forest',
+    title: 'Forest Management',
+    description: 'Manage forest-wide settings and configuration',
+    icon: Database,
+    href: 'forest/forest.html',
+    status: 'active',
+    badge: 'Advanced'
+  },
+  {
+    id: 'dsacl',
+    title: 'DS ACL Management',
+    description: 'Manage Directory Service Access Control Lists',
+    icon: Shield,
+    href: 'dsacl/dsacl.html',
+    status: 'active',
+    badge: 'Expert'
+  },
+  {
+    id: 'ntacl',
+    title: 'NT ACL Management',
+    description: 'Manage NTFS Access Control Lists on SYSVOL',
+    icon: Shield,
+    href: 'ntacl/ntacl.html',
+    status: 'active',
+    badge: 'Expert'
+  }
+]
 
 const getStatusColor = (status?: string): string => {
-    switch (status) {
-        case 'active': return 'text-green-500';
-        case 'warning': return 'text-yellow-500';
-        case 'error': return 'text-red-500';
-        default: return 'text-muted-foreground';
-    }
-};
+  switch (status) {
+    case 'active': return 'text-green-500'
+    case 'warning': return 'text-yellow-500'
+    case 'error': return 'text-red-500'
+    default: return 'text-muted-foreground'
+  }
+}
 
 const getBadgeVariant = (badge?: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
-    switch (badge) {
-        case 'Core': return 'default';
-        case 'Critical': return 'destructive';
-        case 'Advanced': return 'secondary';
-        case 'Expert': return 'outline';
-        default: return 'secondary';
-    }
-};
+  switch (badge) {
+    case 'Core': return 'default'
+    case 'Critical': return 'destructive'
+    case 'Advanced': return 'secondary'
+    case 'Expert': return 'outline'
+    default: return 'secondary'
+  }
+}
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -200,16 +200,16 @@ const queryClient = new QueryClient({
       retry: (failureCount, error) => {
         // Don't retry for 4xx errors
         if ((error as any)?.status >= 400 && (error as any)?.status < 500) {
-          return false;
+          return false
         }
-        return failureCount < 3;
-      },
-    },
-  },
-});
+        return failureCount < 3
+      }
+    }
+  }
+})
 
-export default function Main(): JSX.Element {
-    return (
+export default function Main (): JSX.Element {
+  return (
         <QueryClientProvider client={queryClient}>
             <div className="container mx-auto px-4 py-8">
                 <div className="mb-8">
@@ -221,8 +221,8 @@ export default function Main(): JSX.Element {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {managementModules.map((module) => {
-                    const IconComponent = module.icon;
-                    return (
+                  const IconComponent = module.icon
+                  return (
                         <Card
                             key={module.id}
                             className="group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer border-2 hover:border-primary/20"
@@ -256,7 +256,7 @@ export default function Main(): JSX.Element {
                                 </Button>
                             </CardContent>
                         </Card>
-                    );
+                  )
                 })}
             </div>
 
@@ -279,5 +279,5 @@ export default function Main(): JSX.Element {
             </div>
         </div>
         </QueryClientProvider>
-    );
+  )
 }

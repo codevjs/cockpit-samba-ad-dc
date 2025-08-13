@@ -1,55 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Move, Loader2, FolderTree } from 'lucide-react';
-import { z } from 'zod';
+import React, { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Move, Loader2, FolderTree } from 'lucide-react'
+import { z } from 'zod'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form'
 
-import { useComputerMutations } from './hooks/useComputerMutations';
-import { ErrorToast, SuccessToast } from '@/common';
-import type { SambaComputer, SambaOrganizationalUnit } from '@/types/samba';
+import { useComputerMutations } from './hooks/useComputerMutations'
+import { ErrorToast, SuccessToast } from '@/common'
+import type { SambaComputer, SambaOrganizationalUnit } from '@/types/samba'
 
 // Move computer schema
 const moveComputerSchema = z.object({
-    computerName: z.string().min(1, 'Computer name is required'),
-    targetOU: z.string().min(1, 'Target Organizational Unit is required'),
-    customOU: z.string().optional(),
+  computerName: z.string().min(1, 'Computer name is required'),
+  targetOU: z.string().min(1, 'Target Organizational Unit is required'),
+  customOU: z.string().optional()
 }).refine((data) => {
-    if (data.targetOU === 'custom' && !data.customOU?.trim()) {
-        return false;
-    }
-    return true;
+  if (data.targetOU === 'custom' && !data.customOU?.trim()) {
+    return false
+  }
+  return true
 }, {
-    message: "Please specify the custom Organizational Unit path",
-    path: ["customOU"],
-});
+  message: 'Please specify the custom Organizational Unit path',
+  path: ['customOU']
+})
 
 type MoveComputerFormData = z.infer<typeof moveComputerSchema>;
 
@@ -62,95 +62,95 @@ interface MoveComputerDialogProps {
 
 // Common organizational units for computers
 const COMPUTER_ORG_UNITS: SambaOrganizationalUnit[] = [
-    { name: 'Computers', distinguishedName: 'CN=Computers,DC=domain,DC=local', description: 'Default Computers container', createdAt: new Date(), children: [] },
-    { name: 'Domain Controllers', distinguishedName: 'OU=Domain Controllers,DC=domain,DC=local', description: 'Domain Controllers OU', createdAt: new Date(), children: [] },
-    { name: 'Workstations', distinguishedName: 'OU=Workstations,DC=domain,DC=local', description: 'Client Workstations OU', createdAt: new Date(), children: [] },
-    { name: 'Servers', distinguishedName: 'OU=Servers,DC=domain,DC=local', description: 'Server Computers OU', createdAt: new Date(), children: [] },
-    { name: 'Laptops', distinguishedName: 'OU=Laptops,DC=domain,DC=local', description: 'Laptop Computers OU', createdAt: new Date(), children: [] },
-];
+  { name: 'Computers', distinguishedName: 'CN=Computers,DC=domain,DC=local', description: 'Default Computers container', createdAt: new Date(), children: [] },
+  { name: 'Domain Controllers', distinguishedName: 'OU=Domain Controllers,DC=domain,DC=local', description: 'Domain Controllers OU', createdAt: new Date(), children: [] },
+  { name: 'Workstations', distinguishedName: 'OU=Workstations,DC=domain,DC=local', description: 'Client Workstations OU', createdAt: new Date(), children: [] },
+  { name: 'Servers', distinguishedName: 'OU=Servers,DC=domain,DC=local', description: 'Server Computers OU', createdAt: new Date(), children: [] },
+  { name: 'Laptops', distinguishedName: 'OU=Laptops,DC=domain,DC=local', description: 'Laptop Computers OU', createdAt: new Date(), children: [] }
+]
 
-export default function MoveComputerDialog({ 
-    computer, 
-    computerName: propComputerName, 
-    onComputerMoved, 
-    trigger 
+export default function MoveComputerDialog ({
+  computer,
+  computerName: propComputerName,
+  onComputerMoved,
+  trigger
 }: MoveComputerDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [showToasts, setShowToasts] = useState({ success: false, error: false });
-    const [availableOUs, setAvailableOUs] = useState<SambaOrganizationalUnit[]>(COMPUTER_ORG_UNITS);
+  const [isOpen, setIsOpen] = useState(false)
+  const [showToasts, setShowToasts] = useState({ success: false, error: false })
+  const [availableOUs, setAvailableOUs] = useState<SambaOrganizationalUnit[]>(COMPUTER_ORG_UNITS)
 
-    const computerName = computer?.name || propComputerName || '';
-    const displayName = computer?.name || computerName;
-    const currentOU = computer?.organizationalUnit || 'CN=Computers,DC=domain,DC=local';
+  const computerName = computer?.name || propComputerName || ''
+  const displayName = computer?.name || computerName
+  const currentOU = computer?.organizationalUnit || 'CN=Computers,DC=domain,DC=local'
 
-    const form = useForm<MoveComputerFormData>({
-        resolver: zodResolver(moveComputerSchema),
-        defaultValues: {
-            computerName: computerName,
-            targetOU: '',
-            customOU: '',
-        },
-    });
+  const form = useForm<MoveComputerFormData>({
+    resolver: zodResolver(moveComputerSchema),
+    defaultValues: {
+      computerName,
+      targetOU: '',
+      customOU: ''
+    }
+  })
 
-    const { move: moveComputer, moving, error, clearError } = useComputerMutations({
-        onSuccess: (action, result) => {
-            if (action === 'move') {
-                setShowToasts({ success: true, error: false });
-                setIsOpen(false);
-                form.reset();
-                onComputerMoved?.(computerName, result.organizationalUnit);
-            }
-        },
-        onError: () => {
-            setShowToasts({ success: false, error: true });
-        },
-    });
+  const { move: moveComputer, moving, error, clearError } = useComputerMutations({
+    onSuccess: (action, result) => {
+      if (action === 'move') {
+        setShowToasts({ success: true, error: false })
+        setIsOpen(false)
+        form.reset()
+        onComputerMoved?.(computerName, result.organizationalUnit)
+      }
+    },
+    onError: () => {
+      setShowToasts({ success: false, error: true })
+    }
+  })
 
-    const watchedTargetOU = form.watch('targetOU');
+  const watchedTargetOU = form.watch('targetOU')
 
-    // Load available OUs from the domain (in a real implementation)
-    useEffect(() => {
-        // In a real implementation, you would fetch actual OUs from the domain
-        // For now, we'll use the common OUs defined above
-        setAvailableOUs(COMPUTER_ORG_UNITS);
-    }, []);
+  // Load available OUs from the domain (in a real implementation)
+  useEffect(() => {
+    // In a real implementation, you would fetch actual OUs from the domain
+    // For now, we'll use the common OUs defined above
+    setAvailableOUs(COMPUTER_ORG_UNITS)
+  }, [])
 
-    const onSubmit = async (data: MoveComputerFormData) => {
-        clearError();
-        
-        const targetOUPath = data.targetOU === 'custom' 
-            ? data.customOU! 
-            : data.targetOU;
-        
-        await moveComputer(data.computerName, targetOUPath);
-    };
+  const onSubmit = async (data: MoveComputerFormData) => {
+    clearError()
 
-    const handleOpenChange = (open: boolean) => {
-        setIsOpen(open);
-        if (!open) {
-            form.reset();
-            clearError();
-        }
-    };
+    const targetOUPath = data.targetOU === 'custom'
+      ? data.customOU!
+      : data.targetOU
 
-    const getOUDisplayName = (ouDn: string) => {
-        // Extract the OU name from the distinguished name
-        const match = ouDn.match(/^(CN|OU)=([^,]+)/);
-        return match ? match[2] : ouDn;
-    };
+    await moveComputer(data.computerName, targetOUPath)
+  }
 
-    return (
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) {
+      form.reset()
+      clearError()
+    }
+  }
+
+  const getOUDisplayName = (ouDn: string) => {
+    // Extract the OU name from the distinguished name
+    const match = ouDn.match(/^(CN|OU)=([^,]+)/)
+    return match ? match[2] : ouDn
+  }
+
+  return (
         <>
             {showToasts.error && error && (
-                <ErrorToast 
-                    errorMessage={error} 
-                    closeModal={() => setShowToasts({ ...showToasts, error: false })} 
+                <ErrorToast
+                    errorMessage={error}
+                    closeModal={() => setShowToasts({ ...showToasts, error: false })}
                 />
             )}
             {showToasts.success && (
-                <SuccessToast 
-                    successMessage={`Computer "${computerName}" moved successfully to new organizational unit.`} 
-                    closeModal={() => setShowToasts({ ...showToasts, success: false })} 
+                <SuccessToast
+                    successMessage={`Computer "${computerName}" moved successfully to new organizational unit.`}
+                    closeModal={() => setShowToasts({ ...showToasts, success: false })}
                 />
             )}
 
@@ -194,8 +194,8 @@ export default function MoveComputerDialog({
                                     <FormItem>
                                         <FormLabel>Computer Name</FormLabel>
                                         <FormControl>
-                                            <Input 
-                                                {...field} 
+                                            <Input
+                                                {...field}
                                                 placeholder="Enter computer name"
                                                 disabled={!!computer}
                                             />
@@ -219,8 +219,8 @@ export default function MoveComputerDialog({
                                             </FormControl>
                                             <SelectContent>
                                                 {availableOUs.map((ou) => (
-                                                    <SelectItem 
-                                                        key={ou.distinguishedName} 
+                                                    <SelectItem
+                                                        key={ou.distinguishedName}
                                                         value={ou.distinguishedName}
                                                         disabled={ou.distinguishedName === currentOU}
                                                     >
@@ -258,8 +258,8 @@ export default function MoveComputerDialog({
                                         <FormItem>
                                             <FormLabel>Custom OU Path</FormLabel>
                                             <FormControl>
-                                                <Input 
-                                                    {...field} 
+                                                <Input
+                                                    {...field}
                                                     placeholder="OU=Department,DC=domain,DC=local"
                                                 />
                                             </FormControl>
@@ -273,9 +273,9 @@ export default function MoveComputerDialog({
                             )}
 
                             <DialogFooter>
-                                <Button 
-                                    type="button" 
-                                    variant="outline" 
+                                <Button
+                                    type="button"
+                                    variant="outline"
                                     onClick={() => handleOpenChange(false)}
                                 >
                                     Cancel
@@ -290,5 +290,5 @@ export default function MoveComputerDialog({
                 </DialogContent>
             </Dialog>
         </>
-    );
+  )
 }

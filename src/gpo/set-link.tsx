@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useGPOMutations } from './hooks/useGPO';
-import { toast } from 'sonner';
-import type { SetGPOLinkInput } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useGPOMutations } from './hooks/useGPO'
+import { toast } from 'sonner'
+import type { SetGPOLinkInput } from '@/types/samba'
 
 const setLinkSchema = z.object({
   containerDN: z.string().min(1, 'Container DN is required'),
   gpoName: z.string().min(1, 'GPO name is required'),
   linkOptions: z.string().optional(),
-  order: z.number().optional(),
-});
+  order: z.number().optional()
+})
 
 type SetLinkFormData = z.infer<typeof setLinkSchema>;
 
@@ -25,54 +25,54 @@ interface SetLinkDialogProps {
   onLinkSet: () => void;
 }
 
-export function SetLinkDialog({
+export function SetLinkDialog ({
   isOpen,
   onClose,
-  onLinkSet,
+  onLinkSet
 }: SetLinkDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors }
   } = useForm<SetLinkFormData>({
-    resolver: zodResolver(setLinkSchema),
-  });
+    resolver: zodResolver(setLinkSchema)
+  })
 
   const { setGPOLink } = useGPOMutations(
     () => {
-      toast.success('GPO link set successfully');
-      onLinkSet();
+      toast.success('GPO link set successfully')
+      onLinkSet()
     },
     (error) => {
-      toast.error(`Failed to set GPO link: ${error}`);
+      toast.error(`Failed to set GPO link: ${error}`)
     }
-  );
+  )
 
   const onSubmit = async (data: SetLinkFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: SetGPOLinkInput = {
         containerDN: data.containerDN,
         gpoName: data.gpoName,
         linkOptions: data.linkOptions,
-        order: data.order,
-      };
-      await setGPOLink(input);
-      handleClose();
+        order: data.order
+      }
+      await setGPOLink(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -141,5 +141,5 @@ export function SetLinkDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,19 +17,19 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { useSitesMutations } from './hooks/useSites';
-import { toast } from 'sonner';
-import type { CreateSiteInput } from '@/types/samba';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+import { useSitesMutations } from './hooks/useSites'
+import { toast } from 'sonner'
+import type { CreateSiteInput } from '@/types/samba'
 
 const createSiteSchema = z.object({
   name: z.string().min(1, 'Site name is required'),
-  description: z.string().optional(),
-});
+  description: z.string().optional()
+})
 
 type CreateSiteFormData = z.infer<typeof createSiteSchema>;
 
@@ -39,46 +39,46 @@ interface CreateSiteDialogProps {
   onSiteCreated: () => void;
 }
 
-export function CreateSiteDialog({ isOpen, onClose, onSiteCreated }: CreateSiteDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function CreateSiteDialog ({ isOpen, onClose, onSiteCreated }: CreateSiteDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<CreateSiteFormData>({
     resolver: zodResolver(createSiteSchema),
     defaultValues: {
       name: '',
-      description: '',
-    },
-  });
+      description: ''
+    }
+  })
 
   const { createSite } = useSitesMutations(
     () => {
-      onSiteCreated();
-      handleClose();
+      onSiteCreated()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: CreateSiteFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const siteData: CreateSiteInput = {
         name: data.name,
-        description: data.description || undefined,
-      };
-      
-      await createSite(siteData);
-      toast.success(`Site "${data.name}" created successfully`);
+        description: data.description || undefined
+      }
+
+      await createSite(siteData)
+      toast.success(`Site "${data.name}" created successfully`)
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -89,7 +89,7 @@ export function CreateSiteDialog({ isOpen, onClose, onSiteCreated }: CreateSiteD
             Create a new Active Directory site for managing replication topology.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -147,5 +147,5 @@ export function CreateSiteDialog({ isOpen, onClose, onSiteCreated }: CreateSiteD
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

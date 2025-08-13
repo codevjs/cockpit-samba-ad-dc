@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  FolderOpen, 
-  Plus, 
+import React, { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  FolderOpen,
+  Plus,
   Trash2,
   Search,
   Settings,
@@ -22,49 +22,49 @@ import {
   UnlinkIcon,
   Eye,
   Layers
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { DataTable } from '@/components/ui/data-table';
-import { useGPOs, useGPOContainers } from './hooks/useGPO';
-import { CreateGPODialog } from './create-gpo';
-import { DeleteGPODialog } from './delete-gpo';
-import { BackupGPODialog } from './backup-gpo';
-import { RestoreGPODialog } from './restore-gpo';
-import { FetchGPODialog } from './fetch-gpo';
-import { SetLinkDialog } from './set-link';
-import { DeleteLinkDialog } from './delete-link';
-import { InheritanceDialog } from './inheritance';
-import { ShowGPODialog } from './show-gpo';
-import { toast } from 'sonner';
-import type { SambaGPO } from '@/types/samba';
-import type { DataTableColumn } from '@/components/ui/data-table';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { DataTable } from '@/components/ui/data-table'
+import { useGPOs, useGPOContainers } from './hooks/useGPO'
+import { CreateGPODialog } from './create-gpo'
+import { DeleteGPODialog } from './delete-gpo'
+import { BackupGPODialog } from './backup-gpo'
+import { RestoreGPODialog } from './restore-gpo'
+import { FetchGPODialog } from './fetch-gpo'
+import { SetLinkDialog } from './set-link'
+import { DeleteLinkDialog } from './delete-link'
+import { InheritanceDialog } from './inheritance'
+import { ShowGPODialog } from './show-gpo'
+import { toast } from 'sonner'
+import type { SambaGPO } from '@/types/samba'
+import type { DataTableColumn } from '@/components/ui/data-table'
 
-export default function GPOManagement() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGPO, setSelectedGPO] = useState<SambaGPO | null>(null);
-  
+export default function GPOManagement () {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedGPO, setSelectedGPO] = useState<SambaGPO | null>(null)
+
   // Dialog states
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [backupDialogOpen, setBackupDialogOpen] = useState(false);
-  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
-  const [fetchDialogOpen, setFetchDialogOpen] = useState(false);
-  const [setLinkDialogOpen, setSetLinkDialogOpen] = useState(false);
-  const [deleteLinkDialogOpen, setDeleteLinkDialogOpen] = useState(false);
-  const [inheritanceDialogOpen, setInheritanceDialogOpen] = useState(false);
-  const [showGPODialogOpen, setShowGPODialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [backupDialogOpen, setBackupDialogOpen] = useState(false)
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false)
+  const [fetchDialogOpen, setFetchDialogOpen] = useState(false)
+  const [setLinkDialogOpen, setSetLinkDialogOpen] = useState(false)
+  const [deleteLinkDialogOpen, setDeleteLinkDialogOpen] = useState(false)
+  const [inheritanceDialogOpen, setInheritanceDialogOpen] = useState(false)
+  const [showGPODialogOpen, setShowGPODialogOpen] = useState(false)
 
-  const { gpos, loading: gposLoading, refresh: refreshGPOs } = useGPOs();
-  const { containers, loading: containersLoading } = useGPOContainers();
+  const { gpos, loading: gposLoading, refresh: refreshGPOs } = useGPOs()
+  const { containers, loading: containersLoading } = useGPOContainers()
 
   const handleOperationSuccess = () => {
-    refreshGPOs();
-  };
+    refreshGPOs()
+  }
 
   const filteredGPOs = gpos.filter(gpo =>
     gpo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     gpo.displayName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  )
 
   const gpoColumns: DataTableColumn<SambaGPO>[] = [
     {
@@ -72,40 +72,40 @@ export default function GPOManagement() {
       header: 'Name',
       render: (gpo) => (
         <div className="font-medium">{gpo.name}</div>
-      ),
+      )
     },
     {
       key: 'displayName',
       header: 'Display Name',
       render: (gpo) => (
         <div>{gpo.displayName}</div>
-      ),
+      )
     },
     {
       key: 'guid',
       header: 'GUID',
       render: (gpo) => (
         <div className="font-mono text-xs">{gpo.guid}</div>
-      ),
+      )
     },
     {
       key: 'status',
       header: 'Status',
       render: (gpo) => (
-        <Badge 
+        <Badge
           variant={gpo.status === 'Enabled' ? 'default' : 'secondary'}
           className={gpo.status === 'Enabled' ? 'bg-green-100 text-green-800' : ''}
         >
           {gpo.status}
         </Badge>
-      ),
+      )
     },
     {
       key: 'version',
       header: 'Version',
       render: (gpo) => (
         <div className="text-center">{gpo.version}</div>
-      ),
+      )
     },
     {
       key: 'actions',
@@ -116,8 +116,8 @@ export default function GPOManagement() {
             variant="outline"
             size="sm"
             onClick={() => {
-              setSelectedGPO(gpo);
-              setShowGPODialogOpen(true);
+              setSelectedGPO(gpo)
+              setShowGPODialogOpen(true)
             }}
           >
             <Eye className="h-4 w-4" />
@@ -126,16 +126,16 @@ export default function GPOManagement() {
             variant="outline"
             size="sm"
             onClick={() => {
-              setSelectedGPO(gpo);
-              setDeleteDialogOpen(true);
+              setSelectedGPO(gpo)
+              setDeleteDialogOpen(true)
             }}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
-      ),
-    },
-  ];
+      )
+    }
+  ]
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -163,7 +163,7 @@ export default function GPOManagement() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Enabled</CardTitle>
@@ -245,7 +245,7 @@ export default function GPOManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setCreateDialogOpen(true)}
                   className="w-full"
                 >
@@ -265,7 +265,7 @@ export default function GPOManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setBackupDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -286,7 +286,7 @@ export default function GPOManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setRestoreDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -307,7 +307,7 @@ export default function GPOManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setFetchDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -328,7 +328,7 @@ export default function GPOManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setSetLinkDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -349,7 +349,7 @@ export default function GPOManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setDeleteLinkDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -370,7 +370,7 @@ export default function GPOManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setInheritanceDialogOpen(true)}
                   className="w-full"
                   variant="outline"
@@ -427,7 +427,8 @@ export default function GPOManagement() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {containersLoading ? (
+              {containersLoading
+                ? (
                 <div className="space-y-3">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="animate-pulse">
@@ -435,7 +436,9 @@ export default function GPOManagement() {
                     </div>
                   ))}
                 </div>
-              ) : containers.length === 0 ? (
+                  )
+                : containers.length === 0
+                  ? (
                 <div className="text-center py-8">
                   <Database className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-2 text-sm font-semibold">No Containers</h3>
@@ -443,7 +446,8 @@ export default function GPOManagement() {
                     No containers available for GPO linking
                   </p>
                 </div>
-              ) : (
+                    )
+                  : (
                 <div className="space-y-2">
                   {containers.map((container, index) => (
                     <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
@@ -458,7 +462,7 @@ export default function GPOManagement() {
                     </div>
                   ))}
                 </div>
-              )}
+                    )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -471,8 +475,8 @@ export default function GPOManagement() {
           <div className="space-y-2">
             <p className="font-medium">Group Policy Object Management</p>
             <p className="text-sm">
-              This module provides comprehensive tools for managing GPOs in your 
-              Active Directory environment. Use these operations carefully as GPO 
+              This module provides comprehensive tools for managing GPOs in your
+              Active Directory environment. Use these operations carefully as GPO
               changes can affect user and computer configurations domain-wide.
             </p>
           </div>
@@ -535,5 +539,5 @@ export default function GPOManagement() {
         gpo={selectedGPO}
       />
     </div>
-  );
+  )
 }

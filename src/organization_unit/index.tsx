@@ -1,89 +1,89 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { 
-  FolderTree, 
-  Plus, 
-  Trash2, 
+import React, { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import {
+  FolderTree,
+  Plus,
+  Trash2,
   Move,
   Edit2,
   Search,
   Users,
   Building,
   ArrowLeft
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { useOUs, useOUObjects } from './hooks/useOU';
-import { CreateOUDialog } from './create-ou';
-import { DeleteOUDialog } from './delete-ou';
-import { MoveOUDialog } from './move-ou';
-import { RenameOUDialog } from './rename-ou';
-import { ListObjectsDialog } from './list-objects';
-import { toast } from 'sonner';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { useOUs, useOUObjects } from './hooks/useOU'
+import { CreateOUDialog } from './create-ou'
+import { DeleteOUDialog } from './delete-ou'
+import { MoveOUDialog } from './move-ou'
+import { RenameOUDialog } from './rename-ou'
+import { ListObjectsDialog } from './list-objects'
+import { toast } from 'sonner'
 
-export default function OrganizationUnitManagement() {
-  const { ous, loading: ousLoading, refresh: refreshOUs } = useOUs();
-  const [searchQuery, setSearchQuery] = useState('');
-  
+export default function OrganizationUnitManagement () {
+  const { ous, loading: ousLoading, refresh: refreshOUs } = useOUs()
+  const [searchQuery, setSearchQuery] = useState('')
+
   // Dialog states
-  const [createOUDialogOpen, setCreateOUDialogOpen] = useState(false);
-  const [deleteOUDialogOpen, setDeleteOUDialogOpen] = useState(false);
-  const [moveOUDialogOpen, setMoveOUDialogOpen] = useState(false);
-  const [renameOUDialogOpen, setRenameOUDialogOpen] = useState(false);
-  const [listObjectsDialogOpen, setListObjectsDialogOpen] = useState(false);
-  const [selectedOU, setSelectedOU] = useState<string | null>(null);
+  const [createOUDialogOpen, setCreateOUDialogOpen] = useState(false)
+  const [deleteOUDialogOpen, setDeleteOUDialogOpen] = useState(false)
+  const [moveOUDialogOpen, setMoveOUDialogOpen] = useState(false)
+  const [renameOUDialogOpen, setRenameOUDialogOpen] = useState(false)
+  const [listObjectsDialogOpen, setListObjectsDialogOpen] = useState(false)
+  const [selectedOU, setSelectedOU] = useState<string | null>(null)
 
   const handleCreateOUSuccess = () => {
-    refreshOUs();
-    setCreateOUDialogOpen(false);
-  };
+    refreshOUs()
+    setCreateOUDialogOpen(false)
+  }
 
   const handleDeleteOUSuccess = () => {
-    refreshOUs();
-    setDeleteOUDialogOpen(false);
-    setSelectedOU(null);
-  };
+    refreshOUs()
+    setDeleteOUDialogOpen(false)
+    setSelectedOU(null)
+  }
 
   const handleMoveOUSuccess = () => {
-    refreshOUs();
-    setMoveOUDialogOpen(false);
-    setSelectedOU(null);
-  };
+    refreshOUs()
+    setMoveOUDialogOpen(false)
+    setSelectedOU(null)
+  }
 
   const handleRenameOUSuccess = () => {
-    refreshOUs();
-    setRenameOUDialogOpen(false);
-    setSelectedOU(null);
-  };
+    refreshOUs()
+    setRenameOUDialogOpen(false)
+    setSelectedOU(null)
+  }
 
   const handleDeleteOU = (ouDN: string) => {
-    setSelectedOU(ouDN);
-    setDeleteOUDialogOpen(true);
-  };
+    setSelectedOU(ouDN)
+    setDeleteOUDialogOpen(true)
+  }
 
   const handleMoveOU = (ouDN: string) => {
-    setSelectedOU(ouDN);
-    setMoveOUDialogOpen(true);
-  };
+    setSelectedOU(ouDN)
+    setMoveOUDialogOpen(true)
+  }
 
   const handleRenameOU = (ouDN: string) => {
-    setSelectedOU(ouDN);
-    setRenameOUDialogOpen(true);
-  };
+    setSelectedOU(ouDN)
+    setRenameOUDialogOpen(true)
+  }
 
   const handleListObjects = (ouDN: string) => {
-    setSelectedOU(ouDN);
-    setListObjectsDialogOpen(true);
-  };
+    setSelectedOU(ouDN)
+    setListObjectsDialogOpen(true)
+  }
 
   // Filter OUs based on search query
-  const filteredOUs = ous.filter(ou => 
+  const filteredOUs = ous.filter(ou =>
     ou.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     ou.distinguishedName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  )
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -111,7 +111,7 @@ export default function OrganizationUnitManagement() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Root OUs</CardTitle>
@@ -178,7 +178,8 @@ export default function OrganizationUnitManagement() {
               </div>
             </CardHeader>
             <CardContent>
-              {ousLoading ? (
+              {ousLoading
+                ? (
                 <div className="space-y-3">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="animate-pulse">
@@ -186,14 +187,16 @@ export default function OrganizationUnitManagement() {
                     </div>
                   ))}
                 </div>
-              ) : filteredOUs.length === 0 ? (
+                  )
+                : filteredOUs.length === 0
+                  ? (
                 <div className="text-center py-8">
                   <FolderTree className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-2 text-sm font-semibold">
                     {searchQuery ? 'No OUs Found' : 'No Organization Units'}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {searchQuery 
+                    {searchQuery
                       ? 'Try adjusting your search terms'
                       : 'Create your first organizational unit to get started'
                     }
@@ -204,7 +207,8 @@ export default function OrganizationUnitManagement() {
                     </Button>
                   )}
                 </div>
-              ) : (
+                    )
+                  : (
                 <div className="space-y-3">
                   {filteredOUs.map((ou) => (
                     <Card key={ou.distinguishedName} className="border border-border">
@@ -223,11 +227,13 @@ export default function OrganizationUnitManagement() {
                                 </p>
                               )}
                               <div className="flex items-center gap-2 mt-2">
-                                {ou.parentOU ? (
+                                {ou.parentOU
+                                  ? (
                                   <Badge variant="outline">Nested</Badge>
-                                ) : (
+                                    )
+                                  : (
                                   <Badge variant="secondary">Root</Badge>
-                                )}
+                                    )}
                                 <Badge variant="outline">
                                   {ou.children.length} children
                                 </Badge>
@@ -237,7 +243,7 @@ export default function OrganizationUnitManagement() {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center gap-2">
                             <Button
                               variant="outline"
@@ -281,7 +287,7 @@ export default function OrganizationUnitManagement() {
                     </Card>
                   ))}
                 </div>
-              )}
+                    )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -323,5 +329,5 @@ export default function OrganizationUnitManagement() {
         ouDN={selectedOU}
       />
     </div>
-  );
+  )
 }

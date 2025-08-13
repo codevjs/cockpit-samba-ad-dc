@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useGPOMutations } from './hooks/useGPO';
-import { toast } from 'sonner';
-import type { DeleteGPOInput, SambaGPO } from '@/types/samba';
+import React, { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useGPOMutations } from './hooks/useGPO'
+import { toast } from 'sonner'
+import type { DeleteGPOInput, SambaGPO } from '@/types/samba'
 
 const deleteGPOSchema = z.object({
-  confirmationText: z.string().min(1, 'Please type DELETE to confirm'),
-});
+  confirmationText: z.string().min(1, 'Please type DELETE to confirm')
+})
 
 type DeleteGPOFormData = z.infer<typeof deleteGPOSchema>;
 
@@ -25,70 +25,70 @@ interface DeleteGPODialogProps {
   gpo: SambaGPO | null;
 }
 
-export function DeleteGPODialog({
+export function DeleteGPODialog ({
   isOpen,
   onClose,
   onGPODeleted,
-  gpo,
+  gpo
 }: DeleteGPODialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
     watch,
-    formState: { errors },
+    formState: { errors }
   } = useForm<DeleteGPOFormData>({
     resolver: zodResolver(deleteGPOSchema.refine(
       (data) => data.confirmationText === 'DELETE',
       {
         message: 'Please type DELETE to confirm GPO deletion',
-        path: ['confirmationText'],
+        path: ['confirmationText']
       }
-    )),
-  });
+    ))
+  })
 
   const { deleteGPO } = useGPOMutations(
     () => {
-      toast.success('GPO deleted successfully');
-      onGPODeleted();
+      toast.success('GPO deleted successfully')
+      onGPODeleted()
     },
     (error) => {
-      toast.error(`Failed to delete GPO: ${error}`);
+      toast.error(`Failed to delete GPO: ${error}`)
     }
-  );
+  )
 
-  const confirmationText = watch('confirmationText');
-  const isConfirmed = confirmationText === 'DELETE';
+  const confirmationText = watch('confirmationText')
+  const isConfirmed = confirmationText === 'DELETE'
 
   const onSubmit = async (data: DeleteGPOFormData) => {
     if (!gpo || !isConfirmed) {
-      toast.error('Please type DELETE to confirm GPO deletion');
-      return;
+      toast.error('Please type DELETE to confirm GPO deletion')
+      return
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: DeleteGPOInput = {
-        name: gpo.name,
-      };
-      await deleteGPO(input);
-      handleClose();
+        name: gpo.name
+      }
+      await deleteGPO(input)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   if (!gpo) {
-    return null;
+    return null
   }
 
   return (
@@ -104,8 +104,8 @@ export function DeleteGPODialog({
         <Alert className="border-red-200 bg-red-50">
           <AlertTriangle className="h-4 w-4 text-red-600" />
           <AlertDescription className="text-red-800">
-            <strong>Warning:</strong> This action cannot be undone. Deleting this GPO will 
-            permanently remove it from Active Directory and may affect users and computers 
+            <strong>Warning:</strong> This action cannot be undone. Deleting this GPO will
+            permanently remove it from Active Directory and may affect users and computers
             that rely on its policies.
           </AlertDescription>
         </Alert>
@@ -139,7 +139,7 @@ export function DeleteGPODialog({
             <Alert className="border-orange-200 bg-orange-50">
               <AlertTriangle className="h-4 w-4 text-orange-600" />
               <AlertDescription className="text-orange-800">
-                <strong>Active Links:</strong> This GPO is currently linked to {gpo.linkedOUs.length} 
+                <strong>Active Links:</strong> This GPO is currently linked to {gpo.linkedOUs.length}
                 container(s). Deleting it will remove all policies applied through these links.
               </AlertDescription>
             </Alert>
@@ -165,9 +165,9 @@ export function DeleteGPODialog({
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              variant="destructive" 
+            <Button
+              type="submit"
+              variant="destructive"
               disabled={isSubmitting || !isConfirmed}
             >
               {isSubmitting ? 'Deleting...' : 'Delete GPO'}
@@ -176,5 +176,5 @@ export function DeleteGPODialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

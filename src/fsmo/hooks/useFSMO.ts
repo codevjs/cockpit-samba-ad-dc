@@ -1,8 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { FSMOAPI } from '@/services/fsmo-api';
-import { ErrorHandler } from '@/lib/errors';
-import type { FSMORoles, TransferFSMORoleInput, SeizeFSMORoleInput } from '@/types/samba';
+import { useState, useCallback, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { FSMOAPI } from '@/services/fsmo-api'
+import { ErrorHandler } from '@/lib/errors'
+import type { FSMORoles, TransferFSMORoleInput, SeizeFSMORoleInput } from '@/types/samba'
 
 export interface UseFSMOReturn {
   roles: FSMORoles | null;
@@ -13,37 +13,37 @@ export interface UseFSMOReturn {
 }
 
 export const useFSMO = (autoFetch: boolean = true): UseFSMOReturn => {
-  const { 
-    data: roles = null, 
-    isLoading: loading, 
+  const {
+    data: roles = null,
+    isLoading: loading,
     error: queryError,
-    refetch 
+    refetch
   } = useQuery({
     queryKey: ['fsmo-roles'],
     queryFn: () => FSMOAPI.showRoles(),
     enabled: autoFetch,
     staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
-  });
+    gcTime: 5 * 60 * 1000 // 5 minutes
+  })
 
-  const error = queryError ? (queryError as Error).message : null;
+  const error = queryError ? (queryError as Error).message : null
 
   const refresh = useCallback(async () => {
-    await refetch();
-  }, [refetch]);
+    await refetch()
+  }, [refetch])
 
   const clearError = useCallback(() => {
     // React Query handles error state automatically
-  }, []);
+  }, [])
 
   return {
     roles,
     loading,
     error,
     refresh,
-    clearError,
-  };
-};
+    clearError
+  }
+}
 
 export interface UseFSMOMutationsReturn {
   transferRole: (transferData: TransferFSMORoleInput) => Promise<void>;
@@ -58,30 +58,30 @@ export interface UseFSMOMutationsReturn {
 export const useFSMOMutations = (onSuccess?: () => void, onError?: (error: string) => void): UseFSMOMutationsReturn => {
   const transferRole = useCallback(async (transferData: TransferFSMORoleInput) => {
     try {
-      await FSMOAPI.transferRole(transferData);
-      onSuccess?.();
+      await FSMOAPI.transferRole(transferData)
+      onSuccess?.()
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to transfer FSMO role';
-      onError?.(errorMessage);
-      throw err;
+      const errorMessage = err instanceof Error ? err.message : 'Failed to transfer FSMO role'
+      onError?.(errorMessage)
+      throw err
     }
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError])
 
   const seizeRole = useCallback(async (seizeData: SeizeFSMORoleInput) => {
     try {
-      await FSMOAPI.seizeRole(seizeData);
-      onSuccess?.();
+      await FSMOAPI.seizeRole(seizeData)
+      onSuccess?.()
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to seize FSMO role';
-      onError?.(errorMessage);
-      throw err;
+      const errorMessage = err instanceof Error ? err.message : 'Failed to seize FSMO role'
+      onError?.(errorMessage)
+      throw err
     }
-  }, [onSuccess, onError]);
+  }, [onSuccess, onError])
 
   return {
     transferRole,
     seizeRole,
     isLoading: false, // We handle loading states at the component level
     error: null // We handle errors via the callbacks
-  };
-};
+  }
+}

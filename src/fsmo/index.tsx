@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Crown, 
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
+  Crown,
   Server,
   Database,
   Key,
@@ -13,32 +13,32 @@ import {
   RefreshCw,
   AlertTriangle,
   ArrowLeft
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { ErrorAlert } from '@/components/ui/error-alert';
-import { useFSMO } from './hooks/useFSMO';
-import { TransferRoleDialog } from './transfer';
-import { SeizeRoleDialog } from './seize';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { ErrorAlert } from '@/components/ui/error-alert'
+import { useFSMO } from './hooks/useFSMO'
+import { TransferRoleDialog } from './transfer'
+import { SeizeRoleDialog } from './seize'
 
-export default function FSMOManagement() {
-  const { roles, loading, error, refresh } = useFSMO();
-  
+export default function FSMOManagement () {
+  const { roles, loading, error, refresh } = useFSMO()
+
   // Dialog states
-  const [transferDialogOpen, setTransferDialogOpen] = useState(false);
-  const [seizeDialogOpen, setSeizeDialogOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [transferDialogOpen, setTransferDialogOpen] = useState(false)
+  const [seizeDialogOpen, setSeizeDialogOpen] = useState(false)
+  const [selectedRole, setSelectedRole] = useState<string>('')
 
   const handleTransferSuccess = () => {
-    refresh();
-    setTransferDialogOpen(false);
-    setSelectedRole('');
-  };
+    refresh()
+    setTransferDialogOpen(false)
+    setSelectedRole('')
+  }
 
   const handleSeizeSuccess = () => {
-    refresh();
-    setSeizeDialogOpen(false);
-    setSelectedRole('');
-  };
+    refresh()
+    setSeizeDialogOpen(false)
+    setSelectedRole('')
+  }
 
   const fsmoRoleInfo = [
     {
@@ -86,7 +86,7 @@ export default function FSMOManagement() {
       criticality: 'Medium',
       variant: 'secondary' as const
     }
-  ];
+  ]
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -110,9 +110,9 @@ export default function FSMOManagement() {
           <ArrowRight className="h-4 w-4" />
           Transfer Role
         </Button>
-        <Button 
-          onClick={() => setSeizeDialogOpen(true)} 
-          variant="destructive" 
+        <Button
+          onClick={() => setSeizeDialogOpen(true)}
+          variant="destructive"
           className="flex items-center gap-2"
         >
           <AlertTriangle className="h-4 w-4" />
@@ -121,7 +121,7 @@ export default function FSMOManagement() {
       </div>
 
       {error && (
-        <ErrorAlert 
+        <ErrorAlert
           error={error}
           onRetry={refresh}
           className="mb-4"
@@ -129,7 +129,8 @@ export default function FSMOManagement() {
       )}
 
       {/* FSMO Roles Display */}
-      {loading ? (
+      {loading
+        ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 5 }).map((_, i) => (
             <Card key={i}>
@@ -148,12 +149,14 @@ export default function FSMOManagement() {
             </Card>
           ))}
         </div>
-      ) : roles ? (
+          )
+        : roles
+          ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {fsmoRoleInfo.map((roleInfo) => {
-            const IconComponent = roleInfo.icon;
-            const holder = roles[roleInfo.key];
-            
+            const IconComponent = roleInfo.icon
+            const holder = roles[roleInfo.key]
+
             return (
               <Card key={roleInfo.key} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
@@ -179,23 +182,23 @@ export default function FSMOManagement() {
                     </div>
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => {
-                        setSelectedRole(roleInfo.key);
-                        setTransferDialogOpen(true);
+                        setSelectedRole(roleInfo.key)
+                        setTransferDialogOpen(true)
                       }}
                       className="flex-1"
                     >
                       Transfer
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="destructive" 
+                    <Button
+                      size="sm"
+                      variant="destructive"
                       onClick={() => {
-                        setSelectedRole(roleInfo.key);
-                        setSeizeDialogOpen(true);
+                        setSelectedRole(roleInfo.key)
+                        setSeizeDialogOpen(true)
                       }}
                       className="flex-1"
                     >
@@ -204,10 +207,11 @@ export default function FSMOManagement() {
                   </div>
                 </CardContent>
               </Card>
-            );
+            )
           })}
         </div>
-      ) : (
+            )
+          : (
         <Card>
           <CardContent className="text-center py-8">
             <Server className="mx-auto h-12 w-12 text-muted-foreground" />
@@ -220,7 +224,7 @@ export default function FSMOManagement() {
             </Button>
           </CardContent>
         </Card>
-      )}
+            )}
 
       {/* Information Card */}
       <Card>
@@ -269,5 +273,5 @@ export default function FSMOManagement() {
         preselectedRole={selectedRole}
       />
     </div>
-  );
+  )
 }

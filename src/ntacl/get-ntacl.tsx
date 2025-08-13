@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,16 +17,16 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { FileText, Loader2 } from 'lucide-react';
-import { useNTACL } from './hooks/useNTACL';
-import { toast } from 'sonner';
-import type { GetNTACLInput } from '@/types/samba';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { FileText, Loader2 } from 'lucide-react'
+import { useNTACL } from './hooks/useNTACL'
+import { toast } from 'sonner'
+import type { GetNTACLInput } from '@/types/samba'
 
 const getNTACLSchema = z.object({
   file: z.string().min(1, 'File path is required'),
@@ -34,8 +34,8 @@ const getNTACLSchema = z.object({
   eadbFile: z.string().optional(),
   useNtvfs: z.string().optional(),
   useS3fs: z.string().optional(),
-  service: z.string().optional(),
-});
+  service: z.string().optional()
+})
 
 type GetNTACLFormData = z.infer<typeof getNTACLSchema>;
 
@@ -44,10 +44,10 @@ interface GetNTACLDialogProps {
   onClose: () => void;
 }
 
-export function GetNTACLDialog({ isOpen, onClose }: GetNTACLDialogProps) {
-  const [currentInput, setCurrentInput] = useState<GetNTACLInput | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function GetNTACLDialog ({ isOpen, onClose }: GetNTACLDialogProps) {
+  const [currentInput, setCurrentInput] = useState<GetNTACLInput | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<GetNTACLFormData>({
     resolver: zodResolver(getNTACLSchema),
     defaultValues: {
@@ -56,20 +56,20 @@ export function GetNTACLDialog({ isOpen, onClose }: GetNTACLDialogProps) {
       eadbFile: '',
       useNtvfs: '',
       useS3fs: '',
-      service: '',
-    },
-  });
+      service: ''
+    }
+  })
 
-  const { ntacl, loading, error } = useNTACL(currentInput, !!currentInput);
+  const { ntacl, loading, error } = useNTACL(currentInput, !!currentInput)
 
   const handleClose = () => {
-    form.reset();
-    setCurrentInput(null);
-    onClose();
-  };
+    form.reset()
+    setCurrentInput(null)
+    onClose()
+  }
 
   const onSubmit = async (data: GetNTACLFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const input: GetNTACLInput = {
         file: data.file,
@@ -77,17 +77,17 @@ export function GetNTACLDialog({ isOpen, onClose }: GetNTACLDialogProps) {
         eadbFile: data.eadbFile || undefined,
         useNtvfs: data.useNtvfs || undefined,
         useS3fs: data.useS3fs || undefined,
-        service: data.service || undefined,
-      };
-      
-      setCurrentInput(input);
-      toast.success('Getting NT ACL information...');
+        service: data.service || undefined
+      }
+
+      setCurrentInput(input)
+      toast.success('Getting NT ACL information...')
     } catch (error) {
-      toast.error('Failed to get NT ACL');
+      toast.error('Failed to get NT ACL')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -98,7 +98,7 @@ export function GetNTACLDialog({ isOpen, onClose }: GetNTACLDialogProps) {
             Retrieve Windows NT Access Control Lists for a file or directory.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -264,9 +264,11 @@ export function GetNTACLDialog({ isOpen, onClose }: GetNTACLDialogProps) {
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-medium mb-2">Permissions</h4>
-                    {ntacl.permissions.length === 0 ? (
+                    {ntacl.permissions.length === 0
+                      ? (
                       <p className="text-sm text-muted-foreground">No permissions found</p>
-                    ) : (
+                        )
+                      : (
                       <div className="space-y-2">
                         {ntacl.permissions.map((perm, index) => (
                           <div key={index} className="border rounded-lg p-3">
@@ -295,7 +297,7 @@ export function GetNTACLDialog({ isOpen, onClose }: GetNTACLDialogProps) {
                           </div>
                         ))}
                       </div>
-                    )}
+                        )}
                   </div>
 
                   <div>
@@ -322,5 +324,5 @@ export function GetNTACLDialog({ isOpen, onClose }: GetNTACLDialogProps) {
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

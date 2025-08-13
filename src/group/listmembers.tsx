@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -6,14 +6,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Users, Search, Info } from 'lucide-react';
-import { useGroupMembers } from './hooks/useGroups';
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { Users, Search, Info } from 'lucide-react'
+import { useGroupMembers } from './hooks/useGroups'
 
 interface ListMembersDialogProps {
   isOpen?: boolean;
@@ -27,37 +27,37 @@ export const ListMembersDialog: React.FC<ListMembersDialogProps> = ({
   onClose: externalOnClose,
   groupName: externalGroupName
 }) => {
-  const [internalIsOpen, setInternalIsOpen] = useState(false);
-  const [internalGroupName, setInternalGroupName] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [internalIsOpen, setInternalIsOpen] = useState(false)
+  const [internalGroupName, setInternalGroupName] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
 
   // Use external props if provided, otherwise use internal state
-  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const onClose = externalOnClose || (() => setInternalIsOpen(false));
-  const groupName = externalGroupName || internalGroupName;
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen
+  const onClose = externalOnClose || (() => setInternalIsOpen(false))
+  const groupName = externalGroupName || internalGroupName
 
-  const { members, loading, error } = useGroupMembers(groupName);
+  const { members, loading, error } = useGroupMembers(groupName)
 
   const filteredMembers = members?.filter(member =>
     member.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  ) || []
 
   const handleShowDialog = () => {
-    setInternalIsOpen(true);
-  };
+    setInternalIsOpen(true)
+  }
 
   const handleInputChange = (value: string) => {
-    setInternalGroupName(value);
-  };
+    setInternalGroupName(value)
+  }
 
   const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-  };
+    setSearchTerm(value)
+  }
 
   const handleClose = () => {
-    setSearchTerm('');
-    onClose();
-  };
+    setSearchTerm('')
+    onClose()
+  }
 
   if (!isOpen && !externalIsOpen) {
     return (
@@ -68,7 +68,7 @@ export const ListMembersDialog: React.FC<ListMembersDialogProps> = ({
             value={internalGroupName}
             onChange={(e) => handleInputChange(e.target.value)}
           />
-          <Button 
+          <Button
             onClick={handleShowDialog}
             disabled={!internalGroupName.trim()}
           >
@@ -76,7 +76,7 @@ export const ListMembersDialog: React.FC<ListMembersDialogProps> = ({
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -119,29 +119,33 @@ export const ListMembersDialog: React.FC<ListMembersDialogProps> = ({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {loading ? (
+              {loading
+                ? (
                 <div className="flex justify-center py-8">
                   <LoadingSpinner />
                 </div>
-              ) : filteredMembers.length === 0 ? (
+                  )
+                : filteredMembers.length === 0
+                  ? (
                 <div className="text-center py-8">
                   <Users className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-2 text-sm font-medium">
                     {searchTerm ? 'No matching members' : 'No members found'}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {searchTerm 
-                      ? 'No members match your search criteria.' 
+                    {searchTerm
+                      ? 'No members match your search criteria.'
                       : 'This group currently has no members.'
                     }
                   </p>
                 </div>
-              ) : (
+                    )
+                  : (
                 <div className="max-h-64 overflow-y-auto">
                   <div className="space-y-1">
                     {filteredMembers.map((member, index) => (
-                      <div 
-                        key={index} 
+                      <div
+                        key={index}
                         className="flex items-center p-2 rounded hover:bg-muted/50"
                       >
                         <Users className="h-4 w-4 mr-2 text-muted-foreground" />
@@ -150,7 +154,7 @@ export const ListMembersDialog: React.FC<ListMembersDialogProps> = ({
                     ))}
                   </div>
                 </div>
-              )}
+                    )}
             </CardContent>
           </Card>
 
@@ -158,7 +162,7 @@ export const ListMembersDialog: React.FC<ListMembersDialogProps> = ({
             <Alert className="border-blue-200 bg-blue-50">
               <Info className="h-4 w-4 text-blue-600" />
               <AlertDescription className="text-blue-800">
-                <strong>Group Membership:</strong> This group contains {members.length} member(s). 
+                <strong>Group Membership:</strong> This group contains {members.length} member(s).
                 Use the search box above to filter the list.
               </AlertDescription>
             </Alert>
@@ -172,7 +176,7 @@ export const ListMembersDialog: React.FC<ListMembersDialogProps> = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default ListMembersDialog;
+export default ListMembersDialog

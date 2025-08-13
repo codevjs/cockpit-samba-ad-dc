@@ -1,73 +1,73 @@
-import React, { useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { Plus, Users, Search, Filter } from 'lucide-react';
-import './tailwind.css';
+import React, { useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Plus, Users, Search, Filter } from 'lucide-react'
+import './tailwind.css'
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@/components/ui/tabs';
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@/components/ui/tabs'
 
 // Import user management components
-import UserList from './list';
-import CreateUserDialog from './create';
-import DeleteUserDialog from './delete';
-import MoveUserDialog from './move';
-import ShowUserDialog from './show';
-import ChangePasswordDialog from './password';
-import SetExpiryDialog from './setexpiry';
-import UserStatusToggle from './status-toggle';
+import UserList from './list'
+import CreateUserDialog from './create'
+import DeleteUserDialog from './delete'
+import MoveUserDialog from './move'
+import ShowUserDialog from './show'
+import ChangePasswordDialog from './password'
+import SetExpiryDialog from './setexpiry'
+import UserStatusToggle from './status-toggle'
 
 // Import hooks
-import { useUsers } from './hooks/useUsers';
-import type { FilterOptions } from '@/types/samba';
+import { useUsers } from './hooks/useUsers'
+import type { FilterOptions } from '@/types/samba'
 
 interface UserManagementPageProps {
     initialView?: 'list' | 'management';
 }
 
-function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
-    const [activeTab, setActiveTab] = useState(initialView);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filters, setFilters] = useState<FilterOptions>({});
-    
-    const { 
-        users, 
-        loading, 
-        error, 
-        refresh: refreshUsers 
-    } = useUsers({
-        filters: filters,
-        autoFetch: true,
-    });
+function UserManagementPage ({ initialView = 'list' }: UserManagementPageProps) {
+  const [activeTab, setActiveTab] = useState(initialView)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState<FilterOptions>({})
 
-    const handleSearch = (query: string) => {
-        setSearchQuery(query);
-        setFilters(prev => ({ ...prev, search: query }));
-    };
+  const {
+    users,
+    loading,
+    error,
+    refresh: refreshUsers
+  } = useUsers({
+    filters,
+    autoFetch: true
+  })
 
-    const stats = {
-        total: users.length,
-        enabled: users.filter(user => user.enabled).length,
-        disabled: users.filter(user => !user.enabled).length,
-        expiringSoon: users.filter(user => 
-            user.accountExpires && 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setFilters(prev => ({ ...prev, search: query }))
+  }
+
+  const stats = {
+    total: users.length,
+    enabled: users.filter(user => user.enabled).length,
+    disabled: users.filter(user => !user.enabled).length,
+    expiringSoon: users.filter(user =>
+      user.accountExpires &&
             user.accountExpires.getTime() - Date.now() < 30 * 24 * 60 * 60 * 1000 // 30 days
-        ).length,
-    };
+    ).length
+  }
 
-    return (
+  return (
         <div className="min-h-screen bg-background">
             <div className="container mx-auto p-6 space-y-6">
                 {/* Header */}
@@ -79,7 +79,7 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <CreateUserDialog 
+                        <CreateUserDialog
                             onUserCreated={refreshUsers}
                             trigger={
                                 <Button>
@@ -138,7 +138,7 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                             <TabsTrigger value="list">User List</TabsTrigger>
                             <TabsTrigger value="management">Management</TabsTrigger>
                         </TabsList>
-                        
+
                         {activeTab === 'list' && (
                             <div className="flex gap-2">
                                 <div className="relative">
@@ -166,7 +166,7 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <UserList 
+                                <UserList
                                     users={users}
                                     loading={loading}
                                     error={error}
@@ -186,7 +186,7 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
-                                    <CreateUserDialog 
+                                    <CreateUserDialog
                                         onUserCreated={refreshUsers}
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
@@ -195,7 +195,7 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                                             </Button>
                                         }
                                     />
-                                    <DeleteUserDialog 
+                                    <DeleteUserDialog
                                         onUserDeleted={refreshUsers}
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
@@ -203,7 +203,7 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                                             </Button>
                                         }
                                     />
-                                    <MoveUserDialog 
+                                    <MoveUserDialog
                                         onUserMoved={refreshUsers}
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
@@ -222,7 +222,7 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
-                                    <ChangePasswordDialog 
+                                    <ChangePasswordDialog
                                         mode="admin"
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
@@ -230,14 +230,14 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                                             </Button>
                                         }
                                     />
-                                    <SetExpiryDialog 
+                                    <SetExpiryDialog
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
                                                 Set Account Expiry
                                             </Button>
                                         }
                                     />
-                                    <UserStatusToggle 
+                                    <UserStatusToggle
                                         variant="button"
                                     />
                                 </CardContent>
@@ -251,7 +251,7 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
-                                    <ShowUserDialog 
+                                    <ShowUserDialog
                                         trigger={
                                             <Button variant="outline" className="w-full justify-start">
                                                 View User Details
@@ -265,16 +265,16 @@ function UserManagementPage({ initialView = 'list' }: UserManagementPageProps) {
                 </Tabs>
             </div>
         </div>
-    );
+  )
 }
 
 // Entry point for standalone user management page
-document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById("user");
-    if (container) {
-        const root = createRoot(container);
-        root.render(<UserManagementPage />);
-    }
-});
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('user')
+  if (container) {
+    const root = createRoot(container)
+    root.render(<UserManagementPage />)
+  }
+})
 
-export default UserManagementPage;
+export default UserManagementPage

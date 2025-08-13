@@ -1,95 +1,95 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Search, 
-  User, 
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import {
+  Search,
+  User,
   Key,
   Server,
   Trash2,
   Loader2,
   Eye
-} from 'lucide-react';
-import { SPNAPI } from '@/services/spn-api';
-import { toast } from 'sonner';
-import type { SambaSPN } from '@/types/samba';
+} from 'lucide-react'
+import { SPNAPI } from '@/services/spn-api'
+import { toast } from 'sonner'
+import type { SambaSPN } from '@/types/samba'
 
 interface SPNListProps {
   onDeleteSPN: (spnName: string, userName: string) => void;
 }
 
-export function SPNList({ onDeleteSPN }: SPNListProps) {
-  const [username, setUsername] = useState('');
-  const [spns, setSPNs] = useState<SambaSPN[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [resultsDialogOpen, setResultsDialogOpen] = useState(false);
+export function SPNList ({ onDeleteSPN }: SPNListProps) {
+  const [username, setUsername] = useState('')
+  const [spns, setSPNs] = useState<SambaSPN[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [resultsDialogOpen, setResultsDialogOpen] = useState(false)
 
   const handleSearch = async () => {
     if (!username.trim()) {
-      setError('Username is required');
-      return;
+      setError('Username is required')
+      return
     }
 
     try {
-      setLoading(true);
-      setError(null);
-      
-      const result = await SPNAPI.list(username);
-      setSPNs(result);
-      setDialogOpen(false);
-      setResultsDialogOpen(true);
-      
+      setLoading(true)
+      setError(null)
+
+      const result = await SPNAPI.list(username)
+      setSPNs(result)
+      setDialogOpen(false)
+      setResultsDialogOpen(true)
+
       if (result.length === 0) {
-        toast.info(`No SPNs found for user: ${username}`);
+        toast.info(`No SPNs found for user: ${username}`)
       } else {
-        toast.success(`Found ${result.length} SPNs for user: ${username}`);
+        toast.success(`Found ${result.length} SPNs for user: ${username}`)
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to list SPNs';
-      setError(errorMessage);
-      toast.error('Failed to retrieve SPNs');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to list SPNs'
+      setError(errorMessage)
+      toast.error('Failed to retrieve SPNs')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
+    setUsername(e.target.value)
     if (error) {
-      setError(null);
+      setError(null)
     }
-  };
+  }
 
-  const clearError = () => setError(null);
+  const clearError = () => setError(null)
 
   const parseSPNInfo = (spnName: string) => {
-    const parts = spnName.split('/');
-    const service = parts[0] || 'Unknown';
-    const hostPart = parts[1] || '';
-    
-    let hostname = hostPart;
-    let port = '';
-    
+    const parts = spnName.split('/')
+    const service = parts[0] || 'Unknown'
+    const hostPart = parts[1] || ''
+
+    let hostname = hostPart
+    let port = ''
+
     if (hostPart.includes(':')) {
-      [hostname, port] = hostPart.split(':');
+      [hostname, port] = hostPart.split(':')
     }
-    
-    return { service, hostname, port };
-  };
+
+    return { service, hostname, port }
+  }
 
   return (
     <div className="space-y-6">
@@ -173,7 +173,8 @@ export function SPNList({ onDeleteSPN }: SPNListProps) {
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            {spns.length === 0 ? (
+            {spns.length === 0
+              ? (
               <div className="text-center py-8">
                 <Key className="mx-auto h-12 w-12 text-muted-foreground" />
                 <h3 className="mt-2 text-sm font-semibold">No SPNs Found</h3>
@@ -181,11 +182,12 @@ export function SPNList({ onDeleteSPN }: SPNListProps) {
                   No Service Principal Names are associated with user: {username}
                 </p>
               </div>
-            ) : (
+                )
+              : (
               <div className="space-y-3">
                 {spns.map((spn, index) => {
-                  const { service, hostname, port } = parseSPNInfo(spn.name);
-                  
+                  const { service, hostname, port } = parseSPNInfo(spn.name)
+
                   return (
                     <Card key={index}>
                       <CardContent className="pt-4">
@@ -211,9 +213,9 @@ export function SPNList({ onDeleteSPN }: SPNListProps) {
                               )}
                             </div>
                           </div>
-                          
-                          <Button 
-                            variant="outline" 
+
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => onDeleteSPN(spn.name, spn.user)}
                             className="text-destructive hover:text-destructive"
@@ -223,10 +225,10 @@ export function SPNList({ onDeleteSPN }: SPNListProps) {
                         </div>
                       </CardContent>
                     </Card>
-                  );
+                  )
                 })}
               </div>
-            )}
+                )}
           </div>
 
           <DialogFooter>
@@ -237,5 +239,5 @@ export function SPNList({ onDeleteSPN }: SPNListProps) {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }

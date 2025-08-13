@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Clock, 
-  Server as ServerIcon, 
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Clock,
+  Server as ServerIcon,
   RefreshCw,
   ArrowLeft,
   Calendar
-} from 'lucide-react';
-import { BackButton } from '../common';
-import { ErrorAlert } from '@/components/ui/error-alert';
-import { toast } from 'sonner';
+} from 'lucide-react'
+import { BackButton } from '../common'
+import { ErrorAlert } from '@/components/ui/error-alert'
+import { toast } from 'sonner'
 
-import cockpit from 'cockpit';
+import cockpit from 'cockpit'
 
 interface TimeInfo {
   currentTime: string;
@@ -24,46 +24,46 @@ interface TimeInfo {
   ntpServers: string[];
 }
 
-export default function TimeManagement() {
-  const [serverTime, setServerTime] = useState<string>('');
-  const [server, setServer] = useState<string>('127.0.0.1');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+export default function TimeManagement () {
+  const [serverTime, setServerTime] = useState<string>('')
+  const [server, setServer] = useState<string>('127.0.0.1')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   const getServerTime = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+    e.preventDefault()
+
     if (!server.trim()) {
-      setError('Server address is required');
-      return;
+      setError('Server address is required')
+      return
     }
 
     try {
-      setLoading(true);
-      setError(null);
-      
-      const command = `samba-tool time ${server}`;
-      const result = await cockpit.script(command, { superuser: true, err: 'message' });
-      
-      setServerTime(result);
-      toast.success('Server time retrieved successfully');
+      setLoading(true)
+      setError(null)
+
+      const command = `samba-tool time ${server}`
+      const result = await cockpit.script(command, { superuser: true, err: 'message' })
+
+      setServerTime(result)
+      toast.success('Server time retrieved successfully')
     } catch (exception: any) {
-      const errorMessage = exception?.message || 'Failed to get server time';
-      setError(errorMessage);
-      toast.error('Failed to retrieve server time');
+      const errorMessage = exception?.message || 'Failed to get server time'
+      setError(errorMessage)
+      toast.error('Failed to retrieve server time')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleServerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setServer(e.target.value);
+    setServer(e.target.value)
     if (error) {
-      setError(null);
+      setError(null)
     }
-  };
+  }
 
-  const clearError = () => setError(null);
+  const clearError = () => setError(null)
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -91,7 +91,7 @@ export default function TimeManagement() {
           </CardHeader>
           <CardContent className="space-y-4">
             {error && (
-              <ErrorAlert 
+              <ErrorAlert
                 error={error}
                 onDismiss={clearError}
                 className="mb-4"
@@ -114,22 +114,24 @@ export default function TimeManagement() {
                 </p>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={loading || !server.trim()}
                 className="w-full sm:w-auto"
               >
-                {loading ? (
+                {loading
+                  ? (
                   <>
                     <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                     Querying...
                   </>
-                ) : (
+                    )
+                  : (
                   <>
                     <Clock className="mr-2 h-4 w-4" />
                     Get Server Time
                   </>
-                )}
+                    )}
               </Button>
             </form>
           </CardContent>
@@ -229,5 +231,5 @@ export default function TimeManagement() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -6,14 +6,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { useGroupMutations } from './hooks/useGroupMutations';
-import { toast } from 'sonner';
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle } from 'lucide-react'
+import { useGroupMutations } from './hooks/useGroupMutations'
+import { toast } from 'sonner'
 
 interface DeleteGroupDialogProps {
   isOpen?: boolean;
@@ -29,58 +29,58 @@ export const DeleteGroupDialog: React.FC<DeleteGroupDialogProps> = ({
   onGroupDeleted,
   groupName: externalGroupName
 }) => {
-  const [internalIsOpen, setInternalIsOpen] = useState(false);
-  const [internalGroupName, setInternalGroupName] = useState('');
-  const [confirmationText, setConfirmationText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false)
+  const [internalGroupName, setInternalGroupName] = useState('')
+  const [confirmationText, setConfirmationText] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // Use external state if provided, otherwise use internal state
-  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const onClose = externalOnClose || (() => setInternalIsOpen(false));
-  const groupName = externalGroupName || internalGroupName;
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen
+  const onClose = externalOnClose || (() => setInternalIsOpen(false))
+  const groupName = externalGroupName || internalGroupName
 
   const { deleteGroup } = useGroupMutations(
     () => {
-      toast.success('Group deleted successfully');
-      onGroupDeleted?.();
+      toast.success('Group deleted successfully')
+      onGroupDeleted?.()
     },
     (error) => {
-      toast.error(`Failed to delete group: ${error}`);
+      toast.error(`Failed to delete group: ${error}`)
     }
-  );
+  )
 
   const handleShowDialog = () => {
-    setInternalIsOpen(true);
-  };
+    setInternalIsOpen(true)
+  }
 
   const handleInputChange = (value: string) => {
-    setInternalGroupName(value);
-  };
+    setInternalGroupName(value)
+  }
 
   const handleConfirmationChange = (value: string) => {
-    setConfirmationText(value);
-  };
+    setConfirmationText(value)
+  }
 
   const handleDeleteGroup = async () => {
-    if (!groupName || confirmationText !== groupName) return;
+    if (!groupName || confirmationText !== groupName) return
 
-    setIsDeleting(true);
+    setIsDeleting(true)
     try {
-      await deleteGroup(groupName);
-      handleClose();
+      await deleteGroup(groupName)
+      handleClose()
     } catch (error) {
       // Error handled by mutation
     } finally {
-      setIsDeleting(false);
+      setIsDeleting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    setConfirmationText('');
-    onClose();
-  };
+    setConfirmationText('')
+    onClose()
+  }
 
-  const isConfirmationValid = confirmationText === groupName;
+  const isConfirmationValid = confirmationText === groupName
 
   if (!isOpen && !externalIsOpen) {
     return (
@@ -91,7 +91,7 @@ export const DeleteGroupDialog: React.FC<DeleteGroupDialogProps> = ({
             value={internalGroupName}
             onChange={(e) => handleInputChange(e.target.value)}
           />
-          <Button 
+          <Button
             onClick={handleShowDialog}
             disabled={!internalGroupName.trim()}
             variant="destructive"
@@ -100,7 +100,7 @@ export const DeleteGroupDialog: React.FC<DeleteGroupDialogProps> = ({
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -163,7 +163,7 @@ export const DeleteGroupDialog: React.FC<DeleteGroupDialogProps> = ({
           <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>
-          <Button 
+          <Button
             variant="destructive"
             onClick={handleDeleteGroup}
             disabled={!isConfirmationValid || isDeleting}
@@ -173,7 +173,7 @@ export const DeleteGroupDialog: React.FC<DeleteGroupDialogProps> = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default DeleteGroupDialog;
+export default DeleteGroupDialog

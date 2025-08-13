@@ -1,19 +1,19 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { 
-  Globe, 
-  Server, 
+import React from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import {
+  Globe,
+  Server,
   Shield,
   Database,
   Clock,
   Info
-} from 'lucide-react';
-import { useDomainInfo } from './hooks/useDomain';
+} from 'lucide-react'
+import { useDomainInfo } from './hooks/useDomain'
 
-export function DomainInfoCard() {
-  const { domainInfo, loading, error } = useDomainInfo();
+export function DomainInfoCard () {
+  const { domainInfo, loading, error } = useDomainInfo()
 
   if (loading) {
     return (
@@ -35,7 +35,7 @@ export function DomainInfoCard() {
           </div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   if (error) {
@@ -52,7 +52,7 @@ export function DomainInfoCard() {
           <div className="text-red-600 text-sm">{error}</div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   if (!domainInfo) {
@@ -74,7 +74,7 @@ export function DomainInfoCard() {
           </div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
@@ -136,7 +136,7 @@ export function DomainInfoCard() {
             <p className="text-sm font-medium text-muted-foreground">Domain SID</p>
             <p className="font-mono text-xs bg-muted p-2 rounded">{domainInfo.domainSid}</p>
           </div>
-          
+
           <div>
             <p className="text-sm font-medium text-muted-foreground">Schema Version</p>
             <p className="text-sm">{domainInfo.schemaVersion}</p>
@@ -148,9 +148,11 @@ export function DomainInfoCard() {
         {/* Domain Controllers */}
         <div>
           <p className="text-sm font-medium text-muted-foreground mb-2">Domain Controllers</p>
-          {domainInfo.domainControllers.length === 0 ? (
+          {domainInfo.domainControllers.length === 0
+            ? (
             <p className="text-sm text-muted-foreground">No domain controllers listed</p>
-          ) : (
+              )
+            : (
             <div className="space-y-2">
               {domainInfo.domainControllers.map((dc, index) => (
                 <div key={index} className="flex items-center gap-2 p-2 bg-muted/50 rounded">
@@ -159,7 +161,7 @@ export function DomainInfoCard() {
                 </div>
               ))}
             </div>
-          )}
+              )}
         </div>
 
         <Separator />
@@ -192,7 +194,7 @@ export function DomainInfoCard() {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
-export default DomainInfoCard;
+export default DomainInfoCard

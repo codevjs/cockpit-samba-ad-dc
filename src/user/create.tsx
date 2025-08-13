@@ -1,101 +1,101 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Plus } from 'lucide-react';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2, Plus } from 'lucide-react'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form'
 
-import { createUserSchema, type CreateUserInput } from '@/lib/validation';
-import { useUserMutations } from './hooks/useUserMutations';
-import { ErrorToast, SuccessToast } from '@/common';
+import { createUserSchema, type CreateUserInput } from '@/lib/validation'
+import { useUserMutations } from './hooks/useUserMutations'
+import { ErrorToast, SuccessToast } from '@/common'
 
 interface CreateUserDialogProps {
     onUserCreated?: (user: any) => void;
     trigger?: React.ReactNode;
 }
 
-export default function CreateUserDialog({ onUserCreated, trigger }: CreateUserDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [showToasts, setShowToasts] = useState({ success: false, error: false });
+export default function CreateUserDialog ({ onUserCreated, trigger }: CreateUserDialogProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [showToasts, setShowToasts] = useState({ success: false, error: false })
 
-    const form = useForm<CreateUserInput>({
-        resolver: zodResolver(createUserSchema),
-        defaultValues: {
-            username: '',
-            password: '',
-            firstName: '',
-            lastName: '',
-            displayName: '',
-            email: '',
-            description: '',
-            organizationalUnit: '',
-            groups: [],
-            mustChangePassword: false,
-            passwordNeverExpires: false,
-            accountExpires: undefined,
-        },
-    });
+  const form = useForm<CreateUserInput>({
+    resolver: zodResolver(createUserSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+      displayName: '',
+      email: '',
+      description: '',
+      organizationalUnit: '',
+      groups: [],
+      mustChangePassword: false,
+      passwordNeverExpires: false,
+      accountExpires: undefined
+    }
+  })
 
-    const { create, creating, error, clearError } = useUserMutations({
-        onSuccess: (action, user) => {
-            if (action === 'create') {
-                setShowToasts({ success: true, error: false });
-                setIsOpen(false);
-                form.reset();
-                onUserCreated?.(user);
-            }
-        },
-        onError: (action) => {
-            setShowToasts({ success: false, error: true });
-        },
-    });
+  const { create, creating, error, clearError } = useUserMutations({
+    onSuccess: (action, user) => {
+      if (action === 'create') {
+        setShowToasts({ success: true, error: false })
+        setIsOpen(false)
+        form.reset()
+        onUserCreated?.(user)
+      }
+    },
+    onError: (action) => {
+      setShowToasts({ success: false, error: true })
+    }
+  })
 
-    const onSubmit = async (data: CreateUserInput) => {
-        clearError();
-        await create(data);
-    };
+  const onSubmit = async (data: CreateUserInput) => {
+    clearError()
+    await create(data)
+  }
 
-    const handleOpenChange = (open: boolean) => {
-        setIsOpen(open);
-        if (!open) {
-            form.reset();
-            clearError();
-        }
-    };
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open) {
+      form.reset()
+      clearError()
+    }
+  }
 
-    return (
+  return (
         <>
             {showToasts.error && error && (
-                <ErrorToast 
-                    errorMessage={error} 
-                    closeModal={() => setShowToasts({ ...showToasts, error: false })} 
+                <ErrorToast
+                    errorMessage={error}
+                    closeModal={() => setShowToasts({ ...showToasts, error: false })}
                 />
             )}
             {showToasts.success && (
-                <SuccessToast 
-                    successMessage="User created successfully!" 
-                    closeModal={() => setShowToasts({ ...showToasts, success: false })} 
+                <SuccessToast
+                    successMessage="User created successfully!"
+                    closeModal={() => setShowToasts({ ...showToasts, success: false })}
                 />
             )}
 
@@ -222,10 +222,10 @@ export default function CreateUserDialog({ onUserCreated, trigger }: CreateUserD
                                     <FormItem>
                                         <FormLabel>Description</FormLabel>
                                         <FormControl>
-                                            <Textarea 
-                                                placeholder="Enter user description" 
-                                                className="resize-none" 
-                                                {...field} 
+                                            <Textarea
+                                                placeholder="Enter user description"
+                                                className="resize-none"
+                                                {...field}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -295,9 +295,9 @@ export default function CreateUserDialog({ onUserCreated, trigger }: CreateUserD
                             </div>
 
                             <DialogFooter>
-                                <Button 
-                                    type="button" 
-                                    variant="outline" 
+                                <Button
+                                    type="button"
+                                    variant="outline"
                                     onClick={() => handleOpenChange(false)}
                                 >
                                     Cancel
@@ -312,5 +312,5 @@ export default function CreateUserDialog({ onUserCreated, trigger }: CreateUserD
                 </DialogContent>
             </Dialog>
         </>
-    );
+  )
 }

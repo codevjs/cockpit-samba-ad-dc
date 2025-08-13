@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,21 +17,21 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+  FormMessage
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { useSitesMutations } from './hooks/useSites';
-import { toast } from 'sonner';
-import type { CreateSubnetInput, SambaSite } from '@/types/samba';
+  SelectValue
+} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { useSitesMutations } from './hooks/useSites'
+import { toast } from 'sonner'
+import type { CreateSubnetInput, SambaSite } from '@/types/samba'
 
 const createSubnetSchema = z.object({
   subnet: z.string().min(1, 'Subnet is required').regex(
@@ -39,8 +39,8 @@ const createSubnetSchema = z.object({
     'Subnet must be in CIDR format (e.g., 192.168.1.0/24)'
   ),
   site: z.string().min(1, 'Site is required'),
-  description: z.string().optional(),
-});
+  description: z.string().optional()
+})
 
 type CreateSubnetFormData = z.infer<typeof createSubnetSchema>;
 
@@ -51,48 +51,48 @@ interface CreateSubnetDialogProps {
   sites: SambaSite[];
 }
 
-export function CreateSubnetDialog({ isOpen, onClose, onSubnetCreated, sites }: CreateSubnetDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function CreateSubnetDialog ({ isOpen, onClose, onSubnetCreated, sites }: CreateSubnetDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<CreateSubnetFormData>({
     resolver: zodResolver(createSubnetSchema),
     defaultValues: {
       subnet: '',
       site: '',
-      description: '',
-    },
-  });
+      description: ''
+    }
+  })
 
   const { createSubnet } = useSitesMutations(
     () => {
-      onSubnetCreated();
-      handleClose();
+      onSubnetCreated()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: CreateSubnetFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const subnetData: CreateSubnetInput = {
         subnet: data.subnet,
         site: data.site,
-        description: data.description || undefined,
-      };
-      
-      await createSubnet(subnetData);
-      toast.success(`Subnet "${data.subnet}" created successfully`);
+        description: data.description || undefined
+      }
+
+      await createSubnet(subnetData)
+      toast.success(`Subnet "${data.subnet}" created successfully`)
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -103,7 +103,7 @@ export function CreateSubnetDialog({ isOpen, onClose, onSubnetCreated, sites }: 
             Create a new subnet and associate it with a site for proper replication routing.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -189,5 +189,5 @@ export function CreateSubnetDialog({ isOpen, onClose, onSubnetCreated, sites }: 
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

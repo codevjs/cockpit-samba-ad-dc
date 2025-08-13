@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -17,25 +17,25 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+  FormMessage
+} from '@/components/ui/form'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
-import { useOUMutations } from './hooks/useOU';
-import { toast } from 'sonner';
-import type { MoveOUInput, SambaOU } from '@/types/samba';
+  SelectValue
+} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Info } from 'lucide-react'
+import { useOUMutations } from './hooks/useOU'
+import { toast } from 'sonner'
+import type { MoveOUInput, SambaOU } from '@/types/samba'
 
 const moveOUSchema = z.object({
-  targetParentDN: z.string().min(1, 'Target parent is required'),
-});
+  targetParentDN: z.string().min(1, 'Target parent is required')
+})
 
 type MoveOUFormData = z.infer<typeof moveOUSchema>;
 
@@ -47,55 +47,55 @@ interface MoveOUDialogProps {
   parentOUs: SambaOU[];
 }
 
-export function MoveOUDialog({ isOpen, onClose, onOUMoved, ouDN, parentOUs }: MoveOUDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export function MoveOUDialog ({ isOpen, onClose, onOUMoved, ouDN, parentOUs }: MoveOUDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm<MoveOUFormData>({
     resolver: zodResolver(moveOUSchema),
     defaultValues: {
-      targetParentDN: '',
-    },
-  });
+      targetParentDN: ''
+    }
+  })
 
   const { moveOU } = useOUMutations(
     () => {
-      onOUMoved();
-      handleClose();
+      onOUMoved()
+      handleClose()
     },
     (error) => toast.error(error)
-  );
+  )
 
   const handleClose = () => {
-    form.reset();
-    onClose();
-  };
+    form.reset()
+    onClose()
+  }
 
   const onSubmit = async (data: MoveOUFormData) => {
-    if (!ouDN) return;
-    
-    setIsSubmitting(true);
+    if (!ouDN) return
+
+    setIsSubmitting(true)
     try {
       const moveData: MoveOUInput = {
         ouDN,
-        targetParentDN: data.targetParentDN,
-      };
-      
-      await moveOU(moveData);
-      toast.success('Organization Unit moved successfully');
+        targetParentDN: data.targetParentDN
+      }
+
+      await moveOU(moveData)
+      toast.success('Organization Unit moved successfully')
     } catch (error) {
       // Error already handled by mutation hook
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   // Filter out the current OU and its children to prevent circular moves
-  const availableParents = parentOUs.filter(ou => 
-    ou.distinguishedName !== ouDN && 
+  const availableParents = parentOUs.filter(ou =>
+    ou.distinguishedName !== ouDN &&
     !ou.distinguishedName.includes(ouDN || '')
-  );
+  )
 
-  if (!ouDN) return null;
+  if (!ouDN) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -106,7 +106,7 @@ export function MoveOUDialog({ isOpen, onClose, onOUMoved, ouDN, parentOUs }: Mo
             Move this organizational unit to a different parent container.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <Alert>
@@ -180,5 +180,5 @@ export function MoveOUDialog({ isOpen, onClose, onOUMoved, ouDN, parentOUs }: Mo
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
