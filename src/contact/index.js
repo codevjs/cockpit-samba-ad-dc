@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Create from './create';
 import List from './list';
 import Show from './show';
@@ -38,5 +38,7 @@ export default function Contact() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<Contact />, document.getElementById("contact"));
+    const container = document.getElementById("contact");
+    const root = createRoot(container);
+    root.render(<Contact />);
 });

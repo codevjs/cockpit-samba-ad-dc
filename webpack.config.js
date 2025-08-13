@@ -1,10 +1,10 @@
 const path = require("path");
-const copy = require("copy-webpack-plugin");
-const extract = require("mini-css-extract-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const fs = require("fs");
 const webpack = require("webpack");
 const CompressionPlugin = require("compression-webpack-plugin");
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 var externals = {
     cockpit: "cockpit",
@@ -23,7 +23,7 @@ var production = process.env.NODE_ENV === 'production';
 var info = {
     entries: {
         index: [
-            "./index.js"
+            "./index.tsx"
         ],
 
         "computer/index": [
@@ -91,7 +91,6 @@ var info = {
         ]
     },
     files: [
-        "css",
         "index.html",
         "computer/computer.html",
         "domain/domain.html",
@@ -160,9 +159,14 @@ info.files.forEach(function(value) {
 info.files = files;
 
 var plugins = [
-    new copy(info.files),
-    new extract({ filename: "[name].css" }),
-    new MiniCssExtractPlugin()
+    new CopyWebpackPlugin({
+        patterns: info.files
+    }),
+    new MiniCssExtractPlugin({ filename: "[name].css" }),
+    new ESLintPlugin({
+        extensions: ['js', 'jsx', 'ts', 'tsx'],
+        exclude: 'node_modules'
+    })
 ];
 
 /* Only minimize when in production mode */
@@ -171,10 +175,10 @@ if (production) {
     output.filename = "[name].min.js";
 
     plugins.unshift(new CompressionPlugin({
-        asset: "[path].gz[query]",
+        filename: "[path][base].gz",
+        algorithm: "gzip",
         test: /\.(js|html)$/,
-        minRatio: 0.9,
-        deleteOriginalAssets: true
+        minRatio: 0.9
     }));
 }
 
@@ -191,7 +195,8 @@ var babel_loader = {
                     opera: "44"
                 }
             }],
-            "@babel/preset-react"
+            "@babel/preset-react",
+            "@babel/preset-typescript"
         ]
     }
 };
@@ -200,6 +205,12 @@ module.exports = {
     mode: production ? 'production' : 'development',
     resolve: {
         modules: [ nodedir ],
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        alias: {
+            '@': path.resolve(__dirname, 'src'),
+            '@/components': path.resolve(__dirname, 'src/components'),
+            '@/lib': path.resolve(__dirname, 'src/lib'),
+        },
     },
     entry: info.entries,
     externals: externals,
@@ -208,60 +219,28 @@ module.exports = {
     module: {
         rules: [
             {
-                enforce: 'pre',
-                exclude: /node_modules/,
-                loader: 'eslint-loader',
-                test: /\.(js|jsx)$/
-            },
-            {
+                test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
                 use: babel_loader,
-                test: /\.(js|jsx)$/
             },
-            /* HACK: remove unwanted fonts from PatternFly's css */
             {
-                test: /patternfly-4-cockpit.scss$/,
+                test: /\.(ts|tsx)$/,
+                exclude: /node_modules/,
                 use: [
-                    extract.loader,
+                    babel_loader,
                     {
-                        loader: 'css-loader',
+                        loader: 'ts-loader',
                         options: {
-                            sourceMap: true,
-                            url: false
-                        }
-                    },
-                    {
-                        loader: 'string-replace-loader',
-                        options: {
-                            multiple: [
-                                {
-                                    search: /src:url\("patternfly-icons-fake-path\/pficon[^}]*/g,
-                                    replace: "src:url('fonts/patternfly.woff')format('woff');",
-                                },
-                                {
-                                    search: /@font-face[^}]*patternfly-fonts-fake-path[^}]*}/g,
-                                    replace: '',
-                                },
-                            ]
+                            configFile: path.resolve(__dirname, 'tsconfig.json'),
+                            transpileOnly: false,
                         },
                     },
-                    {
-                        loader: 'resolve-url-loader'
-                    },
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            sourceMap: true,
-                            outputStyle: 'compressed',
-                        },
-                    },
-                ]
+                ],
             },
             {
                 test: /\.s?css$/,
-                exclude: /patternfly-4-cockpit.scss/,
                 use: [
-                    extract.loader,
+                    MiniCssExtractPlugin.loader,
                     {
                         loader: 'css-loader',
                         options: {
@@ -270,15 +249,33 @@ module.exports = {
                         }
                     },
                     {
+                        loader: 'postcss-loader',
+                        options: {
+                            postcssOptions: {
+                                plugins: [
+                                    require('tailwindcss'),
+                                    require('autoprefixer'),
+                                ],
+                            },
+                        },
+                    },
+                    {
                         loader: 'sass-loader',
                         options: {
                             sourceMap: true,
-                            outputStyle: 'compressed',
                         },
                     },
                 ]
             },
         ]
     },
-    plugins: plugins
+    plugins: plugins,
+    devServer: {
+        static: {
+            directory: path.join(__dirname, 'dist'),
+        },
+        compress: true,
+        port: 9000,
+        hot: true,
+    },
 };

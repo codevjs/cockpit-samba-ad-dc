@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Toolbar, ToolbarItem, ToolbarGroup, ToolbarContent } from '@patternfly/react-core';
 import DomainInfo from './info';
 import BackupOffline from './backup/offline';
@@ -89,5 +89,7 @@ export default function Domain() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<Domain />, document.getElementById("domain"));
+    const container = document.getElementById("domain");
+    const root = createRoot(container);
+    root.render(<Domain />);
 });

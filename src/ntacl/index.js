@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Get from './get';
 import Set from './set';
 import ChangeDomsId from './changedomsid';
@@ -44,5 +44,7 @@ export default function NTAcl() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<NTAcl />, document.getElementById("ntacl"));
+    const container = document.getElementById("ntacl");
+    const root = createRoot(container);
+    root.render(<NTAcl />);
 });

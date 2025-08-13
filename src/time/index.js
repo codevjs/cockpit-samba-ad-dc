@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import cockpit from 'cockpit';
 import {
     Form,
@@ -86,5 +86,7 @@ export default function ServerTime() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<ServerTime />, document.getElementById("time"));
+    const container = document.getElementById("time");
+    const root = createRoot(container);
+    root.render(<ServerTime />);
 });

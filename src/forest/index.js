@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import DSHeuristics from './dsheuristics';
 import Show from './show';
 import { Toolbar, ToolbarItem, ToolbarGroup, ToolbarContent } from '@patternfly/react-core';
@@ -26,5 +26,7 @@ export default function Forest() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<Forest />, document.getElementById("forest"));
+    const container = document.getElementById("forest");
+    const root = createRoot(container);
+    root.render(<Forest />);
 });

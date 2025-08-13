@@ -4,24 +4,25 @@
         "browser": true,
         "es6": true
     },
-    "extends": ["eslint:recommended", "standard", "standard-react"],
-    "parser": "babel-eslint",
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "standard",
+        "standard-react"
+    ],
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": "7",
         "ecmaFeatures": {
             "jsx": true
         },
-        "sourceType": "module"
+        "sourceType": "module",
+        "project": "./tsconfig.json"
     },
-    "plugins": ["flowtype", "react", "react-hooks"],
+    "plugins": ["react", "react-hooks", "@typescript-eslint"],
     "rules": {
-        "indent": ["error", 4,
-            {
-                "ObjectExpression": "first",
-                "CallExpression": {"arguments": "first"},
-                "MemberExpression": 2,
-                "ignoredNodes": [ "JSXAttribute" ]
-            }],
+        "indent": "off",
         "newline-per-chained-call": ["error", { "ignoreChainWithDepth": 2 }],
         "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
         "prefer-promise-reject-errors": ["error", { "allowEmptyReject": true }],
@@ -41,6 +42,8 @@
         "react/jsx-curly-spacing": "off",
         "react/jsx-indent-props": "off",
         "react/prop-types": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "off",
         "space-before-function-paren": "off",
         "standard/no-callback-literal": "off",
 

@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import AddService from './add-service';
 import AnyProtocol from './any-protocol';
 import AnyService from './any-service';
@@ -45,5 +45,7 @@ export default function Delegation() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<Delegation />, document.getElementById("delegation"));
+    const container = document.getElementById("delegation");
+    const root = createRoot(container);
+    root.render(<Delegation />);
 });

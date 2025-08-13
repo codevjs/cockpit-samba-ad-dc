@@ -1,6 +1,6 @@
 import "../lib/patternfly-4-cockpit.scss";
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Create from './create';
 import Remove from './remove';
 import CreateSubnet from './create_subnet';
@@ -41,5 +41,7 @@ export default function Sites() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<Sites />, document.getElementById("sites"));
+    const container = document.getElementById("sites");
+    const root = createRoot(container);
+    root.render(<Sites />);
 });
