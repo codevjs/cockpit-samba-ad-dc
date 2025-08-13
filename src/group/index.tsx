@@ -46,10 +46,7 @@ function GroupManagementPage({ initialView = 'list' }: GroupManagementPageProps)
         loading, 
         error, 
         refresh: refreshGroups 
-    } = useGroups({
-        filters: filters,
-        autoFetch: true,
-    });
+    } = useGroups();
 
     const handleSearch = (query: string) => {
         setSearchQuery(query);

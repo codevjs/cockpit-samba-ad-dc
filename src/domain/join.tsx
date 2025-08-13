@@ -1,343 +1,198 @@
 import React, { useState } from 'react';
-import {
-  Modal,
-  ModalVariant,
-  Button,
-  Form,
-  FormGroup,
-  TextInput,
-  FormSelect,
-  FormSelectOption,
-  Alert,
-  Text,
-  TextContent,
-  Spinner,
-  PasswordInput
-} from '@patternfly/react-core';
-import { ExclamationTriangleIcon, ConnectedIcon } from '@patternfly/react-icons';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Info } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useDomainMutations } from './hooks/useDomainMutations';
-import { DomainJoinInput } from '../types/samba';
-import { SuccessToast } from '../common';
+import { toast } from 'sonner';
+import type { DomainJoinInput } from '@/types/samba';
 
-interface JoinDomainDialogProps {
-  isOpen?: boolean;
-  onClose?: () => void;
-  onDomainJoined?: () => void;
+const domainJoinSchema = z.object({
+  domain: z.string().min(1, 'Domain is required'),
+  username: z.string().min(1, 'Username is required'),
+  password: z.string().min(1, 'Password is required'),
+  organizationalUnit: z.string().optional(),
+  computerName: z.string().optional(),
+});
+
+type DomainJoinFormData = z.infer<typeof domainJoinSchema>;
+
+interface DomainJoinDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onJoinCompleted: () => void;
 }
 
-const DOMAIN_ROLES = [
-  { value: 'DC', label: 'Domain Controller (DC)', description: 'Join as an additional domain controller' },
-  { value: 'RODC', label: 'Read-Only Domain Controller (RODC)', description: 'Join as a read-only domain controller' },
-  { value: 'MEMBER', label: 'Member Server', description: 'Join as a domain member server' }
-];
+export function DomainJoinDialog({
+  isOpen,
+  onClose,
+  onJoinCompleted,
+}: DomainJoinDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-export const JoinDomainDialog: React.FC<JoinDomainDialogProps> = ({
-  isOpen: externalIsOpen,
-  onClose: externalOnClose,
-  onDomainJoined
-}) => {
-  const [internalIsOpen, setInternalIsOpen] = useState(false);
-  const [formData, setFormData] = useState<DomainJoinInput>({
-    domain: '',
-    role: 'MEMBER',
-    username: '',
-    password: '',
-    server: '',
-    site: ''
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<DomainJoinFormData>({
+    resolver: zodResolver(domainJoinSchema),
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
-
-  // Use external state if provided, otherwise use internal state
-  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const onClose = externalOnClose || (() => setInternalIsOpen(false));
 
   const { joinDomain } = useDomainMutations(
-    (message) => {
-      // Success callback
-      setSuccessMessage(message || 'Successfully joined domain');
-      setFormData({
-        domain: '',
-        role: 'MEMBER',
-        username: '',
-        password: '',
-        server: '',
-        site: ''
-      });
-      setError(null);
-      onDomainJoined?.();
-      onClose();
+    () => {
+      toast.success('Successfully joined domain');
+      onJoinCompleted();
     },
-    (errorMessage) => {
-      // Error callback
-      setError(errorMessage);
+    (error) => {
+      toast.error(`Failed to join domain: ${error}`);
     }
   );
 
-  const handleSubmit = async () => {
-    // Validation
-    if (!formData.domain.trim()) {
-      setError('Domain name is required');
-      return;
-    }
-
-    if (!formData.username.trim()) {
-      setError('Username is required');
-      return;
-    }
-
-    if (!formData.password) {
-      setError('Password is required');
-      return;
-    }
-
-    // Basic domain name validation
-    if (!/^[a-zA-Z0-9.-]+$/.test(formData.domain)) {
-      setError('Invalid domain name format');
-      return;
-    }
-
+  const onSubmit = async (data: DomainJoinFormData) => {
+    setIsSubmitting(true);
     try {
-      setLoading(true);
-      setError(null);
-      await joinDomain(formData);
-    } catch (err) {
-      // Error is already handled by the mutation hook
+      const input: DomainJoinInput = {
+        domain: data.domain,
+        username: data.username,
+        password: data.password,
+        organizationalUnit: data.organizationalUnit,
+        computerName: data.computerName,
+      };
+      await joinDomain(input);
+      handleClose();
+    } catch (error) {
+      // Error handled by mutation
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
-  };
-
-  const handleModalToggle = () => {
-    if (externalIsOpen === undefined) {
-      setInternalIsOpen(!internalIsOpen);
-    } else {
-      onClose();
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      domain: '',
-      role: 'MEMBER',
-      username: '',
-      password: '',
-      server: '',
-      site: ''
-    });
-    setError(null);
-    setShowAdvanced(false);
   };
 
   const handleClose = () => {
-    resetForm();
+    reset();
     onClose();
   };
 
-  const handleInputChange = (field: keyof DomainJoinInput) => (
-    value: string
-  ) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    if (error) {
-      setError(null);
-    }
-  };
-
-  const getSelectedRoleDescription = () => {
-    const selectedRole = DOMAIN_ROLES.find(role => role.value === formData.role);
-    return selectedRole?.description || '';
-  };
-
   return (
-    <>
-      {successMessage && (
-        <SuccessToast 
-          successMessage={successMessage} 
-          closeModal={() => setSuccessMessage(null)} 
-        />
-      )}
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Join Domain</DialogTitle>
+          <DialogDescription>
+            Join this server to an existing Active Directory domain.
+          </DialogDescription>
+        </DialogHeader>
 
-      {/* Trigger button when using internal state */}
-      {externalIsOpen === undefined && (
-        <Button variant="primary" onClick={handleModalToggle}>
-          <ConnectedIcon style={{ marginRight: '0.5rem' }} />
-          Join Domain
-        </Button>
-      )}
+        <Alert className="border-blue-200 bg-blue-50">
+          <Info className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-800">
+            <strong>Important:</strong> This operation will join the server to the domain 
+            as a domain controller. Ensure you have proper credentials and network connectivity.
+          </AlertDescription>
+        </Alert>
 
-      <Modal
-        variant={ModalVariant.large}
-        title="Join Active Directory Domain"
-        isOpen={isOpen}
-        onClose={handleClose}
-        titleIconVariant={ExclamationTriangleIcon}
-        actions={[
-          <Button
-            key="join"
-            variant="primary"
-            onClick={handleSubmit}
-            isDisabled={loading || !formData.domain.trim() || !formData.username.trim() || !formData.password}
-            isLoading={loading}
-            spinner={<Spinner size="sm" />}
-          >
-            {loading ? 'Joining Domain...' : 'Join Domain'}
-          </Button>,
-          <Button key="cancel" variant="link" onClick={handleClose}>
-            Cancel
-          </Button>
-        ]}
-        appendTo={document.body}
-      >
-        {error && (
-          <Alert variant="danger" title="Error" isInline style={{ marginBottom: '1rem' }}>
-            {error}
-          </Alert>
-        )}
-
-        <TextContent style={{ marginBottom: '1.5rem' }}>
-          <Text component="p">
-            <strong>Warning:</strong> Joining a domain will reconfigure this server's authentication 
-            and directory services. This operation requires domain administrator privileges and may 
-            require a system restart.
-          </Text>
-        </TextContent>
-
-        <Form>
-          <FormGroup
-            label="Domain Name"
-            isRequired
-            fieldId="domain-name"
-            helperText="The FQDN of the domain to join (e.g., corp.example.com)"
-          >
-            <TextInput
-              isRequired
-              type="text"
-              id="domain-name"
-              name="domain-name"
-              value={formData.domain}
-              onChange={(_event, value) => handleInputChange('domain')(value)}
-              placeholder="corp.example.com"
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="domain">Domain *</Label>
+            <Input
+              id="domain"
+              {...register('domain')}
+              placeholder="example.com"
+              className={errors.domain ? 'border-red-500' : ''}
             />
-          </FormGroup>
-
-          <FormGroup
-            label="Join Role"
-            isRequired
-            fieldId="join-role"
-            helperText={getSelectedRoleDescription()}
-          >
-            <FormSelect
-              value={formData.role}
-              onChange={(_event, value) => handleInputChange('role')(value)}
-              id="join-role"
-              name="join-role"
-            >
-              {DOMAIN_ROLES.map((role, index) => (
-                <FormSelectOption
-                  key={index}
-                  value={role.value}
-                  label={role.label}
-                />
-              ))}
-            </FormSelect>
-          </FormGroup>
-
-          <FormGroup
-            label="Domain Administrator Username"
-            isRequired
-            fieldId="admin-username"
-            helperText="Domain administrator account with rights to join computers to the domain"
-          >
-            <TextInput
-              isRequired
-              type="text"
-              id="admin-username"
-              name="admin-username"
-              value={formData.username}
-              onChange={(_event, value) => handleInputChange('username')(value)}
-              placeholder="administrator"
-            />
-          </FormGroup>
-
-          <FormGroup
-            label="Domain Administrator Password"
-            isRequired
-            fieldId="admin-password"
-            helperText="Password for the domain administrator account"
-          >
-            <PasswordInput
-              id="admin-password"
-              name="admin-password"
-              value={formData.password}
-              onChange={(_event, value) => handleInputChange('password')(value)}
-              placeholder="Enter password"
-            />
-          </FormGroup>
-
-          {/* Advanced Options */}
-          <div style={{ marginTop: '1rem' }}>
-            <Button 
-              variant="link" 
-              isInline 
-              onClick={() => setShowAdvanced(!showAdvanced)}
-            >
-              {showAdvanced ? 'Hide' : 'Show'} Advanced Options
-            </Button>
+            {errors.domain && (
+              <p className="text-sm text-red-500">{errors.domain.message}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              The fully qualified domain name to join
+            </p>
           </div>
 
-          {showAdvanced && (
-            <>
-              <FormGroup
-                label="Specific Domain Controller"
-                fieldId="domain-server"
-                helperText="Optionally specify a particular domain controller to use (leave blank for automatic)"
-              >
-                <TextInput
-                  type="text"
-                  id="domain-server"
-                  name="domain-server"
-                  value={formData.server}
-                  onChange={(_event, value) => handleInputChange('server')(value)}
-                  placeholder="dc01.corp.example.com"
-                />
-              </FormGroup>
+          <div className="space-y-2">
+            <Label htmlFor="username">Username *</Label>
+            <Input
+              id="username"
+              {...register('username')}
+              placeholder="Administrator"
+              className={errors.username ? 'border-red-500' : ''}
+            />
+            {errors.username && (
+              <p className="text-sm text-red-500">{errors.username.message}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Domain administrator username
+            </p>
+          </div>
 
-              <FormGroup
-                label="Active Directory Site"
-                fieldId="ad-site"
-                helperText="Optionally specify the AD site for this server (leave blank for automatic)"
-              >
-                <TextInput
-                  type="text"
-                  id="ad-site"
-                  name="ad-site"
-                  value={formData.site}
-                  onChange={(_event, value) => handleInputChange('site')(value)}
-                  placeholder="Default-First-Site-Name"
-                />
-              </FormGroup>
-            </>
-          )}
-        </Form>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password *</Label>
+            <Input
+              id="password"
+              type="password"
+              {...register('password')}
+              placeholder="Enter password"
+              className={errors.password ? 'border-red-500' : ''}
+            />
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Password for the domain administrator
+            </p>
+          </div>
 
-        <Alert variant="warning" title="Important Considerations" isInline style={{ marginTop: '1rem' }}>
-          <ul style={{ marginLeft: '1rem' }}>
-            <li>Ensure proper DNS configuration pointing to domain controllers</li>
-            <li>Verify network connectivity to the target domain</li>
-            <li>The join operation may take several minutes to complete</li>
-            <li>A system restart may be required after successful join</li>
-            <li>Existing local accounts may be affected by domain integration</li>
-          </ul>
-        </Alert>
-      </Modal>
-    </>
+          <div className="space-y-2">
+            <Label htmlFor="organizationalUnit">Organizational Unit</Label>
+            <Input
+              id="organizationalUnit"
+              {...register('organizationalUnit')}
+              placeholder="OU=Domain Controllers,DC=example,DC=com"
+            />
+            <p className="text-xs text-muted-foreground">
+              Optional OU where the computer account will be created
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="computerName">Computer Name</Label>
+            <Input
+              id="computerName"
+              {...register('computerName')}
+              placeholder="DC01"
+            />
+            <p className="text-xs text-muted-foreground">
+              Optional computer name for this domain controller
+            </p>
+          </div>
+
+          <div className="bg-muted/50 p-3 rounded-lg">
+            <h4 className="text-sm font-medium mb-2">Join Process:</h4>
+            <ul className="text-xs text-muted-foreground space-y-1">
+              <li>• Server will be promoted to domain controller</li>
+              <li>• DNS settings will be configured automatically</li>
+              <li>• Computer account will be created in AD</li>
+              <li>• Replication will be established with existing DCs</li>
+              <li>• Server may require a restart after completion</li>
+            </ul>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Joining Domain...' : 'Join Domain'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
-};
+}
 
-export default JoinDomainDialog;
+export default DomainJoinDialog;

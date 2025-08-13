@@ -169,17 +169,7 @@ export function ContactList({
         data={contacts}
         columns={columns}
         loading={loading}
-        searchable={true}
-        sortable={true}
-        emptyState={{
-          title: "No contacts found",
-          description: "No contact objects have been created yet. Create your first contact to get started.",
-          action: (
-            <Button onClick={onRefresh} variant="outline">
-              Refresh
-            </Button>
-          ),
-        }}
+        emptyMessage="No contacts found. Create your first contact to get started."
       />
     </div>
   );

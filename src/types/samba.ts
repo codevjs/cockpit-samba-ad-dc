@@ -51,7 +51,7 @@ export interface SambaComputer {
   description?: string;
 }
 
-export interface CreateComputerInput {
+export interface CreateComputerInput extends Record<string, unknown> {
   name: string;
   organizationalUnit?: string;
   description?: string;
@@ -68,6 +68,8 @@ export interface SambaGroup {
   memberOf: string[];
   createdAt: Date;
   organizationalUnit?: string;
+  sid?: string;
+  memberCount?: number;
 }
 
 export interface CreateGroupInput {
@@ -133,13 +135,6 @@ export interface DNSRecord {
   ttl?: number;
 }
 
-export interface CreateDNSRecordInput {
-  zoneName: string;
-  name: string;
-  type: 'A' | 'AAAA' | 'CNAME' | 'MX' | 'NS' | 'PTR' | 'SOA' | 'SRV' | 'TXT';
-  data: string;
-  ttl?: number;
-}
 
 export interface SambaGPO {
   name: string;
@@ -157,6 +152,68 @@ export interface CreateGPOInput {
   name: string;
   displayName: string;
   description?: string;
+}
+
+export interface UpdateGPOInput {
+  name: string;
+  displayName?: string;
+  description?: string;
+}
+
+export interface DeleteGPOInput {
+  name: string;
+}
+
+export interface BackupGPOInput {
+  name: string;
+  backupPath: string;
+}
+
+export interface RestoreGPOInput {
+  name: string;
+  backupPath: string;
+  newName?: string;
+}
+
+export interface FetchGPOInput {
+  name: string;
+  targetPath: string;
+}
+
+export interface GPOLink {
+  containerDN: string;
+  linkOptions: string;
+  order: number;
+  gpoName: string;
+}
+
+export interface SetGPOLinkInput {
+  containerDN: string;
+  gpoName: string;
+  linkOptions?: string;
+  order?: number;
+}
+
+export interface DeleteGPOLinkInput {
+  containerDN: string;
+  gpoName: string;
+}
+
+export interface GPOInheritance {
+  containerDN: string;
+  inheritance: 'Enabled' | 'Disabled';
+}
+
+export interface SetGPOInheritanceInput {
+  containerDN: string;
+  inheritance: 'Enabled' | 'Disabled';
+}
+
+export interface GPOContainer {
+  distinguishedName: string;
+  name: string;
+  description?: string;
+  type: 'OU' | 'Domain' | 'Site';
 }
 
 // Domain Management Types
@@ -564,4 +621,64 @@ export interface SetAnyServiceInput {
 export interface SetAnyProtocolInput {
   accountName: string;
   enable: boolean;
+}
+
+// DNS Management Types (Already defined but expanding)
+export interface DNSZone {
+  name: string;
+  type: 'Primary' | 'Secondary' | 'Stub';
+  server: string;
+  records: DNSRecord[];
+  createdAt: Date;
+}
+
+export interface DNSServerInfo {
+  serverName: string;
+  version: string;
+  zones: string[];
+  status: 'Running' | 'Stopped' | 'Unknown';
+  rawOutput: string[];
+}
+
+export interface CreateDNSRecordInput {
+  server: string;
+  zone: string;
+  name: string;
+  type: 'A' | 'AAAA' | 'CNAME' | 'MX' | 'NS' | 'PTR' | 'SOA' | 'SRV' | 'TXT';
+  data: string;
+  password?: string;
+  ttl?: number;
+}
+
+export interface DeleteDNSRecordInput {
+  server: string;
+  zone: string;
+  name: string;
+  type: 'A' | 'AAAA' | 'CNAME' | 'MX' | 'NS' | 'PTR' | 'SOA' | 'SRV' | 'TXT';
+  data: string;
+  password?: string;
+}
+
+export interface CreateDNSZoneInput {
+  server: string;
+  zoneName: string;
+  password?: string;
+}
+
+export interface DeleteDNSZoneInput {
+  server: string;
+  zoneName: string;
+  password?: string;
+}
+
+export interface DNSZoneInfo {
+  zoneName: string;
+  server: string;
+  records: DNSRecord[];
+  rawOutput: string[];
+}
+
+export interface DNSCleanupInput {
+  server: string;
+  password?: string;
 }

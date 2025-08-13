@@ -1,269 +1,174 @@
 import React, { useState } from 'react';
-import {
-  Modal,
-  ModalVariant,
-  Button,
-  Form,
-  FormGroup,
-  TextInput,
-  Checkbox,
-  Alert,
-  Text,
-  TextContent,
-  Spinner,
-  Progress,
-  ProgressSize,
-  ProgressVariant
-} from '@patternfly/react-core';
-import { ExclamationTriangleIcon, DownloadIcon } from '@patternfly/react-icons';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Info, Archive } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useDomainMutations } from '../hooks/useDomainMutations';
-import { useBackupHistory } from '../hooks/useDomain';
-import { BackupOfflineInput } from '../../types/samba';
-import { SuccessToast } from '../../common';
+import { toast } from 'sonner';
+import type { BackupOfflineInput } from '@/types/samba';
+
+const backupOfflineSchema = z.object({
+  targetdir: z.string().min(1, 'Target directory is required'),
+  server: z.string().optional(),
+  realm: z.string().optional(),
+});
+
+type BackupOfflineFormData = z.infer<typeof backupOfflineSchema>;
 
 interface BackupOfflineDialogProps {
-  isOpen?: boolean;
-  onClose?: () => void;
-  onBackupCompleted?: () => void;
+  isOpen: boolean;
+  onClose: () => void;
+  onBackupCompleted: () => void;
 }
 
-export const BackupOfflineDialog: React.FC<BackupOfflineDialogProps> = ({
-  isOpen: externalIsOpen,
-  onClose: externalOnClose,
-  onBackupCompleted
-}) => {
-  const [internalIsOpen, setInternalIsOpen] = useState(false);
-  const [formData, setFormData] = useState<BackupOfflineInput>({
-    targetDir: '',
-    compress: true
+export function BackupOfflineDialog({
+  isOpen,
+  onClose,
+  onBackupCompleted,
+}: BackupOfflineDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<BackupOfflineFormData>({
+    resolver: zodResolver(backupOfflineSchema),
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
-  const [showProgress, setShowProgress] = useState(false);
-
-  // Use external state if provided, otherwise use internal state
-  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const onClose = externalOnClose || (() => setInternalIsOpen(false));
-
-  const { addBackup } = useBackupHistory();
 
   const { backupOffline } = useDomainMutations(
-    (message) => {
-      // Success callback
-      setSuccessMessage(message || 'Offline backup completed successfully');
-      
-      // Add to backup history
-      addBackup({
-        type: 'offline',
-        path: formData.targetDir,
-        timestamp: new Date(),
-        size: 0, // Would be populated from actual backup info
-        status: 'completed'
-      });
-
-      setFormData({ targetDir: '', compress: true });
-      setError(null);
-      setShowProgress(false);
-      setProgress(0);
-      onBackupCompleted?.();
-      onClose();
+    () => {
+      toast.success('Offline backup completed successfully');
+      onBackupCompleted();
     },
-    (errorMessage) => {
-      // Error callback
-      setError(errorMessage);
-      setShowProgress(false);
-      setProgress(0);
+    (error) => {
+      toast.error(`Failed to create offline backup: ${error}`);
     }
   );
 
-  const handleSubmit = async () => {
-    if (!formData.targetDir.trim()) {
-      setError('Target directory is required');
-      return;
-    }
-
-    // Basic validation for directory path
-    if (!formData.targetDir.startsWith('/')) {
-      setError('Target directory must be an absolute path (starting with /)');
-      return;
-    }
-
+  const onSubmit = async (data: BackupOfflineFormData) => {
+    setIsSubmitting(true);
     try {
-      setLoading(true);
-      setError(null);
-      setShowProgress(true);
-      setProgress(0);
-
-      // Simulate progress updates (in real implementation, this would come from the backup process)
-      const progressInterval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 1000);
-
-      await backupOffline(formData);
-      
-      clearInterval(progressInterval);
-      setProgress(100);
-    } catch (err) {
-      // Error is already handled by the mutation hook
+      const input: BackupOfflineInput = {
+        targetdir: data.targetdir,
+        server: data.server,
+        realm: data.realm,
+      };
+      await backupOffline(input);
+      handleClose();
+    } catch (error) {
+      // Error handled by mutation
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
-  };
-
-  const handleModalToggle = () => {
-    if (externalIsOpen === undefined) {
-      setInternalIsOpen(!internalIsOpen);
-    } else {
-      onClose();
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({ targetDir: '', compress: true });
-    setError(null);
-    setShowProgress(false);
-    setProgress(0);
   };
 
   const handleClose = () => {
-    resetForm();
+    reset();
     onClose();
   };
 
-  const handleInputChange = (field: keyof BackupOfflineInput) => (
-    value: string | boolean
-  ) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    if (error) {
-      setError(null);
-    }
-  };
-
   return (
-    <>
-      {successMessage && (
-        <SuccessToast 
-          successMessage={successMessage} 
-          closeModal={() => setSuccessMessage(null)} 
-        />
-      )}
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Archive className="h-5 w-5" />
+            Create Offline Backup
+          </DialogTitle>
+          <DialogDescription>
+            Create an offline backup of the Active Directory domain.
+          </DialogDescription>
+        </DialogHeader>
 
-      {/* Trigger button when using internal state */}
-      {externalIsOpen === undefined && (
-        <Button variant="secondary" onClick={handleModalToggle}>
-          <DownloadIcon style={{ marginRight: '0.5rem' }} />
-          Backup Offline
-        </Button>
-      )}
-
-      <Modal
-        variant={ModalVariant.medium}
-        title="Create Offline Backup"
-        description="Backup the local domain directories safely into a tar file"
-        isOpen={isOpen}
-        onClose={handleClose}
-        titleIconVariant={ExclamationTriangleIcon}
-        actions={[
-          <Button
-            key="backup"
-            variant="primary"
-            onClick={handleSubmit}
-            isDisabled={loading || !formData.targetDir.trim()}
-            isLoading={loading}
-            spinner={<Spinner size="sm" />}
-          >
-            {loading ? 'Creating Backup...' : 'Create Backup'}
-          </Button>,
-          <Button key="cancel" variant="link" onClick={handleClose}>
-            Cancel
-          </Button>
-        ]}
-        appendTo={document.body}
-      >
-        {error && (
-          <Alert variant="danger" title="Error" isInline style={{ marginBottom: '1rem' }}>
-            {error}
-          </Alert>
-        )}
-
-        <TextContent style={{ marginBottom: '1rem' }}>
-          <Text component="p">
-            <strong>Important:</strong> This operation will create a backup of the local domain 
-            directories. The domain controller should be offline or in a consistent state to 
-            ensure backup integrity.
-          </Text>
-          <Text component="p" style={{ marginTop: '0.5rem' }}>
-            The backup will be saved as a tar file in the specified directory. Make sure the 
-            target directory has sufficient disk space and appropriate permissions.
-          </Text>
-        </TextContent>
-
-        {showProgress && (
-          <div style={{ marginBottom: '1rem' }}>
-            <Text component="p" style={{ marginBottom: '0.5rem' }}>
-              Backup in progress...
-            </Text>
-            <Progress
-              value={progress}
-              title="Backup Progress"
-              size={ProgressSize.lg}
-              variant={progress === 100 ? ProgressVariant.success : ProgressVariant.info}
-            />
-          </div>
-        )}
-
-        <Form>
-          <FormGroup
-            label="Target Directory"
-            isRequired
-            fieldId="target-dir"
-            helperText="Absolute path where the backup tar file will be created (e.g., /var/backups)"
-          >
-            <TextInput
-              isRequired
-              type="text"
-              id="target-dir"
-              name="target-dir"
-              value={formData.targetDir}
-              onChange={(_event, value) => handleInputChange('targetDir')(value)}
-              placeholder="/var/backups/samba"
-            />
-          </FormGroup>
-
-          <FormGroup fieldId="compress-option">
-            <Checkbox
-              id="compress-option"
-              label="Compress backup"
-              isChecked={formData.compress}
-              onChange={(_event, checked) => handleInputChange('compress')(checked)}
-              description="Enable compression to reduce backup file size (recommended)"
-            />
-          </FormGroup>
-        </Form>
-
-        <Alert variant="warning" title="Backup Considerations" isInline style={{ marginTop: '1rem' }}>
-          <ul style={{ marginLeft: '1rem' }}>
-            <li>Ensure sufficient disk space is available in the target directory</li>
-            <li>The backup process may take considerable time depending on database size</li>
-            <li>Consider stopping Samba services for the most consistent backup</li>
-            <li>Verify backup integrity after completion</li>
-          </ul>
+        <Alert className="border-blue-200 bg-blue-50">
+          <Info className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-800">
+            <strong>Offline Backup:</strong> This creates a complete backup of the domain 
+            data including the ntds.dit database, SYSVOL, and registry settings. The backup 
+            can be used for disaster recovery.
+          </AlertDescription>
         </Alert>
-      </Modal>
-    </>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="targetdir">Target Directory *</Label>
+            <Input
+              id="targetdir"
+              {...register('targetdir')}
+              placeholder="/backup/domain/"
+              className={errors.targetdir ? 'border-red-500' : ''}
+            />
+            {errors.targetdir && (
+              <p className="text-sm text-red-500">{errors.targetdir.message}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Directory where the backup will be stored
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="server">Server</Label>
+            <Input
+              id="server"
+              {...register('server')}
+              placeholder="dc1.domain.com"
+            />
+            <p className="text-xs text-muted-foreground">
+              Optional: Specific domain controller to backup from
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="realm">Realm</Label>
+            <Input
+              id="realm"
+              {...register('realm')}
+              placeholder="DOMAIN.COM"
+            />
+            <p className="text-xs text-muted-foreground">
+              Optional: Kerberos realm for the domain
+            </p>
+          </div>
+
+          <div className="bg-muted/50 p-3 rounded-lg">
+            <h4 className="text-sm font-medium mb-2">Backup Contents:</h4>
+            <ul className="text-xs text-muted-foreground space-y-1">
+              <li>• Active Directory database (ntds.dit)</li>
+              <li>• SYSVOL folder with Group Policy Objects</li>
+              <li>• Registry settings and configuration</li>
+              <li>• Domain security policies</li>
+              <li>• Certificate store data</li>
+            </ul>
+          </div>
+
+          <Alert className="border-orange-200 bg-orange-50">
+            <Info className="h-4 w-4 text-orange-600" />
+            <AlertDescription className="text-orange-800">
+              <strong>Note:</strong> The backup process may take a significant amount of time 
+              depending on the size of your domain data. Ensure adequate disk space is available 
+              in the target directory.
+            </AlertDescription>
+          </Alert>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Creating Backup...' : 'Create Backup'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
-};
+}
 
 export default BackupOfflineDialog;

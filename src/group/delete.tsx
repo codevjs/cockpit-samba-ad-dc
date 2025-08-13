@@ -1,17 +1,26 @@
 import React, { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 import { useGroupMutations } from './hooks/useGroupMutations';
-// import { SuccessToast } from '../common';
+import { toast } from 'sonner';
 
 interface DeleteGroupDialogProps {
   isOpen?: boolean;
   onClose?: () => void;
   onGroupDeleted?: () => void;
   groupName?: string;
+  trigger?: React.ReactElement;
 }
 
 export const DeleteGroupDialog: React.FC<DeleteGroupDialogProps> = ({
@@ -23,9 +32,7 @@ export const DeleteGroupDialog: React.FC<DeleteGroupDialogProps> = ({
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [internalGroupName, setInternalGroupName] = useState('');
   const [confirmationText, setConfirmationText] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Use external state if provided, otherwise use internal state
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
@@ -34,169 +41,138 @@ export const DeleteGroupDialog: React.FC<DeleteGroupDialogProps> = ({
 
   const { deleteGroup } = useGroupMutations(
     () => {
-      // Success callback
-      setSuccessMessage(`Group "${groupName}" deleted successfully`);
-      setConfirmationText('');
-      setError(null);
+      toast.success('Group deleted successfully');
       onGroupDeleted?.();
-      onClose();
     },
-    (errorMessage: string) => {
-      // Error callback
-      setError(errorMessage);
+    (error) => {
+      toast.error(`Failed to delete group: ${error}`);
     }
   );
 
-  const handleSubmit = async () => {
-    if (!groupName) {
-      setError('Group name is required');
-      return;
-    }
+  const handleShowDialog = () => {
+    setInternalIsOpen(true);
+  };
 
-    if (confirmationText !== groupName) {
-      setError('Confirmation text must match the group name exactly');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      await deleteGroup(groupName);
-    } catch (err) {
-      // Error is already handled by the mutation hook
-    } finally {
-      setLoading(false);
-    }
+  const handleInputChange = (value: string) => {
+    setInternalGroupName(value);
   };
 
   const handleConfirmationChange = (value: string) => {
     setConfirmationText(value);
-    if (error) {
-      setError(null);
-    }
   };
 
-  const handleGroupNameChange = (value: string) => {
-    setInternalGroupName(value);
-    if (error) {
-      setError(null);
-    }
-  };
+  const handleDeleteGroup = async () => {
+    if (!groupName || confirmationText !== groupName) return;
 
-  const resetForm = () => {
-    setConfirmationText('');
-    setInternalGroupName('');
-    setError(null);
+    setIsDeleting(true);
+    try {
+      await deleteGroup(groupName);
+      handleClose();
+    } catch (error) {
+      // Error handled by mutation
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleClose = () => {
-    resetForm();
+    setConfirmationText('');
     onClose();
   };
 
-  const isConfirmationValid = confirmationText === groupName && groupName.length > 0;
+  const isConfirmationValid = confirmationText === groupName;
+
+  if (!isOpen && !externalIsOpen) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Enter group name"
+            value={internalGroupName}
+            onChange={(e) => handleInputChange(e.target.value)}
+          />
+          <Button 
+            onClick={handleShowDialog}
+            disabled={!internalGroupName.trim()}
+            variant="destructive"
+          >
+            Delete Group
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      {successMessage && (
-        <SuccessToast 
-          successMessage={successMessage} 
-          closeModal={() => setSuccessMessage(null)} 
-        />
-      )}
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-red-600" />
+            Delete Group: {groupName}
+          </DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. This will permanently delete the group and remove all its members.
+          </DialogDescription>
+        </DialogHeader>
 
-      {/* Trigger button when using internal state */}
-      {externalIsOpen === undefined && (
-        <Button variant="danger" onClick={handleModalToggle}>
-          Delete Group
-        </Button>
-      )}
+        <Alert className="border-red-200 bg-red-50">
+          <AlertTriangle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            <strong>Warning:</strong> Deleting this group will:
+            <ul className="mt-2 list-disc list-inside space-y-1">
+              <li>Permanently remove the group from Active Directory</li>
+              <li>Remove all members from the group</li>
+              <li>Remove any permissions assigned to this group</li>
+              <li>This action cannot be undone</li>
+            </ul>
+          </AlertDescription>
+        </Alert>
 
-      <Modal
-        variant={ModalVariant.medium}
-        title="Delete Group"
-        isOpen={isOpen}
-        onClose={handleClose}
-        titleIconVariant={ExclamationTriangleIcon}
-        actions={[
-          <Button
-            key="delete"
-            variant="danger"
-            onClick={handleSubmit}
-            isDisabled={loading || !isConfirmationValid}
-            isLoading={loading}
-            spinner={<Spinner size="sm" />}
-          >
-            {loading ? 'Deleting...' : 'Delete Group'}
-          </Button>,
-          <Button key="cancel" variant="link" onClick={handleClose}>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="groupName">Group Name</Label>
+            <Input
+              id="groupName"
+              value={groupName}
+              disabled
+              className="bg-muted"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirmation">
+              Type the group name "{groupName}" to confirm deletion
+            </Label>
+            <Input
+              id="confirmation"
+              placeholder={`Type "${groupName}" to confirm`}
+              value={confirmationText}
+              onChange={(e) => handleConfirmationChange(e.target.value)}
+              className={confirmationText && !isConfirmationValid ? 'border-red-500' : ''}
+            />
+            {confirmationText && !isConfirmationValid && (
+              <p className="text-sm text-red-500">
+                Confirmation text does not match the group name
+              </p>
+            )}
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>
-        ]}
-        appendTo={document.body}
-      >
-        {error && (
-          <Alert variant="danger" title="Error" isInline style={{ marginBottom: '1rem' }}>
-            {error}
-          </Alert>
-        )}
-
-        <TextContent style={{ marginBottom: '1.5rem' }}>
-          <Text component="p">
-            <strong>Warning:</strong> This action cannot be undone. Deleting this group will:
-          </Text>
-          <Text component="ul" style={{ marginLeft: '1rem', marginTop: '0.5rem' }}>
-            <Text component="li">Permanently remove the group from Active Directory</Text>
-            <Text component="li">Remove all group memberships</Text>
-            <Text component="li">Remove any permissions granted to this group</Text>
-          </Text>
-          <Text component="p" style={{ marginTop: '1rem' }}>
-            This action is <strong>irreversible</strong>.
-          </Text>
-        </TextContent>
-
-        <Form>
-          {/* Show group name input only if not provided externally */}
-          {!externalGroupName && (
-            <FormGroup
-              label="Group Name"
-              isRequired
-              fieldId="group-name-input"
-              helperText="Enter the name of the group you want to delete"
-            >
-              <TextInput
-                isRequired
-                type="text"
-                id="group-name-input"
-                name="group-name-input"
-                value={internalGroupName}
-                onChange={(_event, value) => handleGroupNameChange(value)}
-                placeholder="Enter group name"
-              />
-            </FormGroup>
-          )}
-
-          <FormGroup
-            label={`Type "${groupName}" to confirm deletion`}
-            isRequired
-            fieldId="confirmation-text"
-            helperText="This confirmation helps prevent accidental deletions"
-            validated={confirmationText && !isConfirmationValid ? 'error' : 'default'}
+          <Button 
+            variant="destructive"
+            onClick={handleDeleteGroup}
+            disabled={!isConfirmationValid || isDeleting}
           >
-            <TextInput
-              isRequired
-              type="text"
-              id="confirmation-text"
-              name="confirmation-text"
-              value={confirmationText}
-              onChange={(_event, value) => handleConfirmationChange(value)}
-              placeholder={groupName || 'Enter group name above first'}
-              validated={confirmationText && !isConfirmationValid ? 'error' : 'default'}
-            />
-          </FormGroup>
-        </Form>
-      </Modal>
-    </>
+            {isDeleting ? 'Deleting...' : 'Delete Group'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -165,7 +165,7 @@ export const useTrustDetails = (): UseTrustDetailsReturn => {
 
   const refresh = useCallback(async () => {
     if (trust) {
-      await fetchTrustDetails(trust.domain);
+      await fetchTrustDetails(trust.name);
     }
   }, [fetchTrustDetails, trust]);
 

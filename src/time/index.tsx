@@ -15,7 +15,6 @@ import { BackButton } from '../common';
 import { ErrorAlert } from '@/components/ui/error-alert';
 import { toast } from 'sonner';
 
-// @ts-expect-error: Cockpit module doesn't have types
 import cockpit from 'cockpit';
 
 interface TimeInfo {

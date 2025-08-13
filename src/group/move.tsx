@@ -23,10 +23,11 @@ import { useGroupMutations } from './hooks/useGroupMutations';
 import { toast } from 'sonner';
 
 interface MoveGroupDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   onGroupMoved?: () => void;
   groupName?: string;
+  trigger?: React.ReactElement;
 }
 
 // Common organizational units in Active Directory
@@ -62,7 +63,7 @@ export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
       toast.success(`Group "${groupName}" moved to ${targetOU} successfully`);
       resetForm();
       onGroupMoved?.();
-      onClose();
+      onClose?.();
     },
     (errorMessage: string) => {
       // Error callback
@@ -130,7 +131,7 @@ export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
 
   const handleClose = () => {
     resetForm();
-    onClose();
+    onClose?.();
   };
 
   const getTargetOU = () => {

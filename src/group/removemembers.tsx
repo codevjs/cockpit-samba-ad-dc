@@ -1,126 +1,81 @@
 import React, { useState } from 'react';
 import {
-  Modal,
-  ModalVariant,
-  Button,
-  Form,
-  FormGroup,
-  TextInput,
-  TextArea,
-  List,
-  ListItem,
-  Checkbox,
-  EmptyState,
-  EmptyStateIcon,
-  EmptyStateBody,
-  EmptyStateHeader,
-  Alert,
-  Spinner,
-  Flex,
-  FlexItem,
-  Card,
-  CardBody,
-  Text,
-  TextContent
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
 } from '@/components/ui/dialog';
-import { UsersIcon, ExclamationTriangleIcon } from '@/components/ui/icons';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Users, AlertTriangle } from 'lucide-react';
 import { useGroupMembers } from './hooks/useGroups';
 import { useGroupMutations } from './hooks/useGroupMutations';
-import { SuccessToast } from '../common';
+import { toast } from 'sonner';
 
 interface RemoveMembersDialogProps {
   isOpen?: boolean;
   onClose?: () => void;
-  onMembersRemoved?: () => void;
   groupName?: string;
+  trigger?: React.ReactElement;
+  onMembersRemoved?: () => void;
 }
 
 export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({
   isOpen: externalIsOpen,
   onClose: externalOnClose,
-  onMembersRemoved,
   groupName: externalGroupName
 }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [internalGroupName, setInternalGroupName] = useState('');
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
 
-  // Use external state if provided, otherwise use internal state
+  // Use external props if provided, otherwise use internal state
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const onClose = externalOnClose || (() => setInternalIsOpen(false));
   const groupName = externalGroupName || internalGroupName;
 
   const { members, loading: membersLoading, error: membersError, refresh } = useGroupMembers(groupName);
-
   const { removeMembers } = useGroupMutations(
     () => {
-      // Success callback
-      setSuccessMessage(`Successfully removed ${selectedMembers.length} member${selectedMembers.length !== 1 ? 's' : ''} from group "${groupName}"`);
+      toast.success('Members removed successfully');
       setSelectedMembers([]);
-      setError(null);
-      refresh(); // Refresh the members list
-      onMembersRemoved?.();
+      refresh();
     },
-    (errorMessage: string) => {
-      // Error callback
-      setError(errorMessage);
+    (error) => {
+      toast.error(`Failed to remove members: ${error}`);
     }
   );
 
-  const handleSubmit = async () => {
-    if (!groupName) {
-      setError('Group name is required');
-      return;
-    }
+  const filteredMembers = members?.filter(member =>
+    member.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
 
-    if (selectedMembers.length === 0) {
-      setError('Please select at least one member to remove');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      await removeMembers(groupName, selectedMembers);
-    } catch (err) {
-      // Error is already handled by the mutation hook
-    } finally {
-      setLoading(false);
-    }
+  const handleShowDialog = () => {
+    setInternalIsOpen(true);
   };
 
-  const handleModalToggle = () => {
-    if (externalIsOpen === undefined) {
-      setInternalIsOpen(!internalIsOpen);
-    } else {
-      onClose();
-    }
-  };
-
-  const handleGroupNameChange = (value: string) => {
+  const handleInputChange = (value: string) => {
     setInternalGroupName(value);
-    setSelectedMembers([]); // Clear selections when group changes
   };
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
   };
 
-  const handleMemberToggle = (memberName: string, checked: boolean) => {
-    setSelectedMembers(prev => {
-      if (checked) {
-        return [...prev, memberName];
-      } else {
-        return prev.filter(name => name !== memberName);
-      }
-    });
-
-    if (error) {
-      setError(null);
+  const handleMemberToggle = (member: string, checked: boolean) => {
+    if (checked) {
+      setSelectedMembers(prev => [...prev, member]);
+    } else {
+      setSelectedMembers(prev => prev.filter(m => m !== member));
     }
   };
 
@@ -130,245 +85,148 @@ export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({
     } else {
       setSelectedMembers([]);
     }
-
-    if (error) {
-      setError(null);
-    }
   };
 
-  const resetForm = () => {
-    setInternalGroupName('');
-    setSelectedMembers([]);
-    setSearchTerm('');
-    setError(null);
+  const handleRemoveMembers = async () => {
+    if (selectedMembers.length === 0) return;
+
+    setIsRemoving(true);
+    try {
+      await removeMembers(groupName, selectedMembers);
+      handleClose();
+    } catch (error) {
+      // Error handled by mutation
+    } finally {
+      setIsRemoving(false);
+    }
   };
 
   const handleClose = () => {
-    resetForm();
+    setSelectedMembers([]);
+    setSearchTerm('');
     onClose();
   };
 
-  const handleRefresh = async () => {
-    await refresh();
-  };
-
-  // Filter members based on search term
-  const filteredMembers = members.filter(member =>
-    member.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const allFilteredSelected = filteredMembers.length > 0 && filteredMembers.every(member => selectedMembers.includes(member));
-  const someFilteredSelected = filteredMembers.some(member => selectedMembers.includes(member));
-
-  const renderMembersList = () => {
-    if (membersLoading) {
-      return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '2rem 0' }}>
-          <Spinner size="sm" />
-          <span>Loading group members...</span>
-        </div>
-      );
-    }
-
-    if (membersError) {
-      return (
-        <Alert variant="danger" title="Error loading members" isInline style={{ margin: '1rem 0' }}>
-          {membersError}
-          <div style={{ marginTop: '1rem' }}>
-            <Button variant="primary" onClick={handleRefresh}>
-              Retry
-            </Button>
-          </div>
-        </Alert>
-      );
-    }
-
-    if (members.length === 0) {
-      return (
-        <EmptyState>
-          <EmptyStateHeader 
-            titleText="No members to remove"
-            icon={<EmptyStateIcon icon={UsersIcon} />}
-            headingLevel="h4"
-          />
-          <EmptyStateBody>
-            This group currently has no members. There are no members to remove.
-          </EmptyStateBody>
-        </EmptyState>
-      );
-    }
-
-    if (filteredMembers.length === 0 && searchTerm) {
-      return (
-        <EmptyState>
-          <EmptyStateHeader 
-            titleText="No matching members"
-            icon={<EmptyStateIcon icon={UsersIcon} />}
-            headingLevel="h4"
-          />
-          <EmptyStateBody>
-            No members match your search term "{searchTerm}". Try adjusting your search criteria.
-          </EmptyStateBody>
-        </EmptyState>
-      );
-    }
-
+  if (!isOpen && !externalIsOpen) {
     return (
-      <Card>
-        <CardBody>
-          {/* Select all checkbox */}
-          <div style={{ marginBottom: '1rem', borderBottom: '1px solid var(--pf-v5-global--BorderColor--100)', paddingBottom: '0.5rem' }}>
-            <Checkbox
-              id="select-all-members"
-              label={`Select all visible members (${filteredMembers.length})`}
-              isChecked={allFilteredSelected}
-              isIndeterminate={someFilteredSelected && !allFilteredSelected}
-              onChange={(_event, checked) => handleSelectAll(checked)}
-            />
-          </div>
-
-          {/* Member list */}
-          <List>
-            {filteredMembers.map((member, index) => (
-              <ListItem key={index}>
-                <Flex alignItems={{ default: 'alignItemsCenter' }}>
-                  <FlexItem>
-                    <Checkbox
-                      id={`member-${index}`}
-                      label={member}
-                      isChecked={selectedMembers.includes(member)}
-                      onChange={(_event, checked) => handleMemberToggle(member, checked)}
-                    />
-                  </FlexItem>
-                </Flex>
-              </ListItem>
-            ))}
-          </List>
-
-          {/* Selection summary */}
-          {selectedMembers.length > 0 && (
-            <div style={{ marginTop: '1rem', padding: '0.5rem', backgroundColor: 'var(--pf-v5-global--BackgroundColor--150)', borderRadius: '4px' }}>
-              <Text component="small">
-                {selectedMembers.length} member{selectedMembers.length !== 1 ? 's' : ''} selected for removal
-              </Text>
-            </div>
-          )}
-        </CardBody>
-      </Card>
-    );
-  };
-
-  return (
-    <>
-      {successMessage && (
-        <SuccessToast 
-          successMessage={successMessage} 
-          closeModal={() => setSuccessMessage(null)} 
-        />
-      )}
-
-      {/* Trigger button when using internal state */}
-      {externalIsOpen === undefined && (
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <TextInput
-            type="text"
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Input
             placeholder="Enter group name"
             value={internalGroupName}
-            onChange={(_event, value) => handleGroupNameChange(value)}
+            onChange={(e) => handleInputChange(e.target.value)}
           />
           <Button 
-            variant="danger" 
-            onClick={handleModalToggle}
-            isDisabled={!internalGroupName.trim()}
+            onClick={handleShowDialog}
+            disabled={!internalGroupName.trim()}
           >
             Remove Members
           </Button>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      <Modal
-        variant={ModalVariant.large}
-        title="Remove Group Members"
-        isOpen={isOpen}
-        onClose={handleClose}
-        titleIconVariant={ExclamationTriangleIcon}
-        actions={[
-          <Button
-            key="remove"
-            variant="danger"
-            onClick={handleSubmit}
-            isDisabled={loading || selectedMembers.length === 0}
-            isLoading={loading}
-            spinner={<Spinner size="sm" />}
-          >
-            {loading ? 'Removing...' : `Remove ${selectedMembers.length} Member${selectedMembers.length !== 1 ? 's' : ''}`}
-          </Button>,
-          <Button key="cancel" variant="link" onClick={handleClose}>
+  return (
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-4xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Remove Members from: {groupName}
+          </DialogTitle>
+          <DialogDescription>
+            Select members to remove from the group
+          </DialogDescription>
+        </DialogHeader>
+
+        {membersError && (
+          <Alert className="border-red-200 bg-red-50">
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+            <AlertDescription className="text-red-800">
+              Error loading group members: {membersError}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="Search members..."
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="flex-1"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleSelectAll(selectedMembers.length !== filteredMembers.length)}
+            >
+              {selectedMembers.length === filteredMembers.length ? 'Deselect All' : 'Select All'}
+            </Button>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">
+                Members ({filteredMembers.length})
+                {selectedMembers.length > 0 && ` - ${selectedMembers.length} selected`}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {membersLoading ? (
+                <div className="flex justify-center py-8">
+                  <LoadingSpinner />
+                </div>
+              ) : filteredMembers.length === 0 ? (
+                <div className="text-center py-8">
+                  <Users className="mx-auto h-12 w-12 text-muted-foreground" />
+                  <h3 className="mt-2 text-sm font-medium">No members found</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {searchTerm ? 'No members match your search criteria.' : 'This group has no members.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {filteredMembers.map((member, index) => (
+                    <div key={index} className="flex items-center space-x-2 p-2 rounded hover:bg-muted/50">
+                      <Checkbox
+                        checked={selectedMembers.includes(member)}
+                        onCheckedChange={(checked) => handleMemberToggle(member, checked as boolean)}
+                      />
+                      <span className="text-sm flex-1">{member}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {selectedMembers.length > 0 && (
+            <Alert className="border-orange-200 bg-orange-50">
+              <AlertTriangle className="h-4 w-4 text-orange-600" />
+              <AlertDescription className="text-orange-800">
+                <strong>Warning:</strong> You are about to remove {selectedMembers.length} member(s) from the group. 
+                This action cannot be undone.
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>
-        ]}
-        appendTo={document.body}
-      >
-        {error && (
-          <Alert variant="danger" title="Error" isInline style={{ marginBottom: '1rem' }}>
-            {error}
-          </Alert>
-        )}
-
-        <TextContent style={{ marginBottom: '1rem' }}>
-          <Text component="p">
-            <strong>Warning:</strong> This will remove the selected members from the group "{groupName}". 
-            This action cannot be undone. The removed users will lose any permissions granted through this group membership.
-          </Text>
-        </TextContent>
-
-        {groupName ? (
-          <>
-            {/* Show group name input only if not provided externally */}
-            {!externalGroupName && (
-              <Form style={{ marginBottom: '1rem' }}>
-                <FormGroup
-                  label="Group Name"
-                  isRequired
-                  fieldId="group-name-input"
-                >
-                  <TextInput
-                    isRequired
-                    type="text"
-                    id="group-name-input"
-                    name="group-name-input"
-                    value={internalGroupName}
-                    onChange={(_event, value) => handleGroupNameChange(value)}
-                    placeholder="Enter group name"
-                  />
-                </FormGroup>
-              </Form>
-            )}
-
-            {/* Search input */}
-            <div style={{ marginBottom: '1rem' }}>
-              <FormGroup label="Search members" fieldId="member-search">
-                <TextInput
-                  type="search"
-                  id="member-search"
-                  name="member-search"
-                  placeholder="Search members to remove..."
-                  value={searchTerm}
-                  onChange={(_event, value) => handleSearchChange(value)}
-                />
-              </FormGroup>
-            </div>
-
-            {/* Members list */}
-            {renderMembersList()}
-          </>
-        ) : (
-          <Alert variant="info" title="No group specified" isInline>
-            Please specify a group name to remove members from.
-          </Alert>
-        )}
-      </Modal>
-    </>
+          <Button 
+            onClick={handleRemoveMembers}
+            disabled={selectedMembers.length === 0 || isRemoving}
+            variant="destructive"
+          >
+            {isRemoving ? 'Removing...' : `Remove ${selectedMembers.length} Member(s)`}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

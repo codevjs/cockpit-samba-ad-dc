@@ -212,7 +212,7 @@ export class ErrorHandler {
     ];
     
     return retryableCodes.includes(error.code || '') || 
-           (error.statusCode && error.statusCode >= 500);
+           Boolean(error.statusCode && error.statusCode >= 500);
   }
 
   static getErrorMessage(error: unknown): string {

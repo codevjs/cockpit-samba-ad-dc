@@ -16,7 +16,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Server, Shield, Network, Database } from 'lucide-react';
 
-// @ts-expect-error - Cockpit module doesn't have types
 import cockpit from 'cockpit';
 
 interface ProvisionFormData {
@@ -131,7 +130,7 @@ export default function Provision(): JSX.Element {
 
             // Refresh the page to show the new AD DC status
             window.location.reload();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Provisioning failed:', error);
             setState(prev => ({
                 ...prev,

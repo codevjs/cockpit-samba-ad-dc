@@ -27,67 +27,67 @@ var info = {
         ],
 
         "computer/index": [
-            "./computer/index.js",
+            "./computer/index.tsx",
         ],
 
         "domain/index": [
-            "./domain/index.js"
+            "./domain/index.tsx"
         ],
 
         "contact/index": [
-            "./contact/index.js"
+            "./contact/index.tsx"
         ],
 
         "time/index": [
-            "./time/index.js"
+            "./time/index.tsx"
         ],
 
         "sites/index": [
-            "./sites/index.js"
+            "./sites/index.tsx"
         ],
 
         "user/index": [
-            "./user/index.js"
+            "./user/index.tsx"
         ],
 
         "organization_unit/index": [
-            "./organization_unit/index.js"
+            "./organization_unit/index.tsx"
         ],
 
         "forest/index": [
-            "./forest/index.js"
+            "./forest/index.tsx"
         ],
 
         "group/index": [
-            "./group/index.js"
+            "./group/index.tsx"
         ],
 
         "dns/index": [
-            "./dns/index.js"
+            "./dns/index.tsx"
         ],
 
         "delegation/index": [
-            "./delegation/index.js"
+            "./delegation/index.tsx"
         ],
 
         "spn/index": [
-            "./spn/index.js"
+            "./spn/index.tsx"
         ],
 
         "fsmo/index": [
-            "./fsmo/index.js"
+            "./fsmo/index.tsx"
         ],
 
         "gpo/index": [
-            "./gpo/index.js"
+            "./gpo/index.tsx"
         ],
 
         "dsacl/index": [
-            "./dsacl/index.js"
+            "./dsacl/index.tsx"
         ],
 
         "ntacl/index": [
-            "./ntacl/index.js"
+            "./ntacl/index.tsx"
         ]
     },
     files: [

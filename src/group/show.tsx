@@ -1,35 +1,26 @@
 import React, { useState } from 'react';
 import {
-  Modal,
-  ModalVariant,
-  Button,
-  Form,
-  FormGroup,
-  TextInput,
-  Alert,
-  Tabs,
-  Tab,
-  TabTitleText,
-  DescriptionList,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  DescriptionListDescription,
-  List,
-  ListItem,
-  EmptyState,
-  EmptyStateIcon,
-  EmptyStateBody,
-  EmptyStateHeader,
-  Skeleton,
-  Spinner
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
 } from '@/components/ui/dialog';
-import { UsersIcon, InfoCircleIcon } from '@/components/ui/icons';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Users, Info } from 'lucide-react';
 import { useGroupDetails, useGroupMembers } from './hooks/useGroups';
 
 interface GroupDetailsDialogProps {
   isOpen?: boolean;
   onClose?: () => void;
   groupName?: string;
+  trigger?: React.ReactElement;
 }
 
 export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
@@ -39,9 +30,8 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
 }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [internalGroupName, setInternalGroupName] = useState('');
-  const [activeTabKey, setActiveTabKey] = useState<string | number>('details');
 
-  // Use external state if provided, otherwise use internal state
+  // Use external props if provided, otherwise use internal state
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const onClose = externalOnClose || (() => setInternalIsOpen(false));
   const groupName = externalGroupName || internalGroupName;
@@ -49,214 +39,167 @@ export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({
   const { group, loading: groupLoading, error: groupError } = useGroupDetails(groupName);
   const { members, loading: membersLoading, error: membersError } = useGroupMembers(groupName);
 
-  const handleModalToggle = () => {
-    if (externalIsOpen === undefined) {
-      setInternalIsOpen(!internalIsOpen);
-    } else {
-      onClose();
-    }
+  const handleShowGroup = () => {
+    setInternalIsOpen(true);
   };
 
-  const handleGroupNameChange = (value: string) => {
+  const handleInputChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setInternalGroupName(value);
   };
 
-  const handleTabClick = (_event: React.MouseEvent<any> | React.KeyboardEvent | MouseEvent, tabIndex: string | number) => {
-    setActiveTabKey(tabIndex);
-  };
-
-  const handleClose = () => {
-    setActiveTabKey('details');
-    onClose();
-  };
-
-  const renderDetailsTab = () => {
-    if (groupLoading) {
-      return <Skeleton height="200px" />;
-    }
-
-    if (groupError) {
-      return (
-        <Alert variant="danger" title="Error loading group details" isInline>
-          {groupError}
-        </Alert>
-      );
-    }
-
-    if (!group) {
-      return (
-        <Alert variant="warning" title="Group not found" isInline>
-          No group found with the name "{groupName}"
-        </Alert>
-      );
-    }
-
+  if (!isOpen && !externalIsOpen) {
     return (
-      <DescriptionList isHorizontal>
-        <DescriptionListGroup>
-          <DescriptionListTerm>Group Name</DescriptionListTerm>
-          <DescriptionListDescription>{group.name}</DescriptionListDescription>
-        </DescriptionListGroup>
-        
-        <DescriptionListGroup>
-          <DescriptionListTerm>Description</DescriptionListTerm>
-          <DescriptionListDescription>
-            {group.description || <em>No description provided</em>}
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-        
-        <DescriptionListGroup>
-          <DescriptionListTerm>Group Type</DescriptionListTerm>
-          <DescriptionListDescription>{group.groupType}</DescriptionListDescription>
-        </DescriptionListGroup>
-        
-        <DescriptionListGroup>
-          <DescriptionListTerm>Distinguished Name</DescriptionListTerm>
-          <DescriptionListDescription>
-            <code style={{ wordBreak: 'break-all' }}>{group.distinguishedName}</code>
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-        
-        <DescriptionListGroup>
-          <DescriptionListTerm>Created</DescriptionListTerm>
-          <DescriptionListDescription>
-            {group.createdAt.toLocaleString()}
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-        
-        <DescriptionListGroup>
-          <DescriptionListTerm>Last Modified</DescriptionListTerm>
-          <DescriptionListDescription>
-            {group.updatedAt.toLocaleString()}
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-      </DescriptionList>
-    );
-  };
-
-  const renderMembersTab = () => {
-    if (membersLoading) {
-      return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Spinner size="sm" />
-          <span>Loading group members...</span>
-        </div>
-      );
-    }
-
-    if (membersError) {
-      return (
-        <Alert variant="danger" title="Error loading group members" isInline>
-          {membersError}
-        </Alert>
-      );
-    }
-
-    if (members.length === 0) {
-      return (
-        <EmptyState>
-          <EmptyStateHeader 
-            titleText="No members"
-            icon={<EmptyStateIcon icon={UsersIcon} />}
-            headingLevel="h4"
-          />
-          <EmptyStateBody>
-            This group currently has no members. Use the "Manage Members" functionality to add users or other groups.
-          </EmptyStateBody>
-        </EmptyState>
-      );
-    }
-
-    return (
-      <div>
-        <p style={{ marginBottom: '1rem', color: 'var(--pf-v5-global--Color--200)' }}>
-          {members.length} member{members.length !== 1 ? 's' : ''}
-        </p>
-        <List>
-          {members.map((member, index) => (
-            <ListItem key={index}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                <span>{member}</span>
-                <Button variant="link" size="sm">
-                  View Details
-                </Button>
-              </div>
-            </ListItem>
-          ))}
-        </List>
-      </div>
-    );
-  };
-
-  return (
-    <>
-      {/* Trigger button when using internal state */}
-      {externalIsOpen === undefined && (
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <TextInput
-            type="text"
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Input
             placeholder="Enter group name"
             value={internalGroupName}
-            onChange={(_event, value) => handleGroupNameChange(value)}
+            onChange={(e) => handleInputChange(e, e.target.value)}
           />
           <Button 
-            variant="primary" 
-            onClick={handleModalToggle}
-            isDisabled={!internalGroupName.trim()}
+            onClick={handleShowGroup}
+            disabled={!internalGroupName.trim()}
           >
-            Show Group Details
+            Show Group
           </Button>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      <Modal
-        variant={ModalVariant.large}
-        title={`Group Details: ${groupName}`}
-        isOpen={isOpen}
-        onClose={handleClose}
-        actions={[
-          <Button key="close" variant="primary" onClick={handleClose}>
-            Close
-          </Button>
-        ]}
-        appendTo={document.body}
-      >
-        {groupName ? (
-          <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
-            <Tab 
-              eventKey="details" 
-              title={
-                <TabTitleText>
-                  <InfoCircleIcon style={{ marginRight: '0.5rem' }} />
-                  Group Information
-                </TabTitleText>
-              }
-            >
-              <div style={{ padding: '1rem 0' }}>
-                {renderDetailsTab()}
-              </div>
-            </Tab>
-            <Tab 
-              eventKey="members" 
-              title={
-                <TabTitleText>
-                  <UsersIcon style={{ marginRight: '0.5rem' }} />
-                  Members ({membersLoading ? '...' : members.length})
-                </TabTitleText>
-              }
-            >
-              <div style={{ padding: '1rem 0' }}>
-                {renderMembersTab()}
-              </div>
-            </Tab>
-          </Tabs>
-        ) : (
-          <Alert variant="info" title="No group specified" isInline>
-            Please specify a group name to view its details.
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Group Details: {groupName}
+          </DialogTitle>
+          <DialogDescription>
+            View group information and manage members
+          </DialogDescription>
+        </DialogHeader>
+
+        {groupError && (
+          <Alert className="border-red-200 bg-red-50">
+            <Info className="h-4 w-4 text-red-600" />
+            <AlertDescription className="text-red-800">
+              Error loading group details: {groupError}
+            </AlertDescription>
           </Alert>
         )}
-      </Modal>
-    </>
+
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="details">Group Details</TabsTrigger>
+            <TabsTrigger value="members">Members</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="details" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Group Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {groupLoading ? (
+                  <div className="flex justify-center py-8">
+                    <LoadingSpinner />
+                  </div>
+                ) : group ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <dt className="text-sm font-medium text-muted-foreground">Name</dt>
+                        <dd className="text-sm mt-1">{group.name}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-medium text-muted-foreground">Display Name</dt>
+                        <dd className="text-sm mt-1">{group.displayName || 'N/A'}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-medium text-muted-foreground">Description</dt>
+                        <dd className="text-sm mt-1">{group.description || 'N/A'}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-medium text-muted-foreground">Group Type</dt>
+                        <dd className="text-sm mt-1">{group.groupType || 'N/A'}</dd>
+                      </div>
+                      <div className="col-span-2">
+                        <dt className="text-sm font-medium text-muted-foreground">Distinguished Name</dt>
+                        <dd className="text-sm mt-1 font-mono break-all">{group.distinguishedName}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-medium text-muted-foreground">SID</dt>
+                        <dd className="text-sm mt-1 font-mono">{group.sid || 'N/A'}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-medium text-muted-foreground">Member Count</dt>
+                        <dd className="text-sm mt-1">{group.memberCount || 0}</dd>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Users className="mx-auto h-12 w-12 text-muted-foreground" />
+                    <h3 className="mt-2 text-sm font-medium">Group not found</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      The specified group could not be located.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="members" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Group Members</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {membersError && (
+                  <Alert className="border-red-200 bg-red-50 mb-4">
+                    <Info className="h-4 w-4 text-red-600" />
+                    <AlertDescription className="text-red-800">
+                      Error loading members: {membersError}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {membersLoading ? (
+                  <div className="flex justify-center py-8">
+                    <LoadingSpinner />
+                  </div>
+                ) : members && members.length > 0 ? (
+                  <div className="space-y-2">
+                    {members.map((member, index) => (
+                      <div key={index} className="flex items-center p-2 bg-muted/50 rounded">
+                        <Users className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span className="text-sm">{member}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Users className="mx-auto h-12 w-12 text-muted-foreground" />
+                    <h3 className="mt-2 text-sm font-medium">No members</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      This group currently has no members.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
