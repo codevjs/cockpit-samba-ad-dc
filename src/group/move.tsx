@@ -5,7 +5,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
+  DialogTrigger
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -27,6 +28,7 @@ interface MoveGroupDialogProps {
   onClose?: () => void;
   onGroupMoved?: () => void;
   groupName?: string;
+  trigger?: React.ReactNode;
 }
 
 // Common organizational units in Active Directory
@@ -42,17 +44,20 @@ const COMMON_OUS = [
 ]
 
 export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
-  isOpen,
+  isOpen: externalIsOpen,
   onClose,
   onGroupMoved,
-  groupName: externalGroupName
+  groupName: externalGroupName,
+  trigger
 }) => {
+  const [internalIsOpen, setInternalIsOpen] = useState(false)
   const [internalGroupName, setInternalGroupName] = useState('')
   const [selectedOU, setSelectedOU] = useState('CN=Users,DC=domain,DC=local')
   const [customOU, setCustomOU] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen
   const groupName = externalGroupName || internalGroupName
 
   const { moveGroup } = useGroupMutations(
@@ -131,6 +136,17 @@ export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
   const handleClose = () => {
     resetForm()
     onClose?.()
+    if (externalIsOpen === undefined) {
+      setInternalIsOpen(false)
+    }
+  }
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      handleClose()
+    } else if (externalIsOpen === undefined) {
+      setInternalIsOpen(true)
+    }
   }
 
   const getTargetOU = () => {
@@ -142,8 +158,12 @@ export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
     return groupName.trim() && targetOU.trim()
   }
 
-  return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+  if (trigger) {
+    return (
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild>
+          {trigger}
+        </DialogTrigger>
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -225,6 +245,99 @@ export const MoveGroupDialog: React.FC<MoveGroupDialogProps> = ({
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={loading || !isFormValid()}
+          >
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {loading ? 'Moving...' : 'Move Group'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    )
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[525px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Move className="h-4 w-4" />
+            Move Group
+          </DialogTitle>
+          <DialogDescription>
+            Move a group to a different organizational unit
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4">
+          {!externalGroupName && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="groupName" className="text-right">
+                Group Name
+              </Label>
+              <Input
+                id="groupName"
+                value={internalGroupName}
+                onChange={(e) => handleGroupNameChange(e.target.value)}
+                className="col-span-3"
+                placeholder="Enter group name"
+              />
+            </div>
+          )}
+
+          {externalGroupName && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Group</Label>
+              <div className="col-span-3 font-medium">{externalGroupName}</div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="targetOU" className="text-right">
+              Target OU
+            </Label>
+            <Select value={selectedOU} onValueChange={handleOUChange}>
+              <SelectTrigger className="col-span-3">
+                <SelectValue placeholder="Select organizational unit" />
+              </SelectTrigger>
+              <SelectContent>
+                {COMMON_OUS.map((ou) => (
+                  <SelectItem key={ou.value} value={ou.value}>
+                    {ou.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {selectedOU === 'OU=Custom' && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="customOU" className="text-right">
+                Custom OU
+              </Label>
+              <Input
+                id="customOU"
+                value={customOU}
+                onChange={(e) => handleCustomOUChange(e.target.value)}
+                className="col-span-3"
+                placeholder="CN=Groups,DC=domain,DC=local"
+              />
+            </div>
+          )}
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={handleClose}>
             Cancel
           </Button>
           <Button

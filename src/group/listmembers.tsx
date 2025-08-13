@@ -5,7 +5,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
+  DialogTrigger
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,12 +20,14 @@ interface ListMembersDialogProps {
   isOpen?: boolean;
   onClose?: () => void;
   groupName?: string;
+  trigger?: React.ReactNode;
 }
 
 export const ListMembersDialog: React.FC<ListMembersDialogProps> = ({
   isOpen: externalIsOpen,
   onClose: externalOnClose,
-  groupName: externalGroupName
+  groupName: externalGroupName,
+  trigger
 }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false)
   const [internalGroupName, setInternalGroupName] = useState('')
@@ -56,30 +59,25 @@ export const ListMembersDialog: React.FC<ListMembersDialogProps> = ({
   const handleClose = () => {
     setSearchTerm('')
     onClose()
+    if (externalIsOpen === undefined) {
+      setInternalIsOpen(false)
+    }
   }
 
-  if (!isOpen && !externalIsOpen) {
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      handleClose()
+    } else if (externalIsOpen === undefined) {
+      setInternalIsOpen(true)
+    }
+  }
+
+  if (trigger) {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Input
-            placeholder="Enter group name"
-            value={internalGroupName}
-            onChange={(e) => handleInputChange(e.target.value)}
-          />
-          <Button
-            onClick={handleShowDialog}
-            disabled={!internalGroupName.trim()}
-          >
-            List Members
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild>
+          {trigger}
+        </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -141,6 +139,114 @@ export const ListMembersDialog: React.FC<ListMembersDialogProps> = ({
                     )
                   : (
                 <div className="max-h-64 overflow-y-auto">
+                  <div className="space-y-1">
+                    {filteredMembers.map((member, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center p-2 rounded hover:bg-muted/50"
+                      >
+                        <Users className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span className="text-sm">{member}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                    )}
+            </CardContent>
+          </Card>
+
+          {members && members.length > 0 && (
+            <Alert className="border-blue-200 bg-blue-50">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-blue-800">
+                <strong>Group Membership:</strong> This group contains {members.length} member(s).
+                Use the search box above to filter the list.
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button onClick={handleClose}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    )
+  }
+
+  // Legacy standalone mode without trigger
+  if (!isOpen && !externalIsOpen) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Enter group name"
+            value={internalGroupName}
+            onChange={(e) => handleInputChange(e.target.value)}
+          />
+          <Button
+            onClick={handleShowDialog}
+            disabled={!internalGroupName.trim()}
+          >
+            List Members
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Group Members: {groupName}
+          </DialogTitle>
+          <DialogDescription>
+            View all members of the selected group
+          </DialogDescription>
+        </DialogHeader>
+
+        {error && (
+          <Alert className="border-red-200 bg-red-50">
+            <Info className="h-4 w-4 text-red-600" />
+            <AlertDescription className="text-red-800">
+              Error loading members: {error}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search members..."
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="flex-1"
+            />
+          </div>
+
+          <Card className="max-h-96 overflow-y-auto">
+            <CardHeader>
+              <CardTitle className="text-sm">
+                Members ({filteredMembers.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <LoadingSpinner />
+                </div>
+              ) : filteredMembers.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  {searchTerm ? 'No members match your search' : 'No members found in this group'}
+                </div>
+              ) : (
+                <div className="space-y-1">
                   <div className="space-y-1">
                     {filteredMembers.map((member, index) => (
                       <div
