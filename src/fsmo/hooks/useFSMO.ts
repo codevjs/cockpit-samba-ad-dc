@@ -1,7 +1,6 @@
-import { useState, useCallback, useEffect } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { FSMOAPI } from '@/services/fsmo-api'
-import { ErrorHandler } from '@/lib/errors'
 import type { FSMORoles, TransferFSMORoleInput, SeizeFSMORoleInput } from '@/types/samba'
 
 export interface UseFSMOReturn {

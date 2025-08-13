@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { GroupAPI } from '../../services/group-api'
-import { CreateGroupInput, UpdateGroupInput } from '../../types/samba'
+import { CreateGroupInput } from '../../types/samba'
 import { APIError } from '../../lib/errors'
 
 export interface UseGroupMutationsReturn {

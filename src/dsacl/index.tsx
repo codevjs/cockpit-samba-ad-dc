@@ -8,17 +8,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Shield,
   Plus,
-  Edit2,
   Search,
   Lock,
   Unlock,
-  Info,
-  ArrowLeft
+  Info
 } from 'lucide-react'
 import { BackButton } from '../common'
 import { useDSACL } from './hooks/useDSACL'
 import { SetDSACLDialog } from './set-dsacl'
-import { toast } from 'sonner'
 
 export default function DSACLManagement () {
   const { dsacl, loading: dsaclLoading, refresh: refreshDSACL } = useDSACL()

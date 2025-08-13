@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { format } from 'date-fns'
-import { MoreHorizontal, Edit, Trash2, User, UserCheck, UserX, Key, Calendar, FolderOpen } from 'lucide-react'
+import { MoreHorizontal, Trash2, User, UserCheck, UserX, Key, Calendar, FolderOpen } from 'lucide-react'
 
 import { DataTable, DataTableColumn } from '@/components/ui/data-table'
 import { ErrorAlert } from '@/components/ui/error-alert'

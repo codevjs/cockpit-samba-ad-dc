@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -23,8 +22,6 @@ interface RemoveMembersDialogProps {
   isOpen?: boolean;
   onClose?: () => void;
   groupName?: string;
-  trigger?: React.ReactElement;
-  onMembersRemoved?: () => void;
 }
 
 export const RemoveMembersDialog: React.FC<RemoveMembersDialogProps> = ({

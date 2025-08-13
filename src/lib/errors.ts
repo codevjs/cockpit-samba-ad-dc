@@ -96,8 +96,6 @@ export class SambaErrorParser {
   }
 
   static parseError (output: string, operation?: string): APIError {
-    const errorText = output.toLowerCase()
-
     // Check for specific error patterns
     for (const [errorType, pattern] of Object.entries(this.ERROR_PATTERNS)) {
       const match = output.match(pattern)
@@ -275,6 +273,6 @@ export class RetryHandler {
       }
     }
 
-    throw lastError!
+    throw lastError || new APIError('Operation failed after retries')
   }
 }

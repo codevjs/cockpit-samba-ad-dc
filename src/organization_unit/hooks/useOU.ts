@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { OrganizationUnitAPI } from '@/services/ou-api'
 import type {
   SambaOU,

@@ -83,18 +83,23 @@ export function ListObjectsDialog ({ isOpen, onClose, ouDN }: ListObjectsDialogP
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto space-y-4">
-          {loading ? (
+          {loading
+            ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin" />
               <span className="ml-2">Loading objects...</span>
             </div>
-          ) : error ? (
+              )
+            : error
+              ? (
             <div className="text-center py-8">
               <div className="text-destructive text-sm">
                 Error loading objects: {error}
               </div>
             </div>
-          ) : objects.length === 0 ? (
+                )
+              : objects.length === 0
+                ? (
             <div className="text-center py-8">
               <Users className="mx-auto h-12 w-12 text-muted-foreground" />
               <h3 className="mt-2 text-sm font-semibold">No Objects Found</h3>
@@ -102,7 +107,8 @@ export function ListObjectsDialog ({ isOpen, onClose, ouDN }: ListObjectsDialogP
                 This organizational unit contains no objects
               </p>
             </div>
-          ) : (
+                  )
+                : (
             <div className="space-y-4">
               {/* Summary */}
               <div className="flex flex-wrap gap-2">
@@ -158,7 +164,7 @@ export function ListObjectsDialog ({ isOpen, onClose, ouDN }: ListObjectsDialogP
                 </div>
               ))}
             </div>
-          )}
+                  )}
         </div>
       </DialogContent>
     </Dialog>

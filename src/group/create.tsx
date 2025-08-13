@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, Plus, Users } from 'lucide-react'
+import { Loader2, Plus } from 'lucide-react'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -34,7 +34,6 @@ import {
 } from '@/components/ui/form'
 
 import { useGroupMutations } from './hooks/useGroupMutations'
-import type { CreateGroupInput } from '@/types/samba'
 
 const createGroupSchema = z.object({
   name: z.string()
@@ -69,7 +68,7 @@ export default function CreateGroupDialog ({ onGroupCreated, trigger }: CreateGr
     }
   })
 
-  const { createGroup, isLoading, error } = useGroupMutations(
+  const { createGroup, isLoading } = useGroupMutations(
     () => {
       // Success callback
       setIsOpen(false)

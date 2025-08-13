@@ -1,5 +1,5 @@
 import { BaseAPI } from './base-api'
-import { SambaOU, SambaOUObject, CreateOUInput, UpdateOUInput, MoveOUInput, RenameOUInput } from '../types/samba'
+import { SambaOU, SambaOUObject, CreateOUInput, MoveOUInput, RenameOUInput } from '../types/samba'
 import { APIError } from '../lib/errors'
 
 export class OrganizationUnitAPI extends BaseAPI {

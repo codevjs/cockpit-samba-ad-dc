@@ -74,7 +74,7 @@ export function SPNList ({ onDeleteSPN }: SPNListProps) {
     }
   }
 
-  const clearError = () => setError(null)
+  // const clearError = () => setError(null)
 
   const parseSPNInfo = (spnName: string) => {
     const parts = spnName.split('/')

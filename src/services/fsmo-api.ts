@@ -1,5 +1,5 @@
 import { BaseAPI } from './base-api'
-import { FSMORole, FSMORoles, TransferFSMORoleInput, SeizeFSMORoleInput } from '../types/samba'
+import { FSMORoles, TransferFSMORoleInput, SeizeFSMORoleInput } from '../types/samba'
 import { APIError } from '../lib/errors'
 
 export class FSMOAPI extends BaseAPI {

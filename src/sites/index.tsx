@@ -9,8 +9,7 @@ import {
   Plus,
   Trash2,
   Server,
-  Globe,
-  ArrowLeft
+  Globe
 } from 'lucide-react'
 import { BackButton } from '../common'
 import { useSites, useSubnets, useSitesMutations } from './hooks/useSites'

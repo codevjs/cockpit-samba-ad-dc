@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Calendar, Clock, Loader2, User } from 'lucide-react'
+import { Calendar, Clock, Loader2 } from 'lucide-react'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'

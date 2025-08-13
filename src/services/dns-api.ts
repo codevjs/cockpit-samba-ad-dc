@@ -1,6 +1,5 @@
 import { BaseAPI } from './base-api'
 import {
-  DNSZone,
   DNSRecord,
   DNSServerInfo,
   DNSZoneInfo,

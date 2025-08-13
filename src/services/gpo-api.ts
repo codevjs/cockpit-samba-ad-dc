@@ -2,7 +2,6 @@ import { BaseAPI } from './base-api'
 import {
   SambaGPO,
   CreateGPOInput,
-  UpdateGPOInput,
   DeleteGPOInput,
   BackupGPOInput,
   RestoreGPOInput,

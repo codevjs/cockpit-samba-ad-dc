@@ -121,7 +121,7 @@ export default function MoveUserDialog ({
     clearError()
 
     const targetOUPath = data.targetOU === 'custom'
-      ? data.customOU!
+      ? data.customOU || ''
       : data.targetOU
 
     await moveUser(data.username, targetOUPath)

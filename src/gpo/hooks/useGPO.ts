@@ -232,7 +232,7 @@ export const useGPOMutations = (onSuccess?: () => void, onError?: (error: string
     }
   }, [onSuccess, onError, invalidateQueries])
 
-  const updateGPO = useCallback(async (input: UpdateGPOInput) => {
+  const updateGPO = useCallback(async (_input: UpdateGPOInput) => {
     try {
       // Note: Samba doesn't have direct update, this would need custom implementation
       // For now, we'll just invalidate queries

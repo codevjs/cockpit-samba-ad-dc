@@ -136,7 +136,7 @@ export function CreateContactDialog ({
   // Watch given name and surname to auto-generate display name
   const givenName = watch('givenName')
   const surname = watch('surname')
-  const displayName = watch('displayName')
+  // const displayName = watch('displayName')
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

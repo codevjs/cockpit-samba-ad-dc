@@ -12,17 +12,15 @@ import {
   Edit2,
   Search,
   Users,
-  Building,
-  ArrowLeft
+  Building
 } from 'lucide-react'
 import { BackButton } from '../common'
-import { useOUs, useOUObjects } from './hooks/useOU'
+import { useOUs } from './hooks/useOU'
 import { CreateOUDialog } from './create-ou'
 import { DeleteOUDialog } from './delete-ou'
 import { MoveOUDialog } from './move-ou'
 import { RenameOUDialog } from './rename-ou'
 import { ListObjectsDialog } from './list-objects'
-import { toast } from 'sonner'
 
 export default function OrganizationUnitManagement () {
   const { ous, loading: ousLoading, refresh: refreshOUs } = useOUs()

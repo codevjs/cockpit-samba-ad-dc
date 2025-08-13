@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { format } from 'date-fns'
 import { Monitor, Power, PowerOff, MoreHorizontal, Trash2, FolderOpen, Info } from 'lucide-react'
 
@@ -128,8 +128,8 @@ export default function ComputerList ({
   const error = propError !== undefined ? propError : hookData.error
   const onRefresh = propOnRefresh || hookData.refreshComputers
 
-  const { enable, disable, enablingDisabling, error: mutationError } = useComputerMutations({
-    onSuccess: (action, data) => {
+  const { enable, disable, enablingDisabling } = useComputerMutations({
+    onSuccess: (_action, _data) => {
       onRefresh()
     },
     onError: (action, error) => {
@@ -137,13 +137,13 @@ export default function ComputerList ({
     }
   })
 
-  const handleEnableDisable = async (computer: SambaComputer) => {
+  const handleEnableDisable = useCallback(async (computer: SambaComputer) => {
     if (computer.enabled) {
       await disable(computer.name)
     } else {
       await enable(computer.name)
     }
-  }
+  }, [disable, enable])
 
   const columns = useMemo<DataTableColumn<SambaComputer>[]>(() => [
     {

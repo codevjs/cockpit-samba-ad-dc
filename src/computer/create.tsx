@@ -43,7 +43,7 @@ const createComputerSchema = z.object({
     .min(1, 'Computer name is required')
     .max(15, 'Computer name cannot exceed 15 characters')
     .regex(
-      /^[A-Za-z0-9\-]+$/,
+      /^[A-Za-z0-9-]+$/,
       'Computer name can only contain letters, numbers, and hyphens'
     ),
   description: z.string().optional(),

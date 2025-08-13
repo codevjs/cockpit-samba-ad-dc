@@ -5,8 +5,7 @@ import { APIError, SambaErrorParser } from '@/lib/errors'
 import type {
   SambaComputer,
   CreateComputerInput,
-  FilterOptions,
-  PaginatedResponse
+  FilterOptions
 } from '@/types/samba'
 
 export class ComputerAPI extends BaseAPI {
@@ -231,11 +230,12 @@ export class ComputerAPI extends BaseAPI {
         case 'description':
           computer.description = value
           break
-        case 'useraccountcontrol':
+        case 'useraccountcontrol': {
           // Parse account control flags
           const flags = parseInt(value)
           computer.enabled = !(flags & 0x0002) // ACCOUNTDISABLE flag
           break
+        }
         case 'whencreated':
           computer.createdAt = this.parseDate(value) || new Date()
           break

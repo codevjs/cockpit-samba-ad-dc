@@ -1,5 +1,5 @@
 import { BaseAPI } from './base-api'
-import { SambaContact, CreateContactInput, UpdateContactInput } from '../types/samba'
+import { SambaContact, CreateContactInput } from '../types/samba'
 import { APIError } from '../lib/errors'
 
 export class ContactAPI extends BaseAPI {

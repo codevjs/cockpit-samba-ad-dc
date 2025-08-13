@@ -20,7 +20,6 @@ interface DeleteGroupDialogProps {
   onClose?: () => void;
   onGroupDeleted?: () => void;
   groupName?: string;
-  trigger?: React.ReactElement;
 }
 
 export const DeleteGroupDialog: React.FC<DeleteGroupDialogProps> = ({

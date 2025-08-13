@@ -1,6 +1,5 @@
 import React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Toaster } from 'sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -250,7 +249,7 @@ export default function Main (): JSX.Element {
                                     variant="outline"
                                     size="sm"
                                     className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                                    onClick={() => window.location.href = module.href}
+                                    onClick={() => { window.location.href = module.href }}
                                 >
                                     Manage
                                 </Button>

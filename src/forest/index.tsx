@@ -10,13 +10,11 @@ import {
   Database,
   Shield,
   Info,
-  ArrowLeft,
   Cog
 } from 'lucide-react'
 import { BackButton } from '../common'
 import { useForest, useDirectoryService } from './hooks/useForest'
 import { DSHeuristicsDialog } from './dsheuristics-dialog'
-import { toast } from 'sonner'
 
 export default function ForestManagement () {
   const { forest, loading: forestLoading, refresh: refreshForest } = useForest()

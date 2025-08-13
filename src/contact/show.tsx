@@ -8,12 +8,11 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Eye,
-  User,
   Mail,
   Phone,
   Building2,
@@ -43,6 +42,7 @@ export function ShowContactDialog ({
     if (isOpen && contactName) {
       fetchContactDetails()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, contactName])
 
   const fetchContactDetails = async () => {
@@ -94,13 +94,16 @@ export function ShowContactDialog ({
             </Alert>
           )}
 
-          {loading ? (
+          {loading
+            ? (
             <div className="space-y-4">
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
               <Skeleton className="h-32 w-full" />
             </div>
-          ) : contact ? (
+              )
+            : contact
+              ? (
             <div className="space-y-6">
               {/* Basic Information */}
               <Card>
@@ -249,14 +252,15 @@ export function ShowContactDialog ({
                 </CardContent>
               </Card>
             </div>
-          ) : (
-            !error && (
-              <div className="text-center py-8">
-                <ContactIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-                <p className="mt-2 text-sm text-muted-foreground">No contact selected</p>
-              </div>
-            )
-          )}
+                )
+              : (
+                  !error && (
+                <div className="text-center py-8">
+                  <ContactIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+                  <p className="mt-2 text-sm text-muted-foreground">No contact selected</p>
+                </div>
+                  )
+                )}
         </div>
 
         <div className="flex justify-end pt-4">

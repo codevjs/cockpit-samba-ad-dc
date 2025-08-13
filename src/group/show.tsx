@@ -20,7 +20,6 @@ interface GroupDetailsDialogProps {
   isOpen?: boolean;
   onClose?: () => void;
   groupName?: string;
-  trigger?: React.ReactElement;
 }
 
 export const GroupDetailsDialog: React.FC<GroupDetailsDialogProps> = ({

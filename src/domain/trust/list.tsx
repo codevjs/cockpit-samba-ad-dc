@@ -9,7 +9,6 @@ import {
   Plus,
   Search,
   Shield,
-  Clock,
   Info,
   Eye,
   Trash2
@@ -114,7 +113,7 @@ export function TrustListCard () {
     {
       key: 'actions',
       header: 'Actions',
-      render: (trust) => (
+      render: (_trust) => (
         <div className="flex items-center gap-2">
           <Button
             variant="outline"

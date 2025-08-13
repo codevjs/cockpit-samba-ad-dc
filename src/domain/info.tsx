@@ -5,9 +5,6 @@ import { Separator } from '@/components/ui/separator'
 import {
   Globe,
   Server,
-  Shield,
-  Database,
-  Clock,
   Info
 } from 'lucide-react'
 import { useDomainInfo } from './hooks/useDomain'

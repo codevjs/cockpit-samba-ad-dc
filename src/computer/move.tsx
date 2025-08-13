@@ -119,7 +119,7 @@ export default function MoveComputerDialog ({
     clearError()
 
     const targetOUPath = data.targetOU === 'custom'
-      ? data.customOU!
+      ? data.customOU || ''
       : data.targetOU
 
     await moveComputer(data.computerName, targetOUPath)

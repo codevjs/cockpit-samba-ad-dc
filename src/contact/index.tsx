@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   Search,
@@ -10,9 +9,7 @@ import {
   Users,
   Mail,
   Phone,
-  Building,
-  Contact as ContactIcon,
-  ArrowLeft
+  Contact as ContactIcon
 } from 'lucide-react'
 import { BackButton } from '../common'
 import { ContactList } from './list'

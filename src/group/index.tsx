@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Plus, Users, Search, Filter, UsersIcon } from 'lucide-react'
+import { Plus, Users, Search, Filter } from 'lucide-react'
 import '../user/tailwind.css'
 
 import { Button } from '@/components/ui/button'
@@ -39,7 +39,7 @@ interface GroupManagementPageProps {
 function GroupManagementPage ({ initialView = 'list' }: GroupManagementPageProps) {
   const [activeTab, setActiveTab] = useState(initialView)
   const [searchQuery, setSearchQuery] = useState('')
-  const [filters, setFilters] = useState<FilterOptions>({})
+  const [, setFilters] = useState<FilterOptions>({})
 
   const {
     groups,

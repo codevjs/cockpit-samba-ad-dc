@@ -196,7 +196,7 @@ export interface UseBackupHistoryReturn {
 export const useBackupHistory = (): UseBackupHistoryReturn => {
   const [backups, setBackups] = useState<BackupInfo[]>([])
   const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error] = useState<string | null>(null)
 
   const addBackup = useCallback((backup: BackupInfo) => {
     setBackups(prev => [backup, ...prev])

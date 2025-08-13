@@ -1,6 +1,5 @@
 import { BaseAPI } from './base-api'
 import {
-  SambaDomain,
   DomainInfo,
   TrustRelationship,
   BackupInfo,

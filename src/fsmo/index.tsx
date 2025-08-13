@@ -11,8 +11,7 @@ import {
   Settings,
   ArrowRight,
   RefreshCw,
-  AlertTriangle,
-  ArrowLeft
+  AlertTriangle
 } from 'lucide-react'
 import { BackButton } from '../common'
 import { ErrorAlert } from '@/components/ui/error-alert'

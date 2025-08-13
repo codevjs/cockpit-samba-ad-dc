@@ -58,15 +58,15 @@ export default function CreateUserDialog ({ onUserCreated, trigger }: CreateUser
   })
 
   const { create, creating, error, clearError } = useUserMutations({
-    onSuccess: (action, user) => {
-      if (action === 'create') {
+    onSuccess: (_action, user) => {
+      if (_action === 'create') {
         setShowToasts({ success: true, error: false })
         setIsOpen(false)
         form.reset()
         onUserCreated?.(user)
       }
     },
-    onError: (action) => {
+    onError: (_action) => {
       setShowToasts({ success: false, error: true })
     }
   })

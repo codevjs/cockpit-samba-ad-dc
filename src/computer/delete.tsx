@@ -69,7 +69,7 @@ export default function DeleteComputerDialog ({
   })
 
   const { delete: deleteComputer, deleting, error, clearError } = useComputerMutations({
-    onSuccess: (action, result) => {
+    onSuccess: (action, _result) => {
       if (action === 'delete') {
         setShowToasts({ success: true, error: false })
         setIsOpen(false)

@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { ContactAPI } from '../../services/contact-api'
-import { CreateContactInput, UpdateContactInput } from '../../types/samba'
+import { CreateContactInput } from '../../types/samba'
 import { APIError } from '../../lib/errors'
 
 export interface UseContactMutationsReturn {

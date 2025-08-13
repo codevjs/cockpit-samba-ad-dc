@@ -9,11 +9,9 @@ import {
   Globe,
   Plus,
   Trash2,
-  Search,
   Settings,
   Database,
   Server,
-  ArrowLeft,
   Info
 } from 'lucide-react'
 import { BackButton } from '../common'
@@ -40,7 +38,7 @@ export default function DNSManagement () {
   const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false)
 
   const { zones, loading: zonesLoading, refresh: refreshZones } = useDNSZones(selectedServer, password)
-  const { serverInfo, loading: serverLoading, refresh: refreshServerInfo } = useDNSServerInfo(selectedServer, password)
+  const { serverInfo, refresh: refreshServerInfo } = useDNSServerInfo(selectedServer, password)
 
   const handleOperationSuccess = () => {
     refreshZones()

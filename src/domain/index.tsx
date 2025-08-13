@@ -3,17 +3,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Globe,
   Plus,
   Trash2,
-  Search,
   Settings,
   Database,
   Shield,
-  ArrowLeft,
   Info,
   Archive,
   Download,
@@ -22,20 +19,17 @@ import {
   Server,
   Users,
   Key,
-  CheckCircle,
-  Clock
+  CheckCircle
 } from 'lucide-react'
 import { BackButton } from '../common'
-import { DataTable } from '@/components/ui/data-table'
 import { DomainInfoCard } from './info'
 import { DomainJoinDialog } from './join'
 import { BackupOfflineDialog } from './backup/offline'
 import { TrustListCard } from './trust/list'
 import { toast } from 'sonner'
-import type { ColumnDef } from '@tanstack/react-table'
 
 export default function DomainManagement () {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [,] = useState('')
 
   // Dialog states
   const [joinDialogOpen, setJoinDialogOpen] = useState(false)

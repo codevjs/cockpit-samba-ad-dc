@@ -1,5 +1,5 @@
 import { BaseAPI } from './base-api'
-import { SambaGroup, CreateGroupInput, UpdateGroupInput } from '../types/samba'
+import { SambaGroup, CreateGroupInput } from '../types/samba'
 import { APIError } from '../lib/errors'
 
 export class GroupAPI extends BaseAPI {

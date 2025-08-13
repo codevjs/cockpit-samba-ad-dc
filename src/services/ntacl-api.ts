@@ -165,7 +165,7 @@ export class NTACLApi extends BaseAPI {
     const permissions: NTACLPermission[] = []
 
     // Simple parsing - in real implementation would need more sophisticated ACL parsing
-    lines.forEach((line, index) => {
+    lines.forEach((line, _index) => {
       if (line.includes('(') && line.includes(')')) {
         permissions.push({
           trustee: this.extractTrustee(line),

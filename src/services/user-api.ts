@@ -6,8 +6,7 @@ import type {
   SambaUser,
   CreateUserInput,
   UpdateUserInput,
-  FilterOptions,
-  PaginatedResponse
+  FilterOptions
 } from '@/types/samba'
 
 export class UserAPI extends BaseAPI {
@@ -49,7 +48,7 @@ export class UserAPI extends BaseAPI {
 
       if (filters?.groups?.length) {
         filteredUsers = filteredUsers.filter(user =>
-          filters.groups!.some(group => user.groups.includes(group))
+          filters.groups?.some(group => user.groups.includes(group))
         )
       }
 
@@ -409,11 +408,12 @@ export class UserAPI extends BaseAPI {
         case 'description':
           user.description = value
           break
-        case 'useraccountcontrol':
+        case 'useraccountcontrol': {
           // Parse account control flags
           const flags = parseInt(value)
           user.enabled = !(flags & 0x0002) // ACCOUNTDISABLE flag
           break
+        }
         case 'whencreated':
           user.createdAt = this.parseDate(value) || new Date()
           break

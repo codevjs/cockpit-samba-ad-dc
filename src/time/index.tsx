@@ -8,7 +8,6 @@ import {
   Clock,
   Server as ServerIcon,
   RefreshCw,
-  ArrowLeft,
   Calendar
 } from 'lucide-react'
 import { BackButton } from '../common'
@@ -17,12 +16,12 @@ import { toast } from 'sonner'
 
 import cockpit from 'cockpit'
 
-interface TimeInfo {
-  currentTime: string;
-  timezone: string;
-  ntpStatus: string;
-  ntpServers: string[];
-}
+// interface TimeInfo {
+//   currentTime: string;
+//   timezone: string;
+//   ntpStatus: string;
+//   ntpServers: string[];
+// }
 
 export default function TimeManagement () {
   const [serverTime, setServerTime] = useState<string>('')

@@ -100,6 +100,14 @@ export interface CreateOUInput {
   parentOU?: string;
 }
 
+export interface FSMORoles {
+  schemaMaster: string;
+  domainNamingMaster: string;
+  ridMaster: string;
+  pdcEmulator: string;
+  infrastructureMaster: string;
+}
+
 export interface SambaDomain {
   name: string;
   realm: string;
@@ -113,12 +121,11 @@ export interface SambaDomain {
   fsmoRoles: FSMORoles;
 }
 
-export interface FSMORoles {
-  schemaMaster: string;
-  domainNamingMaster: string;
-  ridMaster: string;
-  pdcEmulator: string;
-  infrastructureMaster: string;
+export interface DNSRecord {
+  name: string;
+  type: 'A' | 'AAAA' | 'CNAME' | 'MX' | 'NS' | 'PTR' | 'SOA' | 'SRV' | 'TXT';
+  data: string;
+  ttl?: number;
 }
 
 export interface SambaDNSZone {
@@ -126,13 +133,6 @@ export interface SambaDNSZone {
   type: 'Primary' | 'Secondary' | 'Stub';
   records: DNSRecord[];
   createdAt: Date;
-}
-
-export interface DNSRecord {
-  name: string;
-  type: 'A' | 'AAAA' | 'CNAME' | 'MX' | 'NS' | 'PTR' | 'SOA' | 'SRV' | 'TXT';
-  data: string;
-  ttl?: number;
 }
 
 export interface SambaGPO {
@@ -321,15 +321,15 @@ export interface PaginationOptions {
 }
 
 // Form Validation Types
-export interface ValidationResult {
-  isValid: boolean;
-  errors: ValidationError[];
-}
-
 export interface ValidationError {
   field: string;
   message: string;
   code: string;
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: ValidationError[];
 }
 
 // Contact Management Types
@@ -389,14 +389,6 @@ export interface FSMORole {
   role: 'SchemaMaster' | 'DomainNamingMaster' | 'PDCEmulator' | 'RIDMaster' | 'InfrastructureMaster';
   holder: string;
   description: string;
-}
-
-export interface FSMORoles {
-  schemaMaster: string;
-  domainNamingMaster: string;
-  ridMaster: string;
-  pdcEmulator: string;
-  infrastructureMaster: string;
 }
 
 export interface TransferFSMORoleInput {
@@ -463,16 +455,6 @@ export interface SetDSHeuristicsInput {
 }
 
 // Organization Unit Management Types
-export interface SambaOU {
-  name: string;
-  distinguishedName: string;
-  description?: string;
-  parentOU?: string;
-  children: SambaOUChild[];
-  objects: SambaOUObject[];
-  createdAt: Date;
-}
-
 export interface SambaOUChild {
   name: string;
   distinguishedName: string;
@@ -486,10 +468,14 @@ export interface SambaOUObject {
   enabled?: boolean;
 }
 
-export interface CreateOUInput {
+export interface SambaOU {
   name: string;
+  distinguishedName: string;
   description?: string;
   parentOU?: string;
+  children: SambaOUChild[];
+  objects: SambaOUObject[];
+  createdAt: Date;
 }
 
 export interface UpdateOUInput {
@@ -534,18 +520,18 @@ export interface SetDSACLInput {
 }
 
 // NT ACL Management Types
-export interface NTACLInfo {
-  filePath: string;
-  acl: string;
-  permissions: NTACLPermission[];
-  rawOutput: string[];
-}
-
 export interface NTACLPermission {
   trustee: string;
   permissions: string[];
   accessType: 'Allow' | 'Deny';
   inheritance: string[];
+}
+
+export interface NTACLInfo {
+  filePath: string;
+  acl: string;
+  permissions: NTACLPermission[];
+  rawOutput: string[];
 }
 
 export interface GetNTACLInput {

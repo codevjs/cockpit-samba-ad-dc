@@ -27,7 +27,6 @@ interface MoveGroupDialogProps {
   onClose?: () => void;
   onGroupMoved?: () => void;
   groupName?: string;
-  trigger?: React.ReactElement;
 }
 
 // Common organizational units in Active Directory

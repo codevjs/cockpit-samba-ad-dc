@@ -2,17 +2,12 @@ import React, { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import {
-  Search,
   Plus,
   List,
   Key,
-  User,
   Server,
-  Shield,
-  ArrowLeft
+  Shield
 } from 'lucide-react'
 import { BackButton } from '../common'
 import { SPNList } from './list'
@@ -25,16 +20,16 @@ interface SPNManagementPageProps {
 
 export default function SPNManagementPage ({ initialView = 'list' }: SPNManagementPageProps) {
   const [activeTab, setActiveTab] = useState(initialView)
-  const [searchQuery, setSearchQuery] = useState('')
+  // const [searchQuery, setSearchQuery] = useState('')
 
   // SPN management dialogs
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedSPN, setSelectedSPN] = useState<{name: string, user: string} | null>(null)
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-  }
+  // const handleSearch = (query: string) => {
+  //   setSearchQuery(query)
+  // }
 
   const handleAddSuccess = () => {
     setAddDialogOpen(false)

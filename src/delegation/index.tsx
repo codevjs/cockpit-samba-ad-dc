@@ -13,7 +13,6 @@ import {
   Settings,
   Lock,
   Unlock,
-  ArrowLeft,
   Info
 } from 'lucide-react'
 import { BackButton } from '../common'
@@ -36,7 +35,7 @@ export default function DelegationManagement () {
   const [setAnyServiceDialogOpen, setSetAnyServiceDialogOpen] = useState(false)
   const [setAnyProtocolDialogOpen, setSetAnyProtocolDialogOpen] = useState(false)
 
-  const { delegation, loading: delegationLoading, refresh: refreshDelegation } = useDelegation(selectedAccount)
+  const { delegation, refresh: refreshDelegation } = useDelegation(selectedAccount)
 
   const handleOperationSuccess = () => {
     refreshDelegation()

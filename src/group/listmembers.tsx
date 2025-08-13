@@ -19,7 +19,6 @@ interface ListMembersDialogProps {
   isOpen?: boolean;
   onClose?: () => void;
   groupName?: string;
-  trigger?: React.ReactElement;
 }
 
 export const ListMembersDialog: React.FC<ListMembersDialogProps> = ({

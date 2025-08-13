@@ -62,7 +62,7 @@ export function DeleteGPODialog ({
   const confirmationText = watch('confirmationText')
   const isConfirmed = confirmationText === 'DELETE'
 
-  const onSubmit = async (data: DeleteGPOFormData) => {
+  const onSubmit = async (_data: DeleteGPOFormData) => {
     if (!gpo || !isConfirmed) {
       toast.error('Please type DELETE to confirm GPO deletion')
       return

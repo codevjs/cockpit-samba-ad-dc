@@ -13,7 +13,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
@@ -154,7 +153,7 @@ export default function ShowComputerDialog ({
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => handleCopyToClipboard(computer.dnsHostName!)}
+                                                onClick={() => handleCopyToClipboard(computer.dnsHostName || '')}
                                             >
                                                 <Copy className="h-3 w-3" />
                                             </Button>

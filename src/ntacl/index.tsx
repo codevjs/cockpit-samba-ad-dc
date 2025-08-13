@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Shield,
@@ -11,7 +10,6 @@ import {
   CheckCircle,
   AlertTriangle,
   HardDrive,
-  ArrowLeft,
   Info
 } from 'lucide-react'
 import { BackButton } from '../common'
@@ -21,7 +19,6 @@ import { SetNTACLDialog } from './set-ntacl'
 import { ChangeDomSIDDialog } from './change-domsid'
 import { GetDOSInfoDialog } from './get-dosinfo'
 import { SysvolResetDialog } from './sysvol-reset'
-import { toast } from 'sonner'
 
 export default function NTACLManagement () {
   const { sysvolStatus, loading: sysvolLoading, refresh: refreshSysvol } = useSysvolCheck()

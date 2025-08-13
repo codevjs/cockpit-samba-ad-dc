@@ -16,7 +16,7 @@ const createZoneSchema = z.object({
   server: z.string().min(1, 'Server is required'),
   zoneName: z.string()
     .min(1, 'Zone name is required')
-    .regex(/^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$/,
+    .regex(/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
       'Invalid zone name format'),
   password: z.string().optional()
 })

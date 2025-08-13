@@ -13,7 +13,6 @@ import {
   Settings,
   Database,
   Shield,
-  ArrowLeft,
   Info,
   Archive,
   Download,
@@ -35,7 +34,6 @@ import { SetLinkDialog } from './set-link'
 import { DeleteLinkDialog } from './delete-link'
 import { InheritanceDialog } from './inheritance'
 import { ShowGPODialog } from './show-gpo'
-import { toast } from 'sonner'
 import type { SambaGPO } from '@/types/samba'
 import type { DataTableColumn } from '@/components/ui/data-table'
 

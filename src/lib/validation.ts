@@ -6,7 +6,6 @@ import { z } from 'zod'
 const USERNAME_PATTERN = /^[a-zA-Z0-9._-]{1,64}$/
 const COMPUTER_NAME_PATTERN = /^[a-zA-Z0-9-]{1,15}$/
 const GROUP_NAME_PATTERN = /^[a-zA-Z0-9 ._-]{1,64}$/
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 // Password complexity requirements for Active Directory
 const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/
