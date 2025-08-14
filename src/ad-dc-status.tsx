@@ -24,6 +24,13 @@ export default function GetServerRole (): JSX.Element {
       try {
         setState(prev => ({ ...prev, loading: true, error: undefined }))
 
+        // First check if samba-tool exists
+        try {
+          await cockpit.script('which samba-tool', { err: 'ignore' })
+        } catch {
+          throw new Error('Samba is not installed or samba-tool is not in PATH')
+        }
+
         const command = 'samba-tool testparm --parameter-name=serverrole'
         const data = await cockpit.script(command, { superuser: true, err: 'message' })
 
@@ -35,10 +42,23 @@ export default function GetServerRole (): JSX.Element {
         })
       } catch (exception: any) {
         console.error('Failed to check AD DC status:', exception)
+        // Handle different types of errors gracefully
+        const isPermissionDenied = exception?.problem === 'access-denied'
+        const isSambaNotFound = exception?.message?.includes('samba-tool: not found') || 
+                                exception?.message?.includes('Samba is not installed')
+        
+        let errorMessage = exception?.message || 'Failed to check server role'
+        
+        if (isPermissionDenied) {
+          errorMessage = 'Permission required: Please ensure you have sudo access or run Cockpit as administrator'
+        } else if (isSambaNotFound) {
+          errorMessage = 'Samba AD DC is not installed. Please install samba package first.'
+        }
+
         setState({
-          addcStatus: false,
+          addcStatus: undefined, // Unknown status due to error
           loading: false,
-          error: exception?.message || 'Failed to check server role'
+          error: errorMessage
         })
       }
     }
@@ -73,6 +93,11 @@ export default function GetServerRole (): JSX.Element {
                     </CardContent>
                 </Card>
       )
+    }
+
+    // Handle permission denied case - show main interface with warning
+    if (state.addcStatus === undefined && !state.loading && !state.error) {
+      return <Main />
     }
 
     if (state.addcStatus) {

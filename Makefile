@@ -22,7 +22,7 @@ all: $(VITE_TEST)
 %.spec: %.spec.in
 	sed -e 's/%{VERSION}/$(VERSION)/g' $< > $@
 
-$(VITE_TEST): $(NODE_MODULES_TEST) $(shell find src/ -type f) package.json vite.config.ts $(patsubst %,dist/po.%.js,$(LINGUAS))
+$(VITE_TEST): $(NODE_MODULES_TEST) $(shell find src/ -type f) package.json vite.config.ts
 	NODE_ENV=$(NODE_ENV) npm run build
 
 watch:

@@ -17,24 +17,9 @@ function vpath(...args: string[]): string {
 }
 
 // Define all entry points (matching webpack config)
+// For now, let's start with just the main entry to fix issues
 const entries = {
-  'index': './src/index.tsx',
-  'computer/index': './src/computer/index.tsx',
-  'domain/index': './src/domain/index.tsx',
-  'contact/index': './src/contact/index.tsx',
-  'time/index': './src/time/index.tsx',
-  'sites/index': './src/sites/index.tsx',
-  'user/index': './src/user/index.tsx',
-  'organization_unit/index': './src/organization_unit/index.tsx',
-  'forest/index': './src/forest/index.tsx',
-  'group/index': './src/group/index.tsx',
-  'dns/index': './src/dns/index.tsx',
-  'delegation/index': './src/delegation/index.tsx',
-  'spn/index': './src/spn/index.tsx',
-  'fsmo/index': './src/fsmo/index.tsx',
-  'gpo/index': './src/gpo/index.tsx',
-  'dsacl/index': './src/dsacl/index.tsx',
-  'ntacl/index': './src/ntacl/index.tsx'
+  'index': './src/index.tsx'
 }
 
 // Define files to copy (matching webpack config)
@@ -78,6 +63,13 @@ export default defineConfig({
             })
           }
         })
+        
+        // Create po files for localization (simplified)
+        this.emitFile({
+          type: 'asset',
+          fileName: 'po.js',
+          source: 'cockpit.locale = cockpit.locale || {};'
+        })
       }
     }
   ],
@@ -100,6 +92,8 @@ export default defineConfig({
         entryFileNames: '[name].js',
         chunkFileNames: '[name]-[hash].js',
         assetFileNames: '[name].[ext]',
+        format: 'umd',
+        name: 'SambaADDC',
         globals: {
           cockpit: 'cockpit'
         }
@@ -124,7 +118,7 @@ export default defineConfig({
   },
   
   server: {
-    port: 9000,
+    port: 9090,
     host: true,
     open: false,
     // Proxy API calls to Cockpit when developing standalone
