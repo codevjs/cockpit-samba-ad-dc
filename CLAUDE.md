@@ -11,7 +11,7 @@ A modernized Cockpit plugin for managing Samba Active Directory Domain Controlle
 ### Build & Development
 ```bash
 # Development
-npm run dev              # Webpack dev server
+npm run dev              # Vite dev server (fast HMR)
 npm run watch           # Watch mode
 make watch              # Alternative watch
 
@@ -47,7 +47,7 @@ npm run test:coverage   # Test with coverage report
 ### Technology Stack
 - **Frontend**: React 18.3.1 + TypeScript 5.6+
 - **UI**: Tailwind CSS 3.4+ + Shadcn/ui (Radix UI components)
-- **Build**: Webpack 5 with multiple entry points
+- **Build**: Vite 7+ with multiple entry points (much faster than Webpack)
 - **Testing**: Jest + React Testing Library
 - **Forms**: React Hook Form + Zod validation
 - **Integration**: Cockpit API for system management
@@ -172,12 +172,12 @@ __tests__/
 
 ## Build System
 
-### Webpack Configuration
-- **Multiple entry points**: Each module has separate entry
-- **Code splitting**: Vendor and common chunks
-- **CSS processing**: SCSS + PostCSS + Tailwind
-- **TypeScript**: ts-loader + babel-loader
-- **Development**: HMR support on port 9000
+### Vite Configuration
+- **Multiple entry points**: Each module has separate entry (faster than Webpack)
+- **Code splitting**: Automatic smart chunking
+- **CSS processing**: SCSS + PostCSS + Tailwind (built-in)
+- **TypeScript**: Native TypeScript support
+- **Development**: Lightning-fast HMR on port 9000
 
 ### Entry Points
 Each module generates separate bundles:

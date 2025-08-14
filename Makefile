@@ -10,10 +10,10 @@ RPMFILE=$(shell rpmspec -D"VERSION $(VERSION)" -q cockpit-samba-ad-dc.spec.in).r
 VM_IMAGE=$(CURDIR)/test/images/$(TEST_OS)
 # stamp file to check if/when npm install ran
 NODE_MODULES_TEST=package-lock.json
-# one example file in dist/ from webpack to check if that already ran
-WEBPACK_TEST=dist/index.html
+# one example file in dist/ from vite to check if that already ran
+VITE_TEST=dist/index.html
 
-all: $(WEBPACK_TEST)
+all: $(VITE_TEST)
 
 #
 # Build/Install/dist
@@ -22,7 +22,7 @@ all: $(WEBPACK_TEST)
 %.spec: %.spec.in
 	sed -e 's/%{VERSION}/$(VERSION)/g' $< > $@
 
-$(WEBPACK_TEST): $(NODE_MODULES_TEST) $(shell find src/ -type f) package.json webpack.config.js $(patsubst %,dist/po.%.js,$(LINGUAS))
+$(VITE_TEST): $(NODE_MODULES_TEST) $(shell find src/ -type f) package.json vite.config.ts $(patsubst %,dist/po.%.js,$(LINGUAS))
 	NODE_ENV=$(NODE_ENV) npm run build
 
 watch:
@@ -32,25 +32,25 @@ clean:
 	rm -rf dist/
 	[ ! -e cockpit-$(PACKAGE_NAME).spec.in ] || rm -f cockpit-$(PACKAGE_NAME).spec
 
-install: $(WEBPACK_TEST)
+install: $(VITE_TEST)
 	mkdir -p $(DESTDIR)/usr/share/cockpit/$(PACKAGE_NAME)
 	cp -r dist/* $(DESTDIR)/usr/share/cockpit/$(PACKAGE_NAME)
 	mkdir -p $(DESTDIR)/usr/share/metainfo/
 	cp org.cockpit-project.$(PACKAGE_NAME).metainfo.xml $(DESTDIR)/usr/share/metainfo/
 
 # this requires a built source tree and avoids having to install anything system-wide
-devel-install: $(WEBPACK_TEST)
+devel-install: $(VITE_TEST)
 	mkdir -p ~/.local/share/cockpit
 	ln -s `pwd`/dist ~/.local/share/cockpit/$(PACKAGE_NAME)
 
 dist-gzip: $(TARFILE)
 
-# when building a distribution tarball, call webpack with a 'production' environment
+# when building a distribution tarball, call vite with a 'production' environment
 # we don't ship node_modules for license and compactness reasons; we ship a
 # pre-built dist/ (so it's not necessary) and ship packge-lock.json (so that
 # node_modules/ can be reconstructed if necessary)
 $(TARFILE): NODE_ENV=production
-$(TARFILE): $(WEBPACK_TEST) cockpit-$(PACKAGE_NAME).spec
+$(TARFILE): $(VITE_TEST) cockpit-$(PACKAGE_NAME).spec
 	if type appstream-util >/dev/null 2>&1; then appstream-util validate-relax --nonet *.metainfo.xml; fi
 	mv node_modules node_modules.release
 	touch -r package.json $(NODE_MODULES_TEST)
