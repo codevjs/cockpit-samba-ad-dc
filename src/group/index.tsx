@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Providers } from '@/lib/providers'
 import { Plus, Users, Search, Filter } from 'lucide-react'
 import '../user/tailwind.css'
+import { PageHeader } from '@/components/layout/PageHeader'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -64,26 +65,20 @@ function GroupManagementPage ({ initialView = 'list' }: GroupManagementPageProps
   return (
         <div className="min-h-screen bg-background">
             <div className="container mx-auto p-6 space-y-6">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Group Management</h1>
-                        <p className="text-muted-foreground">
-                            Manage Active Directory groups, members, and permissions
-                        </p>
-                    </div>
-                    <div className="flex gap-2">
-                        <CreateGroupDialog
-                            onGroupCreated={refreshGroups}
-                            trigger={
-                                <Button>
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Create Group
-                                </Button>
-                            }
-                        />
-                    </div>
-                </div>
+                <PageHeader
+                    title="Group Management"
+                    description="Manage Active Directory groups, members, and permissions"
+                >
+                    <CreateGroupDialog
+                        onGroupCreated={refreshGroups}
+                        trigger={
+                            <Button>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create Group
+                            </Button>
+                        }
+                    />
+                </PageHeader>
 
                 {/* Statistics Cards */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Providers } from '@/lib/providers'
 import '../user/tailwind.css'
+import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -69,15 +70,11 @@ export default function TimeManagement () {
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
-      <div className="flex items-center gap-4">
-        <BackButton />
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Time Configuration</h1>
-          <p className="text-muted-foreground">
-            Configure time synchronization and NTP settings for Samba AD DC
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Time Configuration"
+        description="Configure time synchronization and NTP settings for Samba AD DC"
+        showBackButton={true}
+      />
 
       {/* Configuration Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

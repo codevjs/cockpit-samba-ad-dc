@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Providers } from '@/lib/providers'
 import '../user/tailwind.css'
+import { PageHeader } from '@/components/layout/PageHeader'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -34,15 +35,11 @@ export default function ForestManagement () {
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
-      <div className="flex items-center gap-4">
-        <BackButton />
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Forest Management</h1>
-          <p className="text-muted-foreground">
-            Manage Active Directory forest settings and directory service configuration
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Forest Management"
+        description="Manage Active Directory forest settings and directory service configuration"
+        showBackButton={true}
+      />
 
       {/* Forest Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

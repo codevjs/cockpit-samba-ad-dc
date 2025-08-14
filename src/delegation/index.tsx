@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Providers } from '@/lib/providers'
 import '../user/tailwind.css'
+import { PageHeader } from '@/components/layout/PageHeader'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -61,15 +62,11 @@ export default function DelegationManagement () {
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
-      <div className="flex items-center gap-4">
-        <BackButton />
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Delegation Management</h1>
-          <p className="text-muted-foreground">
-            Manage Kerberos delegation settings for service accounts
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Delegation Management"
+        description="Manage Kerberos delegation settings for service accounts"
+        showBackButton={true}
+      />
 
       {/* Account Search */}
       <Card>

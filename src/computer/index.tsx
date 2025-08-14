@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Providers } from '@/lib/providers'
 import { Plus, Monitor, Search, Filter, HardDrive } from 'lucide-react'
 import '../user/tailwind.css'
+import { PageHeader } from '@/components/layout/PageHeader'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -59,26 +60,20 @@ function ComputerManagementPage ({ initialView = 'list' }: ComputerManagementPag
   return (
         <div className="min-h-screen bg-background">
             <div className="container mx-auto p-6 space-y-6">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Computer Management</h1>
-                        <p className="text-muted-foreground">
-                            Manage Active Directory computer accounts and domain-joined machines
-                        </p>
-                    </div>
-                    <div className="flex gap-2">
-                        <CreateComputerDialog
-                            onComputerCreated={refreshComputers}
-                            trigger={
-                                <Button>
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Create Computer
-                                </Button>
-                            }
-                        />
-                    </div>
-                </div>
+                <PageHeader
+                    title="Computer Management"
+                    description="Manage Active Directory computer accounts and domain-joined machines"
+                >
+                    <CreateComputerDialog
+                        onComputerCreated={refreshComputers}
+                        trigger={
+                            <Button>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create Computer
+                            </Button>
+                        }
+                    />
+                </PageHeader>
 
                 {/* Statistics Cards */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

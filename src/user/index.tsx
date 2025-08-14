@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Providers } from '@/lib/providers'
 import { Plus, Users, Search, Filter } from 'lucide-react'
 import './tailwind.css'
+import { PageHeader } from '@/components/layout/PageHeader'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -70,27 +71,21 @@ function UserManagementPage ({ initialView = 'list' }: UserManagementPageProps) 
 
   return (
         <div className="min-h-screen bg-background">
+            <PageHeader
+                title="User Management"
+                description="Manage Active Directory users, groups, and permissions"
+            >
+                <CreateUserDialog
+                    onUserCreated={refreshUsers}
+                    trigger={
+                        <Button>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Create User
+                        </Button>
+                    }
+                />
+            </PageHeader>
             <div className="container mx-auto p-6 space-y-6">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-                        <p className="text-muted-foreground">
-                            Manage Active Directory users, groups, and permissions
-                        </p>
-                    </div>
-                    <div className="flex gap-2">
-                        <CreateUserDialog
-                            onUserCreated={refreshUsers}
-                            trigger={
-                                <Button>
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Create User
-                                </Button>
-                            }
-                        />
-                    </div>
-                </div>
 
                 {/* Statistics Cards */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
