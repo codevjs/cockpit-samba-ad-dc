@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Providers } from '@/lib/providers'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -201,3 +203,16 @@ export default function ContactManagementPage ({ initialView = 'list' }: Contact
     </div>
   )
 }
+
+// Entry point for standalone Contact management page
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('contact')
+  if (container) {
+    const root = createRoot(container)
+    root.render(
+      <Providers>
+        <ContactManagementPage />
+      </Providers>
+    )
+  }
+})

@@ -1,0 +1,1 @@
+cockpit.locale = cockpit.locale || {};

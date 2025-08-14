@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Providers } from '@/lib/providers'
 import { Plus, Users, Search, Filter } from 'lucide-react'
 import './tailwind.css'
 
@@ -273,7 +274,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('user')
   if (container) {
     const root = createRoot(container)
-    root.render(<UserManagementPage />)
+    root.render(
+      <Providers>
+        <UserManagementPage />
+      </Providers>
+    )
   }
 })
 

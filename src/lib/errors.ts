@@ -250,7 +250,7 @@ export class RetryHandler {
       shouldRetry = ErrorHandler.isRetryableError
     } = options
 
-    let lastError: APIError
+    let lastError: APIError | undefined
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {

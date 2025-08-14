@@ -1,0 +1,1 @@
+cockpit.manifests = cockpit.manifests || {};

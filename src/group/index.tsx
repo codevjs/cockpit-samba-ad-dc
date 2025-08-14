@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Providers } from '@/lib/providers'
 import { Plus, Users, Search, Filter } from 'lucide-react'
 import '../user/tailwind.css'
 
@@ -276,7 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('group')
   if (container) {
     const root = createRoot(container)
-    root.render(<GroupManagementPage />)
+    root.render(
+      <Providers>
+        <GroupManagementPage />
+      </Providers>
+    )
   }
 })
 

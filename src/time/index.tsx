@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Providers } from '@/lib/providers'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -232,3 +234,16 @@ export default function TimeManagement () {
     </div>
   )
 }
+
+// Entry point for standalone Time management page
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('time')
+  if (container) {
+    const root = createRoot(container)
+    root.render(
+      <Providers>
+        <TimeManagement />
+      </Providers>
+    )
+  }
+})

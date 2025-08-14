@@ -1,10 +1,10 @@
 const path = require("path");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const copy = require("copy-webpack-plugin");
+const extract = require("mini-css-extract-plugin");
 const fs = require("fs");
 const webpack = require("webpack");
 const CompressionPlugin = require("compression-webpack-plugin");
-const ESLintPlugin = require('eslint-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 var externals = {
     cockpit: "cockpit",
@@ -91,6 +91,7 @@ var info = {
         ]
     },
     files: [
+        "globals.css",
         "index.html",
         "computer/computer.html",
         "domain/domain.html",
@@ -109,6 +110,8 @@ var info = {
         "dsacl/dsacl.html",
         "ntacl/ntacl.html",
         "manifest.json",
+        "po.js",
+        "po.manifest.js",
     ],
 };
 
@@ -136,13 +139,13 @@ function vpath(/* ... */) {
 }
 
 /* Qualify all the paths in entries */
-Object.keys(info.entries).forEach(function(key) {
+Object.keys(info.entries).forEach(function (key) {
     if (section && key.indexOf(section) !== 0) {
         delete info.entries[key];
         return;
     }
 
-    info.entries[key] = info.entries[key].map(function(value) {
+    info.entries[key] = info.entries[key].map(function (value) {
         if (value.indexOf("/") === -1)
             return value;
         else
@@ -152,23 +155,16 @@ Object.keys(info.entries).forEach(function(key) {
 
 /* Qualify all the paths in files listed */
 var files = [];
-info.files.forEach(function(value) {
+info.files.forEach(function (value) {
     if (!section || value.indexOf(section) === 0)
         files.push({ from: vpath(value), to: value });
 });
 info.files = files;
 
 var plugins = [
-    new CopyWebpackPlugin({
-        patterns: info.files
-    }),
-    new MiniCssExtractPlugin({ filename: "[name].css" }),
-    new ESLintPlugin({
-        extensions: ['js', 'jsx', 'ts', 'tsx'],
-        exclude: 'node_modules',
-        failOnError: false, // Allow build to continue with linting warnings
-        emitWarning: true
-    })
+    new copy({ patterns: info.files }),
+    new extract({ filename: "[name].css" }),
+    new MiniCssExtractPlugin()
 ];
 
 /* Only minimize when in production mode */
@@ -178,9 +174,9 @@ if (production) {
 
     plugins.unshift(new CompressionPlugin({
         filename: "[path][base].gz",
-        algorithm: "gzip",
         test: /\.(js|html)$/,
-        minRatio: 0.9
+        minRatio: 0.9,
+        deleteOriginalAssets: true
     }));
 }
 
@@ -197,8 +193,7 @@ var babel_loader = {
                     opera: "44"
                 }
             }],
-            "@babel/preset-react",
-            "@babel/preset-typescript"
+            "@babel/preset-react"
         ]
     }
 };
@@ -206,43 +201,109 @@ var babel_loader = {
 module.exports = {
     mode: production ? 'production' : 'development',
     resolve: {
-        modules: [ nodedir ],
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        modules: [nodedir],
         alias: {
             '@': path.resolve(__dirname, 'src'),
             '@/components': path.resolve(__dirname, 'src/components'),
-            '@/lib': path.resolve(__dirname, 'src/lib'),
+            '@/lib': path.resolve(__dirname, 'src/lib')
         },
+        extensions: ['.tsx', '.ts', '.js', '.jsx'],
     },
     entry: info.entries,
     externals: externals,
     output: output,
     devtool: "source-map",
+    devServer: {
+        static: {
+            directory: path.join(__dirname, 'dist'),
+        },
+        compress: true,
+        port: 9000,
+        hot: true,
+        open: false
+    },
     module: {
         rules: [
-            {
-                test: /\.(js|jsx)$/,
-                exclude: /node_modules/,
-                use: babel_loader,
-            },
             {
                 test: /\.(ts|tsx)$/,
                 exclude: /node_modules/,
                 use: [
-                    babel_loader,
                     {
                         loader: 'ts-loader',
                         options: {
-                            configFile: path.resolve(__dirname, 'tsconfig.json'),
                             transpileOnly: true,
                         },
                     },
                 ],
             },
             {
-                test: /\.s?css$/,
+                exclude: /node_modules/,
+                use: babel_loader,
+                test: /\.(js|jsx)$/
+            },
+            /* HACK: remove unwanted fonts from PatternFly's css */
+            {
+                test: /patternfly-4-cockpit.scss$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    extract.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            sourceMap: true,
+                            url: false
+                        }
+                    },
+                    {
+                        loader: 'string-replace-loader',
+                        options: {
+                            multiple: [
+                                {
+                                    search: /src:url\("patternfly-icons-fake-path\/pficon[^}]*/g,
+                                    replace: "src:url('fonts/patternfly.woff')format('woff');",
+                                },
+                                {
+                                    search: /@font-face[^}]*patternfly-fonts-fake-path[^}]*}/g,
+                                    replace: '',
+                                },
+                            ]
+                        },
+                    },
+                    {
+                        loader: 'resolve-url-loader'
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: true,
+                            outputStyle: 'compressed',
+                        },
+                    },
+                ]
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    extract.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            sourceMap: true,
+                            importLoaders: 1,
+                        }
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            sourceMap: true,
+                        },
+                    },
+                ]
+            },
+            {
+                test: /\.s[ac]ss$/,
+                exclude: /patternfly-4-cockpit.scss/,
+                use: [
+                    extract.loader,
                     {
                         loader: 'css-loader',
                         options: {
@@ -253,12 +314,7 @@ module.exports = {
                     {
                         loader: 'postcss-loader',
                         options: {
-                            postcssOptions: {
-                                plugins: [
-                                    require('tailwindcss'),
-                                    require('autoprefixer'),
-                                ],
-                            },
+                            sourceMap: true,
                         },
                     },
                     {
@@ -271,13 +327,5 @@ module.exports = {
             },
         ]
     },
-    plugins: plugins,
-    devServer: {
-        static: {
-            directory: path.join(__dirname, 'dist'),
-        },
-        compress: true,
-        port: 9000,
-        hot: true,
-    },
+    plugins: plugins
 };

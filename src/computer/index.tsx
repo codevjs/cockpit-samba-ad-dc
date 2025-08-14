@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Providers } from '@/lib/providers'
 import { Plus, Monitor, Search, Filter, HardDrive } from 'lucide-react'
 import '../user/tailwind.css'
 
@@ -271,7 +272,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('computer')
   if (container) {
     const root = createRoot(container)
-    root.render(<ComputerManagementPage />)
+    root.render(
+      <Providers>
+        <ComputerManagementPage />
+      </Providers>
+    )
   }
 })
 
