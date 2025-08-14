@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Providers } from '@/lib/providers'
+import '../user/tailwind.css'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -334,7 +335,7 @@ export default function OrganizationUnitManagement () {
 
 // Entry point for standalone Organization Unit management page
 document.addEventListener('DOMContentLoaded', () => {
-  const container = document.getElementById('organization_unit')
+  const container = document.getElementById('org-unit')
   if (container) {
     const root = createRoot(container)
     root.render(
